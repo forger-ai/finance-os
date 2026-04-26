@@ -1,0 +1,19 @@
+# Backend
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.ruff_cache/
+backend/.pytest_cache/
+backend/data/*.sqlite
+backend/data/*.sqlite-journal
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Editor
+.idea/
+.vscode/
+.DS_Store

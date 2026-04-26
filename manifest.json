@@ -1,0 +1,81 @@
+{
+  "name": "finance-os",
+  "version": "0.1.0",
+  "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
+  "author": "FinanceOS",
+  "license": "MIT",
+  "stack": {
+    "backend": {
+      "language": "python",
+      "framework": "fastapi",
+      "package_manager": "uv",
+      "database": "sqlite",
+      "python_version": "3.12"
+    },
+    "frontend": {
+      "language": "typescript",
+      "framework": "react",
+      "bundler": "vite",
+      "ui": "mui",
+      "node_version": "20"
+    }
+  },
+  "catalog": {
+    "display_name": "Finance OS",
+    "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
+    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances — all without sending your data anywhere.",
+    "category": "finance",
+    "permissions": ["app_data", "user_selected_imports", "app_exports", "ai_api"],
+    "supported_platforms": ["darwin_arm64", "darwin_x64"]
+  },
+  "services": [
+    {
+      "name": "backend",
+      "type": "http",
+      "context": "./backend",
+      "port": 8000,
+      "command": "uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+      "healthcheck": "/health",
+      "environment": {
+        "DATABASE_URL": "sqlite:////app/data/finance_os.sqlite",
+        "CORS_ORIGINS": "http://localhost:5180,http://127.0.0.1:5180"
+      },
+      "volumes": [
+        {
+          "source": "./backend",
+          "target": "/app"
+        },
+        {
+          "source": "./backend/data",
+          "target": "/app/data",
+          "persist": true
+        }
+      ]
+    },
+    {
+      "name": "frontend",
+      "type": "http",
+      "context": "./frontend",
+      "port": 5180,
+      "command": "npm run dev -- --host 0.0.0.0 --port 5180",
+      "environment": {
+        "VITE_API_BASE_URL": "http://localhost:8000"
+      },
+      "depends_on": ["backend"]
+    }
+  ],
+  "scripts": {
+    "init_db": "cd backend && uv run python scripts/init_db.py",
+    "seed": "cd backend && uv run python scripts/seed.py",
+    "list_categories": "cd backend && uv run python scripts/list_categories.py",
+    "list_movements": "cd backend && uv run python scripts/list_movements.py",
+    "import_movements": "cd backend && uv run python scripts/import_movements.py",
+    "upsert_categories": "cd backend && uv run python scripts/upsert_categories.py",
+    "edit_movement": "cd backend && uv run python scripts/edit_movement.py",
+    "delete_movement": "cd backend && uv run python scripts/delete_movement.py",
+    "verify": "cd backend && uv run python scripts/verify.py"
+  },
+  "skills": [
+    "./skills/load-movements"
+  ]
+}

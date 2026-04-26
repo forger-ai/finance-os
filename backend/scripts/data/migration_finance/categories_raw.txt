@@ -1,0 +1,430 @@
+
+> finance@0.1.0 db:list:categories
+> node scripts/db/list-categories.mjs
+
+[
+  {
+    "id": "cmodpib100000pj7vctmm0ml8",
+    "name": "Income",
+    "kind": "INCOME",
+    "budget": null,
+    "createdAt": "2026-04-25T02:14:50.965Z",
+    "updatedAt": "2026-04-25T02:43:05.616Z",
+    "subcategories": [
+      {
+        "id": "cmodpib180004pj7vgl0eshpb",
+        "name": "Bono",
+        "budget": null,
+        "categoryId": "cmodpib100000pj7vctmm0ml8",
+        "createdAt": "2026-04-25T02:14:50.972Z",
+        "updatedAt": "2026-04-25T02:14:50.972Z"
+      },
+      {
+        "id": "cmodpib190006pj7v53cqjq7c",
+        "name": "Devolucion",
+        "budget": null,
+        "categoryId": "cmodpib100000pj7vctmm0ml8",
+        "createdAt": "2026-04-25T02:14:50.973Z",
+        "updatedAt": "2026-04-25T02:14:50.973Z"
+      },
+      {
+        "id": "cmodpib190008pj7v52kiwxaa",
+        "name": "Reembolso",
+        "budget": null,
+        "categoryId": "cmodpib100000pj7vctmm0ml8",
+        "createdAt": "2026-04-25T02:14:50.974Z",
+        "updatedAt": "2026-04-25T02:14:50.974Z"
+      },
+      {
+        "id": "cmodqimmv000apjyocim6klx7",
+        "name": "Retiro ahorro",
+        "budget": null,
+        "categoryId": "cmodpib100000pj7vctmm0ml8",
+        "createdAt": "2026-04-25T02:43:05.624Z",
+        "updatedAt": "2026-04-25T02:43:05.624Z"
+      },
+      {
+        "id": "cmodpib150002pj7vaykzgo39",
+        "name": "Sueldo",
+        "budget": null,
+        "categoryId": "cmodpib100000pj7vctmm0ml8",
+        "createdAt": "2026-04-25T02:14:50.970Z",
+        "updatedAt": "2026-04-25T02:14:50.970Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1f000kpj7v07yp93cp",
+    "name": "Ahorro",
+    "kind": "EXPENSE",
+    "budget": "700000",
+    "createdAt": "2026-04-25T02:14:50.979Z",
+    "updatedAt": "2026-04-25T02:43:05.628Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1g000opj7vhk1uivxw",
+        "name": "Ahorro corto plazo",
+        "budget": null,
+        "categoryId": "cmodpib1f000kpj7v07yp93cp",
+        "createdAt": "2026-04-25T02:14:50.981Z",
+        "updatedAt": "2026-04-25T02:14:50.981Z"
+      },
+      {
+        "id": "cmodpib1f000mpj7v1tof0907",
+        "name": "Fondo de emergencia",
+        "budget": null,
+        "categoryId": "cmodpib1f000kpj7v07yp93cp",
+        "createdAt": "2026-04-25T02:14:50.980Z",
+        "updatedAt": "2026-04-25T02:14:50.980Z"
+      },
+      {
+        "id": "cmodpib1h000qpj7v9xvzrdap",
+        "name": "Inversion",
+        "budget": null,
+        "categoryId": "cmodpib1f000kpj7v07yp93cp",
+        "createdAt": "2026-04-25T02:14:50.981Z",
+        "updatedAt": "2026-04-25T02:14:50.981Z"
+      },
+      {
+        "id": "cmodpib1h000spj7vnr8bk3go",
+        "name": "Meta grande",
+        "budget": null,
+        "categoryId": "cmodpib1f000kpj7v07yp93cp",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:14:50.982Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1a0009pj7v4ggxua5t",
+    "name": "Esencial fijo",
+    "kind": "EXPENSE",
+    "budget": "900000",
+    "createdAt": "2026-04-25T02:14:50.975Z",
+    "updatedAt": "2026-04-25T02:43:05.625Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1b000bpj7v5n7c1lya",
+        "name": "Arriendo",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:14:50.975Z"
+      },
+      {
+        "id": "cmodpib1e000jpj7vym2dyncx",
+        "name": "Banco y mantenciones",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T02:14:50.979Z",
+        "updatedAt": "2026-04-25T02:14:50.979Z"
+      },
+      {
+        "id": "cmodpib1c000dpj7vwvkqf6rf",
+        "name": "Gastos comunes",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T02:14:50.976Z",
+        "updatedAt": "2026-04-25T02:14:50.976Z"
+      },
+      {
+        "id": "cmodpib1d000fpj7vu9th7jly",
+        "name": "Internet y telefono",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T02:14:50.977Z",
+        "updatedAt": "2026-04-25T02:14:50.977Z"
+      },
+      {
+        "id": "cmodpib1d000hpj7vlp428jst",
+        "name": "Luz",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T02:14:50.978Z",
+        "updatedAt": "2026-04-25T02:14:50.978Z"
+      },
+      {
+        "id": "cmodt705r0001p83m1fz7mp6w",
+        "name": "Supermercado",
+        "budget": null,
+        "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+        "createdAt": "2026-04-25T03:58:02.127Z",
+        "updatedAt": "2026-04-25T03:58:02.127Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1i000tpj7v3xr02mks",
+    "name": "Esencial variable",
+    "kind": "EXPENSE",
+    "budget": "650000",
+    "createdAt": "2026-04-25T02:14:50.982Z",
+    "updatedAt": "2026-04-25T02:43:05.631Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1k000zpj7vv31ijuut",
+        "name": "Bencina",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:14:50.984Z",
+        "updatedAt": "2026-04-25T02:14:50.984Z"
+      },
+      {
+        "id": "cmodpib1k0011pj7vdy5rkuao",
+        "name": "Farmacia",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:14:50.985Z",
+        "updatedAt": "2026-04-25T02:14:50.985Z"
+      },
+      {
+        "id": "cmodpib1l0015pj7vlrqw2bnm",
+        "name": "Hogar basico",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:14:50.986Z"
+      },
+      {
+        "id": "cmodpib1l0013pj7v00osfi9e",
+        "name": "Mara",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:14:50.985Z",
+        "updatedAt": "2026-04-25T02:14:50.985Z"
+      },
+      {
+        "id": "cmodq7xvf000xpjuc6xpz035r",
+        "name": "Minimarket",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:34:46.971Z",
+        "updatedAt": "2026-04-25T02:34:46.971Z"
+      },
+      {
+        "id": "cmodpib1j000xpj7vagacnobo",
+        "name": "Transporte",
+        "budget": null,
+        "categoryId": "cmodpib1i000tpj7v3xr02mks",
+        "createdAt": "2026-04-25T02:14:50.984Z",
+        "updatedAt": "2026-04-25T02:14:50.984Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1t001spj7vh7kvtpy2",
+    "name": "Extraordinario",
+    "kind": "EXPENSE",
+    "budget": "200000",
+    "createdAt": "2026-04-25T02:14:50.994Z",
+    "updatedAt": "2026-04-25T02:43:05.641Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1w0022pj7vjkxdv4kb",
+        "name": "Emergencias",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.997Z",
+        "updatedAt": "2026-04-25T02:14:50.997Z"
+      },
+      {
+        "id": "cmodpib1w0020pj7ve7eymhb8",
+        "name": "Regalos",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.996Z",
+        "updatedAt": "2026-04-25T02:14:50.996Z"
+      },
+      {
+        "id": "cmodpib1x0024pj7vo9l5ua09",
+        "name": "Reparaciones",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:14:50.998Z"
+      },
+      {
+        "id": "cmodpib1u001upj7vji0f07io",
+        "name": "Salud mayor",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:14:50.994Z"
+      },
+      {
+        "id": "cmodpib1v001ypj7vlwlpe32a",
+        "name": "Tramites",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.995Z",
+        "updatedAt": "2026-04-25T02:14:50.995Z"
+      },
+      {
+        "id": "cmodpib1u001wpj7vnmzwvxka",
+        "name": "Viajes",
+        "budget": null,
+        "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+        "createdAt": "2026-04-25T02:14:50.995Z",
+        "updatedAt": "2026-04-25T02:14:50.995Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1m0016pj7vlafzg7t7",
+    "name": "No esencial",
+    "kind": "EXPENSE",
+    "budget": "300000",
+    "createdAt": "2026-04-25T02:14:50.986Z",
+    "updatedAt": "2026-04-25T02:43:05.634Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1o001cpj7v02qdjm44",
+        "name": "Cafe",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.988Z",
+        "updatedAt": "2026-04-25T02:14:50.988Z"
+      },
+      {
+        "id": "cmodpib1q001ipj7vzz2j5of7",
+        "name": "Compras",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.990Z",
+        "updatedAt": "2026-04-25T04:00:06.402Z"
+      },
+      {
+        "id": "cmodpib1m0018pj7vj2ixk6t5",
+        "name": "Delivery",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.987Z",
+        "updatedAt": "2026-04-25T02:14:50.987Z"
+      },
+      {
+        "id": "cmodqimn8001kpjyoe2hdkqvt",
+        "name": "Entretencion",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:43:05.636Z",
+        "updatedAt": "2026-04-25T02:43:05.636Z"
+      },
+      {
+        "id": "cmodqimn8001mpjyoc0pinlvv",
+        "name": "Mara",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:43:05.636Z",
+        "updatedAt": "2026-04-25T02:43:05.636Z"
+      },
+      {
+        "id": "cmodpib1n001apj7v5zq91a3x",
+        "name": "Restaurantes",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.987Z",
+        "updatedAt": "2026-04-25T02:14:50.987Z"
+      },
+      {
+        "id": "cmodpib1p001gpj7vwmnlc2pm",
+        "name": "Ropa",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.990Z",
+        "updatedAt": "2026-04-25T02:14:50.990Z"
+      },
+      {
+        "id": "cmodpib1p001epj7vmue7ioy2",
+        "name": "Salidas",
+        "budget": null,
+        "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+        "createdAt": "2026-04-25T02:14:50.989Z",
+        "updatedAt": "2026-04-25T02:14:50.989Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1q001jpj7vdyoizcqv",
+    "name": "Suscripciones",
+    "kind": "EXPENSE",
+    "budget": "100000",
+    "createdAt": "2026-04-25T02:14:50.991Z",
+    "updatedAt": "2026-04-25T02:43:05.638Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1s001ppj7vyz9o1bo6",
+        "name": "Apps",
+        "budget": null,
+        "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+        "createdAt": "2026-04-25T02:14:50.993Z",
+        "updatedAt": "2026-04-25T02:14:50.993Z"
+      },
+      {
+        "id": "cmodpib1s001npj7v9gy0ctai",
+        "name": "Herramientas",
+        "budget": null,
+        "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+        "createdAt": "2026-04-25T02:14:50.992Z",
+        "updatedAt": "2026-04-25T02:14:50.992Z"
+      },
+      {
+        "id": "cmodpib1t001rpj7vaquvziw5",
+        "name": "Membresias",
+        "budget": null,
+        "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+        "createdAt": "2026-04-25T02:14:50.993Z",
+        "updatedAt": "2026-04-25T02:14:50.993Z"
+      },
+      {
+        "id": "cmodpib1r001lpj7vz8t5a65r",
+        "name": "Streaming",
+        "budget": null,
+        "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+        "createdAt": "2026-04-25T02:14:50.991Z",
+        "updatedAt": "2026-04-25T02:14:50.991Z"
+      }
+    ]
+  },
+  {
+    "id": "cmodpib1y0025pj7vsy9hzxcd",
+    "name": "No cobrable",
+    "kind": "UNCHARGEABLE",
+    "budget": null,
+    "createdAt": "2026-04-25T02:14:50.998Z",
+    "updatedAt": "2026-04-25T02:43:05.644Z",
+    "subcategories": [
+      {
+        "id": "cmodpib1z0029pj7vjo6yox5l",
+        "name": "Ajuste",
+        "budget": null,
+        "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+        "createdAt": "2026-04-25T02:14:50.999Z",
+        "updatedAt": "2026-04-25T02:14:50.999Z"
+      },
+      {
+        "id": "cmodpib20002dpj7vcrvcjsfj",
+        "name": "Dinero por rendir",
+        "budget": null,
+        "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+        "createdAt": "2026-04-25T02:14:51.000Z",
+        "updatedAt": "2026-04-25T02:14:51.000Z"
+      },
+      {
+        "id": "cmodpib1z002bpj7vyeczarn7",
+        "name": "Movimiento entre cuentas",
+        "budget": null,
+        "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+        "createdAt": "2026-04-25T02:14:51.000Z",
+        "updatedAt": "2026-04-25T02:14:51.000Z"
+      },
+      {
+        "id": "cmodpib1y0027pj7v8djfnc8f",
+        "name": "Transferencia interna",
+        "budget": null,
+        "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+        "createdAt": "2026-04-25T02:14:50.999Z",
+        "updatedAt": "2026-04-25T02:14:50.999Z"
+      }
+    ]
+  }
+]

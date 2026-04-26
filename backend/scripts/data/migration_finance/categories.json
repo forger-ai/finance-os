@@ -1,0 +1,101 @@
+[
+  {
+    "name": "Income",
+    "kind": "INCOME",
+    "budget": null,
+    "subcategories": [
+      "Bono",
+      "Devolucion",
+      "Reembolso",
+      "Retiro ahorro",
+      "Sueldo"
+    ]
+  },
+  {
+    "name": "Ahorro",
+    "kind": "EXPENSE",
+    "budget": "700000",
+    "subcategories": [
+      "Ahorro corto plazo",
+      "Fondo de emergencia",
+      "Inversion",
+      "Meta grande"
+    ]
+  },
+  {
+    "name": "Esencial fijo",
+    "kind": "EXPENSE",
+    "budget": "900000",
+    "subcategories": [
+      "Arriendo",
+      "Banco y mantenciones",
+      "Gastos comunes",
+      "Internet y telefono",
+      "Luz",
+      "Supermercado"
+    ]
+  },
+  {
+    "name": "Esencial variable",
+    "kind": "EXPENSE",
+    "budget": "650000",
+    "subcategories": [
+      "Bencina",
+      "Farmacia",
+      "Hogar basico",
+      "Mara",
+      "Minimarket",
+      "Transporte"
+    ]
+  },
+  {
+    "name": "Extraordinario",
+    "kind": "EXPENSE",
+    "budget": "200000",
+    "subcategories": [
+      "Emergencias",
+      "Regalos",
+      "Reparaciones",
+      "Salud mayor",
+      "Tramites",
+      "Viajes"
+    ]
+  },
+  {
+    "name": "No esencial",
+    "kind": "EXPENSE",
+    "budget": "300000",
+    "subcategories": [
+      "Cafe",
+      "Compras",
+      "Delivery",
+      "Entretencion",
+      "Mara",
+      "Restaurantes",
+      "Ropa",
+      "Salidas"
+    ]
+  },
+  {
+    "name": "Suscripciones",
+    "kind": "EXPENSE",
+    "budget": "100000",
+    "subcategories": [
+      "Apps",
+      "Herramientas",
+      "Membresias",
+      "Streaming"
+    ]
+  },
+  {
+    "name": "No cobrable",
+    "kind": "UNCHARGEABLE",
+    "budget": null,
+    "subcategories": [
+      "Ajuste",
+      "Dinero por rendir",
+      "Movimiento entre cuentas",
+      "Transferencia interna"
+    ]
+  }
+]

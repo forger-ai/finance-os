@@ -1,0 +1,3486 @@
+
+> finance@0.1.0 db:list:movements
+> node scripts/db/list-movements.mjs --limit 100000
+
+[
+  {
+    "id": "cmodqp6pg0009pj399lvt78dl",
+    "date": "2026-04-27T00:00:00.000Z",
+    "accountingDate": "2026-04-27T00:00:00.000Z",
+    "amount": "4097808",
+    "business": "Retiro ahorro",
+    "reason": "Retiro desde ahorro",
+    "source": "BANK",
+    "rawDescription": "COBRO VVISTA 026444043503-00001 OTROS",
+    "reviewed": true,
+    "subcategoryId": "cmodqimmv000apjyocim6klx7",
+    "createdAt": "2026-04-25T02:48:11.572Z",
+    "updatedAt": "2026-04-25T02:57:32.779Z",
+    "subcategory": {
+      "id": "cmodqimmv000apjyocim6klx7",
+      "name": "Retiro ahorro",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:43:05.624Z",
+      "updatedAt": "2026-04-25T02:43:05.624Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pf0007pj39os08rtcn",
+    "date": "2026-04-27T00:00:00.000Z",
+    "accountingDate": "2026-04-27T00:00:00.000Z",
+    "amount": "448053",
+    "business": "Transferencia propia",
+    "reason": "Transferencia a cuenta propia",
+    "source": "BANK",
+    "rawDescription": "0190897494 TRANSF A FELIPE IGNACIO PEZOA PINOCHET",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.571Z",
+    "updatedAt": "2026-04-25T02:57:36.957Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pe0005pj391yekgid2",
+    "date": "2026-04-27T00:00:00.000Z",
+    "accountingDate": "2026-04-27T00:00:00.000Z",
+    "amount": "1504907",
+    "business": "Pago tarjeta credito",
+    "reason": "Pago tarjeta",
+    "source": "BANK",
+    "rawDescription": "Traspaso Internet a T. Crédito",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.571Z",
+    "updatedAt": "2026-04-25T02:57:40.618Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pd0003pj391uzhn1ae",
+    "date": "2026-04-27T00:00:00.000Z",
+    "accountingDate": "2026-04-27T00:00:00.000Z",
+    "amount": "123985",
+    "business": "Compra de divisas",
+    "reason": "Conversion de moneda",
+    "source": "BANK",
+    "rawDescription": "Egreso por Compra de Divisas",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.569Z",
+    "updatedAt": "2026-04-25T03:00:55.652Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6p80001pj39b0lc98j9",
+    "date": "2026-04-27T00:00:00.000Z",
+    "accountingDate": "2026-04-27T00:00:00.000Z",
+    "amount": "10876",
+    "business": "Compra de divisas",
+    "reason": "Conversion de moneda",
+    "source": "BANK",
+    "rawDescription": "Egreso por Compra de Divisas",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.565Z",
+    "updatedAt": "2026-04-25T03:00:56.583Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pg000bpj391vucwe8d",
+    "date": "2026-04-23T00:00:00.000Z",
+    "accountingDate": "2026-04-23T00:00:00.000Z",
+    "amount": "63000",
+    "business": "Claudio Pezoa",
+    "reason": "Transferencia recibida",
+    "source": "BANK",
+    "rawDescription": "0094975166 TRANSF. PEZOA MUNOZ CLAUDIO ANDRES",
+    "reviewed": true,
+    "subcategoryId": "cmodpib190008pj7v52kiwxaa",
+    "createdAt": "2026-04-25T02:48:11.573Z",
+    "updatedAt": "2026-04-25T03:01:29.924Z",
+    "subcategory": {
+      "id": "cmodpib190008pj7v52kiwxaa",
+      "name": "Reembolso",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:14:50.974Z",
+      "updatedAt": "2026-04-25T02:14:50.974Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ph000dpj39tr21flif",
+    "date": "2026-04-22T00:00:00.000Z",
+    "accountingDate": "2026-04-22T00:00:00.000Z",
+    "amount": "200000",
+    "business": "Pago tarjeta credito",
+    "reason": "Pago tarjeta",
+    "source": "BANK",
+    "rawDescription": "Traspaso Internet a T. Crédito",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.574Z",
+    "updatedAt": "2026-04-25T03:01:31.767Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rn0059pj3af8ket207",
+    "date": "2026-04-21T00:00:00.000Z",
+    "accountingDate": "2026-04-21T00:00:00.000Z",
+    "amount": "62810",
+    "business": "ANA MARIA",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ANA MARIA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.651Z",
+    "updatedAt": "2026-04-25T03:23:27.406Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rm0057pj3aaqxn446x",
+    "date": "2026-04-20T00:00:00.000Z",
+    "accountingDate": "2026-04-20T00:00:00.000Z",
+    "amount": "1600",
+    "business": "HASS COPY LTDA",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "HASS COPY LTDA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.651Z",
+    "updatedAt": "2026-04-25T03:24:10.039Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rm0055pj3aevxf06lv",
+    "date": "2026-04-20T00:00:00.000Z",
+    "accountingDate": "2026-04-20T00:00:00.000Z",
+    "amount": "12880",
+    "business": "Netflix",
+    "reason": "Suscripcion streaming",
+    "source": "CREDIT_CARD",
+    "rawDescription": "NETFLIX",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1r001lpj7vz8t5a65r",
+    "createdAt": "2026-04-25T02:48:11.651Z",
+    "updatedAt": "2026-04-25T03:24:03.191Z",
+    "subcategory": {
+      "id": "cmodpib1r001lpj7vz8t5a65r",
+      "name": "Streaming",
+      "budget": null,
+      "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+      "createdAt": "2026-04-25T02:14:50.991Z",
+      "updatedAt": "2026-04-25T02:14:50.991Z",
+      "category": {
+        "id": "cmodpib1q001jpj7vdyoizcqv",
+        "name": "Suscripciones",
+        "kind": "EXPENSE",
+        "budget": "100000",
+        "createdAt": "2026-04-25T02:14:50.991Z",
+        "updatedAt": "2026-04-25T02:43:05.638Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rm0053pj3ai76kuorw",
+    "date": "2026-04-20T00:00:00.000Z",
+    "accountingDate": "2026-04-20T00:00:00.000Z",
+    "amount": "42861",
+    "business": "Enel",
+    "reason": "Cuenta de luz",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ENEL",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1d000hpj7vlp428jst",
+    "createdAt": "2026-04-25T02:48:11.650Z",
+    "updatedAt": "2026-04-25T03:25:19.856Z",
+    "subcategory": {
+      "id": "cmodpib1d000hpj7vlp428jst",
+      "name": "Luz",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.978Z",
+      "updatedAt": "2026-04-25T02:14:50.978Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rl0051pj3axptwy0b3",
+    "date": "2026-04-20T00:00:00.000Z",
+    "accountingDate": "2026-04-20T00:00:00.000Z",
+    "amount": "700",
+    "business": "MERCADOPAGO*GRANADAPARK",
+    "reason": "Salida o panorama",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*GRANADAPARK",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.650Z",
+    "updatedAt": "2026-04-25T03:25:17.074Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rl004zpj3aumeh0sud",
+    "date": "2026-04-20T00:00:00.000Z",
+    "accountingDate": "2026-04-20T00:00:00.000Z",
+    "amount": "37139",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.649Z",
+    "updatedAt": "2026-04-25T03:25:22.180Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rk004xpj3a34d9dr6b",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "9670",
+    "business": "TOMMY BEANS ALTOLASCONDES",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TOMMY BEANS ALTOLASCONDES",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.649Z",
+    "updatedAt": "2026-04-25T03:34:06.581Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rk004vpj3adt3diygl",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "3150",
+    "business": "PARKING ALTO LAS CONDES",
+    "reason": "Salida o panorama",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PARKING ALTO LAS CONDES",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.649Z",
+    "updatedAt": "2026-04-25T03:34:03.923Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rj004rpj3aa89w7zef",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "7990",
+    "business": "Botilleria",
+    "reason": "Entretencion",
+    "source": "CREDIT_CARD",
+    "rawDescription": "BOTILLERIA",
+    "reviewed": true,
+    "subcategoryId": "cmodqimn8001kpjyoe2hdkqvt",
+    "createdAt": "2026-04-25T02:48:11.648Z",
+    "updatedAt": "2026-04-25T03:34:17.075Z",
+    "subcategory": {
+      "id": "cmodqimn8001kpjyoe2hdkqvt",
+      "name": "Entretencion",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:43:05.636Z",
+      "updatedAt": "2026-04-25T02:43:05.636Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rk004tpj3axskwfrmf",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "9640",
+    "business": "JUMBO BILBAO",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "JUMBO BILBAO",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.648Z",
+    "updatedAt": "2026-04-25T03:58:02.137Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ri004npj3allshgiyy",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "11450",
+    "business": "13753BK ALTO LAS COND",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "13753BK ALTO LAS COND",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.647Z",
+    "updatedAt": "2026-04-25T03:51:30.929Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rj004ppj3apcgazkon",
+    "date": "2026-04-18T00:00:00.000Z",
+    "accountingDate": "2026-04-18T00:00:00.000Z",
+    "amount": "16990",
+    "business": "GLAM ALTO LAS CONDES",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "GLAM ALTO LAS CONDES",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.647Z",
+    "updatedAt": "2026-04-25T03:34:26.169Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ri004lpj3a0wdjuvss",
+    "date": "2026-04-17T00:00:00.000Z",
+    "accountingDate": "2026-04-17T00:00:00.000Z",
+    "amount": "11190",
+    "business": "NOTARIO EXPRESS",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "NOTARIO EXPRESS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.646Z",
+    "updatedAt": "2026-04-25T03:51:33.283Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rh004hpj3a27owvvnf",
+    "date": "2026-04-17T00:00:00.000Z",
+    "accountingDate": "2026-04-17T00:00:00.000Z",
+    "amount": "28546",
+    "business": "TEMU.COM",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TEMU.COM",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.646Z",
+    "updatedAt": "2026-04-25T03:55:59.822Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ri004jpj3aje39q9ij",
+    "date": "2026-04-17T00:00:00.000Z",
+    "accountingDate": "2026-04-17T00:00:00.000Z",
+    "amount": "9370",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.646Z",
+    "updatedAt": "2026-04-25T03:51:35.002Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rh004fpj3aqujclku5",
+    "date": "2026-04-17T00:00:00.000Z",
+    "accountingDate": "2026-04-17T00:00:00.000Z",
+    "amount": "1400",
+    "business": "EL QUINTAL PANADERIA SPA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "EL QUINTAL PANADERIA SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.645Z",
+    "updatedAt": "2026-04-25T03:58:31.091Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rg004dpj3ac16aeaul",
+    "date": "2026-04-16T00:00:00.000Z",
+    "accountingDate": "2026-04-16T00:00:00.000Z",
+    "amount": "26273",
+    "business": "UNIMARC LOS LEONES",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "UNIMARC LOS LEONES",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.645Z",
+    "updatedAt": "2026-04-25T03:58:33.222Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rf0049pj3a0c7hz6l1",
+    "date": "2026-04-16T00:00:00.000Z",
+    "accountingDate": "2026-04-16T00:00:00.000Z",
+    "amount": "6500",
+    "business": "LA POLLOTEKA SPA",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "LA POLLOTEKA SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.644Z",
+    "updatedAt": "2026-04-25T03:58:53.392Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rg004bpj3ax5x95phd",
+    "date": "2026-04-16T00:00:00.000Z",
+    "accountingDate": "2026-04-16T00:00:00.000Z",
+    "amount": "1500",
+    "business": "MERCADOPAGO*COMDONQUIJOTE",
+    "reason": "Snack o compra menor",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*COMDONQUIJOTE",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.644Z",
+    "updatedAt": "2026-04-25T03:58:40.938Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pi000fpj39xgk12mks",
+    "date": "2026-04-16T00:00:00.000Z",
+    "accountingDate": "2026-04-16T00:00:00.000Z",
+    "amount": "33710",
+    "business": "Khipu",
+    "reason": "Compra no esencial",
+    "source": "BANK",
+    "rawDescription": "0761872877 TRANSF A KHIPU CLBS F",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.574Z",
+    "updatedAt": "2026-04-25T03:58:56.429Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6re0045pj3aeeoaneh2",
+    "date": "2026-04-15T00:00:00.000Z",
+    "accountingDate": "2026-04-15T00:00:00.000Z",
+    "amount": "4500",
+    "business": "LA PAJARERA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "LA PAJARERA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.643Z",
+    "updatedAt": "2026-04-25T03:59:59.222Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rf0047pj3ak6z5hpu2",
+    "date": "2026-04-15T00:00:00.000Z",
+    "accountingDate": "2026-04-15T00:00:00.000Z",
+    "amount": "2430",
+    "business": "LAS ESPIGAS",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "LAS ESPIGAS",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.643Z",
+    "updatedAt": "2026-04-25T04:00:10.276Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6re0043pj3a3kd0xsc0",
+    "date": "2026-04-14T00:00:00.000Z",
+    "accountingDate": "2026-04-14T00:00:00.000Z",
+    "amount": "102565",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.642Z",
+    "updatedAt": "2026-04-25T04:00:21.264Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rd0041pj3auf1rjpgm",
+    "date": "2026-04-13T00:00:00.000Z",
+    "accountingDate": "2026-04-13T00:00:00.000Z",
+    "amount": "25990",
+    "business": "Entel Hogar",
+    "reason": "Internet hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ENTEL HOGAR",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1d000fpj7vu9th7jly",
+    "createdAt": "2026-04-25T02:48:11.642Z",
+    "updatedAt": "2026-04-25T04:00:23.175Z",
+    "subcategory": {
+      "id": "cmodpib1d000fpj7vu9th7jly",
+      "name": "Internet y telefono",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.977Z",
+      "updatedAt": "2026-04-25T02:14:50.977Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rd003zpj3acgnu6dh9",
+    "date": "2026-04-13T00:00:00.000Z",
+    "accountingDate": "2026-04-13T00:00:00.000Z",
+    "amount": "3490",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.642Z",
+    "updatedAt": "2026-04-25T04:00:26.112Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rd003xpj3aj02oh4vb",
+    "date": "2026-04-13T00:00:00.000Z",
+    "accountingDate": "2026-04-13T00:00:00.000Z",
+    "amount": "3242",
+    "business": "TUU*EMPORIO MALLORCA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TUU*EMPORIO MALLORCA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.641Z",
+    "updatedAt": "2026-04-25T04:00:29.276Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rc003tpj3a286n590k",
+    "date": "2026-04-12T00:00:00.000Z",
+    "accountingDate": "2026-04-12T00:00:00.000Z",
+    "amount": "17462",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.641Z",
+    "updatedAt": "2026-04-25T04:00:31.471Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rc003vpj3al0ufj2f8",
+    "date": "2026-04-12T00:00:00.000Z",
+    "accountingDate": "2026-04-12T00:00:00.000Z",
+    "amount": "24199",
+    "business": "Salcobrand",
+    "reason": "Farmacia",
+    "source": "CREDIT_CARD",
+    "rawDescription": "SALCOBRAND",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1l0013pj7v00osfi9e",
+    "createdAt": "2026-04-25T02:48:11.641Z",
+    "updatedAt": "2026-04-25T04:00:41.243Z",
+    "subcategory": {
+      "id": "cmodpib1l0013pj7v00osfi9e",
+      "name": "Mara",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:14:50.985Z",
+      "updatedAt": "2026-04-25T02:14:50.985Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ro005fpj3ad3yvw9k6",
+    "date": "2026-04-11T00:00:00.000Z",
+    "accountingDate": "2026-04-11T00:00:00.000Z",
+    "amount": "969",
+    "business": "Impuesto DL 3475",
+    "reason": "Impuesto financiero",
+    "source": "CREDIT_CARD",
+    "rawDescription": "IMPTO. DECRETO LEY 3475",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.652Z",
+    "updatedAt": "2026-04-25T04:00:47.105Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rb003npj3abfrkmzgo",
+    "date": "2026-04-11T00:00:00.000Z",
+    "accountingDate": "2026-04-11T00:00:00.000Z",
+    "amount": "39490",
+    "business": "Medigestiva",
+    "reason": "Gasto de salud",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*MEDIGESTIVA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1w0022pj7vjkxdv4kb",
+    "createdAt": "2026-04-25T02:48:11.640Z",
+    "updatedAt": "2026-04-25T04:00:58.765Z",
+    "subcategory": {
+      "id": "cmodpib1w0022pj7vjkxdv4kb",
+      "name": "Emergencias",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.997Z",
+      "updatedAt": "2026-04-25T02:14:50.997Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rc003rpj3aurty7wxm",
+    "date": "2026-04-11T00:00:00.000Z",
+    "accountingDate": "2026-04-11T00:00:00.000Z",
+    "amount": "4500",
+    "business": "LA PAJARERA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "LA PAJARERA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.640Z",
+    "updatedAt": "2026-04-25T04:00:50.648Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rb003ppj3aft76p9i2",
+    "date": "2026-04-11T00:00:00.000Z",
+    "accountingDate": "2026-04-11T00:00:00.000Z",
+    "amount": "46946",
+    "business": "Adobe",
+    "reason": "Suscripcion herramienta",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ADOBE ADOBE",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1s001npj7v9gy0ctai",
+    "createdAt": "2026-04-25T02:48:11.640Z",
+    "updatedAt": "2026-04-25T04:00:49.053Z",
+    "subcategory": {
+      "id": "cmodpib1s001npj7v9gy0ctai",
+      "name": "Herramientas",
+      "budget": null,
+      "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+      "createdAt": "2026-04-25T02:14:50.992Z",
+      "updatedAt": "2026-04-25T02:14:50.992Z",
+      "category": {
+        "id": "cmodpib1q001jpj7vdyoizcqv",
+        "name": "Suscripciones",
+        "kind": "EXPENSE",
+        "budget": "100000",
+        "createdAt": "2026-04-25T02:14:50.991Z",
+        "updatedAt": "2026-04-25T02:43:05.638Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ra003jpj3az81vlms0",
+    "date": "2026-04-10T00:00:00.000Z",
+    "accountingDate": "2026-04-10T00:00:00.000Z",
+    "amount": "5400",
+    "business": "40547SBX MEGACENTER",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "40547SBX MEGACENTER",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.639Z",
+    "updatedAt": "2026-04-25T04:01:12.224Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rb003lpj3ass75xpn9",
+    "date": "2026-04-10T00:00:00.000Z",
+    "accountingDate": "2026-04-10T00:00:00.000Z",
+    "amount": "4880",
+    "business": "OPEN KENNEDY",
+    "reason": "Salida o panorama",
+    "source": "CREDIT_CARD",
+    "rawDescription": "OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.639Z",
+    "updatedAt": "2026-04-25T04:01:02.017Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ra003hpj3axg0ruilu",
+    "date": "2026-04-10T00:00:00.000Z",
+    "accountingDate": "2026-04-10T00:00:00.000Z",
+    "amount": "65450",
+    "business": "MUU STEAK PQA",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MUU STEAK PQA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.638Z",
+    "updatedAt": "2026-04-25T04:01:18.141Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r9003fpj3amjgfs4z1",
+    "date": "2026-04-10T00:00:00.000Z",
+    "accountingDate": "2026-04-10T00:00:00.000Z",
+    "amount": "12990",
+    "business": "H&M OPEN KENNEDY",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "H&M OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.638Z",
+    "updatedAt": "2026-04-25T04:01:15.938Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pj000hpj3989k3wv0f",
+    "date": "2026-04-10T00:00:00.000Z",
+    "accountingDate": "2026-04-10T00:00:00.000Z",
+    "amount": "50000",
+    "business": "Transferencia propia",
+    "reason": "Transferencia a cuenta propia",
+    "source": "BANK",
+    "rawDescription": "0190897494 TRANSF A FELIPE PEZOA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.575Z",
+    "updatedAt": "2026-04-25T04:01:21.738Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r9003dpj3aywgafkgr",
+    "date": "2026-04-09T00:00:00.000Z",
+    "accountingDate": "2026-04-09T00:00:00.000Z",
+    "amount": "13900",
+    "business": "FLOR ORIENTAL",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FLOR ORIENTAL",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.638Z",
+    "updatedAt": "2026-04-25T04:02:26.614Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r9003bpj3a9xfb8iec",
+    "date": "2026-04-09T00:00:00.000Z",
+    "accountingDate": "2026-04-09T00:00:00.000Z",
+    "amount": "5923",
+    "business": "Enel",
+    "reason": "Cuenta de luz",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ONE CLICK ENEL X WAY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1d000hpj7vlp428jst",
+    "createdAt": "2026-04-25T02:48:11.637Z",
+    "updatedAt": "2026-04-25T04:02:44.117Z",
+    "subcategory": {
+      "id": "cmodpib1d000hpj7vlp428jst",
+      "name": "Luz",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.978Z",
+      "updatedAt": "2026-04-25T02:14:50.978Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r80039pj3auqkftbu0",
+    "date": "2026-04-09T00:00:00.000Z",
+    "accountingDate": "2026-04-09T00:00:00.000Z",
+    "amount": "5480",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.636Z",
+    "updatedAt": "2026-04-25T04:02:46.005Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pj000jpj39jdq66zen",
+    "date": "2026-04-09T00:00:00.000Z",
+    "accountingDate": "2026-04-09T00:00:00.000Z",
+    "amount": "10000",
+    "business": "Passline",
+    "reason": "Entretencion",
+    "source": "BANK",
+    "rawDescription": "0771433855 TRANSF A PASSLINE",
+    "reviewed": true,
+    "subcategoryId": "cmodqimn8001kpjyoe2hdkqvt",
+    "createdAt": "2026-04-25T02:48:11.576Z",
+    "updatedAt": "2026-04-25T04:02:48.046Z",
+    "subcategory": {
+      "id": "cmodqimn8001kpjyoe2hdkqvt",
+      "name": "Entretencion",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:43:05.636Z",
+      "updatedAt": "2026-04-25T02:43:05.636Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r70037pj3abri6dec6",
+    "date": "2026-04-08T00:00:00.000Z",
+    "accountingDate": "2026-04-08T00:00:00.000Z",
+    "amount": "7700",
+    "business": "FUDO *CASA BRAVA CASA B",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FUDO *CASA BRAVA CASA B",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.636Z",
+    "updatedAt": "2026-04-25T04:02:50.207Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r70035pj3ap5e8nkyt",
+    "date": "2026-04-08T00:00:00.000Z",
+    "accountingDate": "2026-04-08T00:00:00.000Z",
+    "amount": "1000",
+    "business": "TUU*EMPORIO MALLORCA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TUU*EMPORIO MALLORCA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.636Z",
+    "updatedAt": "2026-04-25T04:02:52.680Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r70033pj3a4kkwbbyu",
+    "date": "2026-04-08T00:00:00.000Z",
+    "accountingDate": "2026-04-08T00:00:00.000Z",
+    "amount": "1755",
+    "business": "TUU*EMPORIO MALLORCA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TUU*EMPORIO MALLORCA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.635Z",
+    "updatedAt": "2026-04-25T04:02:56.697Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r60031pj3alvgxdnxu",
+    "date": "2026-04-07T00:00:00.000Z",
+    "accountingDate": "2026-04-07T00:00:00.000Z",
+    "amount": "2659",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.635Z",
+    "updatedAt": "2026-04-25T04:02:59.813Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r6002zpj3aq1x30tcs",
+    "date": "2026-04-07T00:00:00.000Z",
+    "accountingDate": "2026-04-07T00:00:00.000Z",
+    "amount": "47704",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.634Z",
+    "updatedAt": "2026-04-25T04:03:23.528Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r5002xpj3a4b534qoi",
+    "date": "2026-04-07T00:00:00.000Z",
+    "accountingDate": "2026-04-07T00:00:00.000Z",
+    "amount": "24218",
+    "business": "MERCADOPAGO*MERCADOLIBRE",
+    "reason": "Compra discrecional",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*MERCADOLIBRE",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.634Z",
+    "updatedAt": "2026-04-25T04:03:13.987Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r5002vpj3a9iexjv05",
+    "date": "2026-04-06T00:00:00.000Z",
+    "accountingDate": "2026-04-06T00:00:00.000Z",
+    "amount": "1890",
+    "business": "LOC EL AGUILUCHO ERBI",
+    "reason": "Compra no identificada",
+    "source": "CREDIT_CARD",
+    "rawDescription": "LOC EL AGUILUCHO ERBI",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.634Z",
+    "updatedAt": "2026-04-25T04:03:31.298Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r4002rpj3aral2rp1o",
+    "date": "2026-04-06T00:00:00.000Z",
+    "accountingDate": "2026-04-06T00:00:00.000Z",
+    "amount": "1680",
+    "business": "EL QUINTAL PANADERIA SPA",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "EL QUINTAL PANADERIA SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.633Z",
+    "updatedAt": "2026-04-25T04:04:20.716Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r5002tpj3al56obi3k",
+    "date": "2026-04-06T00:00:00.000Z",
+    "accountingDate": "2026-04-06T00:00:00.000Z",
+    "amount": "33950",
+    "business": "UNIMARC LOS LEONES",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "UNIMARC LOS LEONES",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.633Z",
+    "updatedAt": "2026-04-25T04:03:33.287Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pk000lpj39l87er2t1",
+    "date": "2026-04-06T00:00:00.000Z",
+    "accountingDate": "2026-04-06T00:00:00.000Z",
+    "amount": "79555",
+    "business": "Pago tarjeta credito",
+    "reason": "Pago tarjeta",
+    "source": "BANK",
+    "rawDescription": "Traspaso Internet a T. Crédito",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.576Z",
+    "updatedAt": "2026-04-25T04:04:44.046Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rn005dpj3adb8om7wq",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "15080",
+    "business": "Nota de credito",
+    "reason": "Abono tarjeta",
+    "source": "CREDIT_CARD",
+    "rawDescription": "NOTA DE CREDITO",
+    "reviewed": true,
+    "subcategoryId": "cmodpib190006pj7v53cqjq7c",
+    "createdAt": "2026-04-25T02:48:11.652Z",
+    "updatedAt": "2026-04-25T04:04:48.171Z",
+    "subcategory": {
+      "id": "cmodpib190006pj7v53cqjq7c",
+      "name": "Devolucion",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:14:50.973Z",
+      "updatedAt": "2026-04-25T02:14:50.973Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r4002ppj3a5w4ldsx6",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "7800",
+    "business": "CA NUCLEO COLON IZQ -2",
+    "reason": "Compra no identificada",
+    "source": "CREDIT_CARD",
+    "rawDescription": "CA NUCLEO COLON IZQ -2",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.633Z",
+    "updatedAt": "2026-04-25T04:04:56.885Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r3002lpj3akchc25d0",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "16600",
+    "business": "CINEPOLIS WEB",
+    "reason": "Salida o panorama",
+    "source": "CREDIT_CARD",
+    "rawDescription": "CINEPOLIS WEB",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.632Z",
+    "updatedAt": "2026-04-25T04:05:00.802Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r4002npj3avlxrc6ts",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "9990",
+    "business": "TRICOT PRESTADOR 1",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TRICOT PRESTADOR 1",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.632Z",
+    "updatedAt": "2026-04-25T04:04:59.134Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r3002jpj3aj727xdqu",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "7500",
+    "business": "MERCADOPAGO*INVERSIONESTO",
+    "reason": "Compra no esencial",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*INVERSIONESTO",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.631Z",
+    "updatedAt": "2026-04-25T04:05:03.494Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r2002hpj3acfqs7e1g",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "22671",
+    "business": "MALLPLAZA LOS DOMINICOS",
+    "reason": "Salida o panorama",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MALLPLAZA LOS DOMINICOS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.631Z",
+    "updatedAt": "2026-04-25T04:05:08.614Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r1002fpj3auirfpc5b",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "7035",
+    "business": "ASIA GLOBAL IMPORT EXPORT",
+    "reason": "Compra discrecional",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ASIA GLOBAL IMPORT EXPORT",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.630Z",
+    "updatedAt": "2026-04-25T04:05:11.281Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6r0002dpj3ak7oeai89",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "10360",
+    "business": "GM GLOBAL SPA",
+    "reason": "Compra discrecional",
+    "source": "CREDIT_CARD",
+    "rawDescription": "GM GLOBAL SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.629Z",
+    "updatedAt": "2026-04-25T04:05:13.524Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qy002bpj3a8qs3jx7p",
+    "date": "2026-04-05T00:00:00.000Z",
+    "accountingDate": "2026-04-05T00:00:00.000Z",
+    "amount": "11150",
+    "business": "24748BK LOS DOMINICOS",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "24748BK LOS DOMINICOS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.627Z",
+    "updatedAt": "2026-04-25T04:05:17.061Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qv0029pj3aj6i7nott",
+    "date": "2026-04-04T00:00:00.000Z",
+    "accountingDate": "2026-04-04T00:00:00.000Z",
+    "amount": "29536",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.624Z",
+    "updatedAt": "2026-04-25T04:05:20.341Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qt0027pj3a2e67fufn",
+    "date": "2026-04-04T00:00:00.000Z",
+    "accountingDate": "2026-04-04T00:00:00.000Z",
+    "amount": "8151",
+    "business": "MERPAGO*MAX",
+    "reason": "Mascotas u hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERPAGO*MAX",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1r001lpj7vz8t5a65r",
+    "createdAt": "2026-04-25T02:48:11.622Z",
+    "updatedAt": "2026-04-25T04:05:26.460Z",
+    "subcategory": {
+      "id": "cmodpib1r001lpj7vz8t5a65r",
+      "name": "Streaming",
+      "budget": null,
+      "categoryId": "cmodpib1q001jpj7vdyoizcqv",
+      "createdAt": "2026-04-25T02:14:50.991Z",
+      "updatedAt": "2026-04-25T02:14:50.991Z",
+      "category": {
+        "id": "cmodpib1q001jpj7vdyoizcqv",
+        "name": "Suscripciones",
+        "kind": "EXPENSE",
+        "budget": "100000",
+        "createdAt": "2026-04-25T02:14:50.991Z",
+        "updatedAt": "2026-04-25T02:43:05.638Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qs0025pj3ar0qn3p1b",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "49562",
+    "business": "JUMBO BILBAO",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "JUMBO BILBAO",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.620Z",
+    "updatedAt": "2026-04-25T04:05:28.401Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qq0023pj3a6pe0u8dz",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "7070",
+    "business": "EL VOLCAN",
+    "reason": "Compra no identificada",
+    "source": "CREDIT_CARD",
+    "rawDescription": "EL VOLCAN",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.618Z",
+    "updatedAt": "2026-04-25T04:05:30.563Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qm0021pj3a2vr50207",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "40980",
+    "business": "SODIMAC PARQUE ARAUCO",
+    "reason": "Compra hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "SODIMAC PARQUE ARAUCO",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.614Z",
+    "updatedAt": "2026-04-25T04:05:47.639Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qi001zpj3a8a9nmcv8",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "19032",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.611Z",
+    "updatedAt": "2026-04-25T04:05:51.910Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6qf001xpj3as9yg8jj6",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "3490",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.608Z",
+    "updatedAt": "2026-04-25T04:05:53.573Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q7001vpj3ar9rrig7j",
+    "date": "2026-04-03T00:00:00.000Z",
+    "accountingDate": "2026-04-03T00:00:00.000Z",
+    "amount": "140410",
+    "business": "EDIPROPLAZAC",
+    "reason": "Gastos comunes",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERPAGO*EDIPROPLAZAC",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1c000dpj7vwvkqf6rf",
+    "createdAt": "2026-04-25T02:48:11.599Z",
+    "updatedAt": "2026-04-25T04:05:56.207Z",
+    "subcategory": {
+      "id": "cmodpib1c000dpj7vwvkqf6rf",
+      "name": "Gastos comunes",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.976Z",
+      "updatedAt": "2026-04-25T02:14:50.976Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q6001tpj3a6b5febja",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "81970",
+    "business": "DP *FALABELLA.COM",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "DP *FALABELLA.COM",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.598Z",
+    "updatedAt": "2026-04-25T04:06:01.403Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q4001rpj3a9783m043",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "26645",
+    "business": "Salcobrand",
+    "reason": "Farmacia",
+    "source": "CREDIT_CARD",
+    "rawDescription": "SALCOBRAND",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1u001upj7vji0f07io",
+    "createdAt": "2026-04-25T02:48:11.597Z",
+    "updatedAt": "2026-04-25T04:06:10.855Z",
+    "subcategory": {
+      "id": "cmodpib1u001upj7vji0f07io",
+      "name": "Salud mayor",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.994Z",
+      "updatedAt": "2026-04-25T02:14:50.994Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q4001ppj3az4ocif0b",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "13100",
+    "business": "FLOR ORIENTAL",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FLOR ORIENTAL",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.596Z",
+    "updatedAt": "2026-04-25T04:06:32.413Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q3001npj3ahuyhdy0g",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "6990",
+    "business": "COMPARA ONLINE 1 SOAP-CL-",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "COMPARA ONLINE 1 SOAP-CL-",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.596Z",
+    "updatedAt": "2026-04-25T04:06:35.125Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q3001lpj3amnc21kie",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "20967",
+    "business": "SII",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "SII",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.595Z",
+    "updatedAt": "2026-04-25T04:06:37.027Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6q2001jpj3adgsn4i4x",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "192310",
+    "business": "TGR",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TGR",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.594Z",
+    "updatedAt": "2026-04-25T04:06:38.834Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pz001hpj3amdb3ovnj",
+    "date": "2026-04-02T00:00:00.000Z",
+    "accountingDate": "2026-04-02T00:00:00.000Z",
+    "amount": "82701",
+    "business": "TGR",
+    "reason": "Tramite o impuesto",
+    "source": "CREDIT_CARD",
+    "rawDescription": "TGR",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1v001ypj7vlwlpe32a",
+    "createdAt": "2026-04-25T02:48:11.587Z",
+    "updatedAt": "2026-04-25T04:06:40.288Z",
+    "subcategory": {
+      "id": "cmodpib1v001ypj7vlwlpe32a",
+      "name": "Tramites",
+      "budget": null,
+      "categoryId": "cmodpib1t001spj7vh7kvtpy2",
+      "createdAt": "2026-04-25T02:14:50.995Z",
+      "updatedAt": "2026-04-25T02:14:50.995Z",
+      "category": {
+        "id": "cmodpib1t001spj7vh7kvtpy2",
+        "name": "Extraordinario",
+        "kind": "EXPENSE",
+        "budget": "200000",
+        "createdAt": "2026-04-25T02:14:50.994Z",
+        "updatedAt": "2026-04-25T02:43:05.641Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pu001fpj3atrxgudkl",
+    "date": "2026-04-01T00:00:00.000Z",
+    "accountingDate": "2026-04-01T00:00:00.000Z",
+    "amount": "5460",
+    "business": "EKONO LOS LEONES II",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "EKONO LOS LEONES II",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.587Z",
+    "updatedAt": "2026-04-25T04:06:43.044Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pt001dpj3ansgkd7u0",
+    "date": "2026-04-01T00:00:00.000Z",
+    "accountingDate": "2026-04-01T00:00:00.000Z",
+    "amount": "3600",
+    "business": "MERCADOPAGO*SRFERRER",
+    "reason": "Compra no identificada",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*SRFERRER",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.586Z",
+    "updatedAt": "2026-04-25T04:06:47.195Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pt001bpj3arst50fm9",
+    "date": "2026-04-01T00:00:00.000Z",
+    "accountingDate": "2026-04-01T00:00:00.000Z",
+    "amount": "7080",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.585Z",
+    "updatedAt": "2026-04-25T04:06:48.877Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pn000tpj39i8pzjhe2",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-04-01T00:00:00.000Z",
+    "amount": "2858295",
+    "business": "POP ESTATE CHILE SPA",
+    "reason": "Sueldo",
+    "source": "BANK",
+    "rawDescription": "0776668966 TRANSF. POP ESTATE CHILE SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib150002pj7vaykzgo39",
+    "createdAt": "2026-04-25T02:48:11.579Z",
+    "updatedAt": "2026-04-25T15:22:45.163Z",
+    "subcategory": {
+      "id": "cmodpib150002pj7vaykzgo39",
+      "name": "Sueldo",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:14:50.970Z",
+      "updatedAt": "2026-04-25T02:14:50.970Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ps0019pj3amydj2aaj",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "3990",
+    "business": "Uber",
+    "reason": "Transporte privado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "UBER",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1j000xpj7vagacnobo",
+    "createdAt": "2026-04-25T02:48:11.585Z",
+    "updatedAt": "2026-04-25T04:06:50.740Z",
+    "subcategory": {
+      "id": "cmodpib1j000xpj7vagacnobo",
+      "name": "Transporte",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:14:50.984Z",
+      "updatedAt": "2026-04-25T02:14:50.984Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ps0017pj3a8bxj58c6",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "31775",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.584Z",
+    "updatedAt": "2026-04-25T04:06:54.747Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pr0015pj3aso184rkg",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "23270",
+    "business": "MP*MICOCACOLA",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MP*MICOCACOLA",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.584Z",
+    "updatedAt": "2026-04-25T04:07:02.377Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pl000ppj390ijbw6rx",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "630000",
+    "business": "Rodrigo Alejandro J",
+    "reason": "Arriendo",
+    "source": "BANK",
+    "rawDescription": "0074784097 TRANSF A RODRIGO ALEJANDRO J",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1b000bpj7v5n7c1lya",
+    "createdAt": "2026-04-25T02:48:11.578Z",
+    "updatedAt": "2026-04-25T04:07:14.048Z",
+    "subcategory": {
+      "id": "cmodpib1b000bpj7v5n7c1lya",
+      "name": "Arriendo",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.975Z",
+      "updatedAt": "2026-04-25T02:14:50.975Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pm000rpj39dclfe0mz",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "1621389",
+    "business": "Pago tarjeta credito",
+    "reason": "Pago tarjeta",
+    "source": "BANK",
+    "rawDescription": "Traspaso Internet a T. Crédito",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1y0027pj7v8djfnc8f",
+    "createdAt": "2026-04-25T02:48:11.578Z",
+    "updatedAt": "2026-04-25T04:07:16.940Z",
+    "subcategory": {
+      "id": "cmodpib1y0027pj7v8djfnc8f",
+      "name": "Transferencia interna",
+      "budget": null,
+      "categoryId": "cmodpib1y0025pj7vsy9hzxcd",
+      "createdAt": "2026-04-25T02:14:50.999Z",
+      "updatedAt": "2026-04-25T02:14:50.999Z",
+      "category": {
+        "id": "cmodpib1y0025pj7vsy9hzxcd",
+        "name": "No cobrable",
+        "kind": "UNCHARGEABLE",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.998Z",
+        "updatedAt": "2026-04-25T02:43:05.644Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pl000npj390whewcjd",
+    "date": "2026-03-31T00:00:00.000Z",
+    "accountingDate": "2026-03-31T00:00:00.000Z",
+    "amount": "212432",
+    "business": "Compra de divisas",
+    "reason": "Conversion de moneda",
+    "source": "BANK",
+    "rawDescription": "Egreso por Compra de Divisas",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.577Z",
+    "updatedAt": "2026-04-25T04:07:37.737Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pq0013pj3aeqkbfsvg",
+    "date": "2026-03-30T00:00:00.000Z",
+    "accountingDate": "2026-03-30T00:00:00.000Z",
+    "amount": "4380",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.583Z",
+    "updatedAt": "2026-04-25T04:07:42.098Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pq0011pj3aue7diiaw",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "4000",
+    "business": "MERCADOPAGO*MRPRETZELS",
+    "reason": "Cafe o snack",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MERCADOPAGO*MRPRETZELS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1o001cpj7v02qdjm44",
+    "createdAt": "2026-04-25T02:48:11.582Z",
+    "updatedAt": "2026-04-25T04:07:59.975Z",
+    "subcategory": {
+      "id": "cmodpib1o001cpj7v02qdjm44",
+      "name": "Cafe",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.988Z",
+      "updatedAt": "2026-04-25T02:14:50.988Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pp000zpj3afrpaqejl",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "1280",
+    "business": "IKEA OPEN KENNEDY",
+    "reason": "Compra hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "IKEA OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.582Z",
+    "updatedAt": "2026-04-25T04:07:56.336Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6po000xpj3azmnv26ms",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "980",
+    "business": "IKEA OPEN KENNEDY",
+    "reason": "Compra hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "IKEA OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.581Z",
+    "updatedAt": "2026-04-25T04:08:11.893Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6po000vpj3aupvp198v",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "32938",
+    "business": "IKEA OPEN KENNEDY",
+    "reason": "Compra hogar",
+    "source": "CREDIT_CARD",
+    "rawDescription": "IKEA OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.580Z",
+    "updatedAt": "2026-04-25T04:08:19.247Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pm000rpj3ajda84fus",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "25380",
+    "business": "FALABELLA PARQUE ARAUCO",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FALABELLA PARQUE ARAUCO",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.579Z",
+    "updatedAt": "2026-04-25T04:08:26.130Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pn000tpj3aqqkc0sml",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "10000",
+    "business": "H&M OPEN KENNEDY",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "H&M OPEN KENNEDY",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.579Z",
+    "updatedAt": "2026-04-25T04:08:21.583Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pl000ppj3akarj3ie9",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "15359",
+    "business": "EKONO LOS LEONES",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "EKONO LOS LEONES",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.578Z",
+    "updatedAt": "2026-04-25T04:08:28.203Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pl000npj3am8qbdt7x",
+    "date": "2026-03-29T00:00:00.000Z",
+    "accountingDate": "2026-03-29T00:00:00.000Z",
+    "amount": "2990",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.577Z",
+    "updatedAt": "2026-04-25T04:08:29.381Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pk000lpj3a64lqmwit",
+    "date": "2026-03-28T00:00:00.000Z",
+    "accountingDate": "2026-03-28T00:00:00.000Z",
+    "amount": "17050",
+    "business": "HOLY MOLY LASTARRIA",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "HOLY MOLY LASTARRIA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.577Z",
+    "updatedAt": "2026-04-25T04:08:32.207Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6po000vpj391ot3qxfz",
+    "date": "2026-03-27T00:00:00.000Z",
+    "accountingDate": "2026-03-27T00:00:00.000Z",
+    "amount": "4778",
+    "business": "Banco Santander",
+    "reason": "Mantencion plan cuenta corriente",
+    "source": "BANK",
+    "rawDescription": "COM.MANTENCION PLAN",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1e000jpj7vym2dyncx",
+    "createdAt": "2026-04-25T02:48:11.580Z",
+    "updatedAt": "2026-04-25T04:08:36.485Z",
+    "subcategory": {
+      "id": "cmodpib1e000jpj7vym2dyncx",
+      "name": "Banco y mantenciones",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T02:14:50.979Z",
+      "updatedAt": "2026-04-25T02:14:50.979Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pj000jpj3ahg1sne1x",
+    "date": "2026-03-27T00:00:00.000Z",
+    "accountingDate": "2026-03-27T00:00:00.000Z",
+    "amount": "71980",
+    "business": "HYM COSTANERA CENTER",
+    "reason": "Ropa y accesorios",
+    "source": "CREDIT_CARD",
+    "rawDescription": "HYM COSTANERA CENTER",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001gpj7vwmnlc2pm",
+    "createdAt": "2026-04-25T02:48:11.576Z",
+    "updatedAt": "2026-04-25T04:08:39.195Z",
+    "subcategory": {
+      "id": "cmodpib1p001gpj7vwmnlc2pm",
+      "name": "Ropa",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T02:14:50.990Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pi000fpj3alt36zrsj",
+    "date": "2026-03-27T00:00:00.000Z",
+    "accountingDate": "2026-03-27T00:00:00.000Z",
+    "amount": "39022",
+    "business": "UNIMARC LOS LEONES",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "UNIMARC LOS LEONES",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.575Z",
+    "updatedAt": "2026-04-25T04:09:14.345Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pj000hpj3a52ev4sgn",
+    "date": "2026-03-27T00:00:00.000Z",
+    "accountingDate": "2026-03-27T00:00:00.000Z",
+    "amount": "13380",
+    "business": "JUMBO COSTANERA CENTER",
+    "reason": "Supermercado",
+    "source": "CREDIT_CARD",
+    "rawDescription": "JUMBO COSTANERA CENTER",
+    "reviewed": true,
+    "subcategoryId": "cmodt705r0001p83m1fz7mp6w",
+    "createdAt": "2026-04-25T02:48:11.575Z",
+    "updatedAt": "2026-04-25T04:09:19.306Z",
+    "subcategory": {
+      "id": "cmodt705r0001p83m1fz7mp6w",
+      "name": "Supermercado",
+      "budget": null,
+      "categoryId": "cmodpib1a0009pj7v4ggxua5t",
+      "createdAt": "2026-04-25T03:58:02.127Z",
+      "updatedAt": "2026-04-25T03:58:02.127Z",
+      "category": {
+        "id": "cmodpib1a0009pj7v4ggxua5t",
+        "name": "Esencial fijo",
+        "kind": "EXPENSE",
+        "budget": "900000",
+        "createdAt": "2026-04-25T02:14:50.975Z",
+        "updatedAt": "2026-04-25T02:43:05.625Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6rn005bpj3aoyb0mvqu",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "4990",
+    "business": "Nota de credito",
+    "reason": "Abono tarjeta",
+    "source": "CREDIT_CARD",
+    "rawDescription": "NOTA DE CREDITO",
+    "reviewed": true,
+    "subcategoryId": "cmodpib190006pj7v53cqjq7c",
+    "createdAt": "2026-04-25T02:48:11.652Z",
+    "updatedAt": "2026-04-25T04:09:24.163Z",
+    "subcategory": {
+      "id": "cmodpib190006pj7v53cqjq7c",
+      "name": "Devolucion",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:14:50.973Z",
+      "updatedAt": "2026-04-25T02:14:50.973Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6po000xpj39m2bozoiy",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "6400",
+    "business": "Glenn Marcano",
+    "reason": "Transferencia recibida",
+    "source": "BANK",
+    "rawDescription": "0261282836 TRANSF. GLENN ANDRES MARCANO RADA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib190008pj7v52kiwxaa",
+    "createdAt": "2026-04-25T02:48:11.581Z",
+    "updatedAt": "2026-04-25T04:09:27.034Z",
+    "subcategory": {
+      "id": "cmodpib190008pj7v52kiwxaa",
+      "name": "Reembolso",
+      "budget": null,
+      "categoryId": "cmodpib100000pj7vctmm0ml8",
+      "createdAt": "2026-04-25T02:14:50.974Z",
+      "updatedAt": "2026-04-25T02:14:50.974Z",
+      "category": {
+        "id": "cmodpib100000pj7vctmm0ml8",
+        "name": "Income",
+        "kind": "INCOME",
+        "budget": null,
+        "createdAt": "2026-04-25T02:14:50.965Z",
+        "updatedAt": "2026-04-25T02:43:05.616Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6ph000dpj3aon2xrdh9",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "6200",
+    "business": "FLOR ORIENTAL",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FLOR ORIENTAL",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.574Z",
+    "updatedAt": "2026-04-25T04:09:29.254Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pg000bpj3ag0ly7isa",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "5580",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.573Z",
+    "updatedAt": "2026-04-25T04:09:30.958Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pg0009pj3anmr3h4ds",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "20587",
+    "business": "Uber Eats",
+    "reason": "Delivery",
+    "source": "CREDIT_CARD",
+    "rawDescription": "PAYU *UBER EATS",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1m0018pj7vj2ixk6t5",
+    "createdAt": "2026-04-25T02:48:11.572Z",
+    "updatedAt": "2026-04-25T04:09:33.196Z",
+    "subcategory": {
+      "id": "cmodpib1m0018pj7vj2ixk6t5",
+      "name": "Delivery",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pf0007pj3a8u4u0njd",
+    "date": "2026-03-26T00:00:00.000Z",
+    "accountingDate": "2026-03-26T00:00:00.000Z",
+    "amount": "9490",
+    "business": "FLORET SPA",
+    "reason": "Compra social o regalo",
+    "source": "CREDIT_CARD",
+    "rawDescription": "FLORET SPA",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1q001ipj7vzz2j5of7",
+    "createdAt": "2026-04-25T02:48:11.571Z",
+    "updatedAt": "2026-04-25T04:09:39.291Z",
+    "subcategory": {
+      "id": "cmodpib1q001ipj7vzz2j5of7",
+      "name": "Compras",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.990Z",
+      "updatedAt": "2026-04-25T04:00:06.402Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pe0005pj3a5vqob2qx",
+    "date": "2026-03-25T00:00:00.000Z",
+    "accountingDate": "2026-03-25T00:00:00.000Z",
+    "amount": "15459",
+    "business": "Melt Pizza",
+    "reason": "Comida fuera de casa",
+    "source": "CREDIT_CARD",
+    "rawDescription": "MP*MELT",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1n001apj7v5zq91a3x",
+    "createdAt": "2026-04-25T02:48:11.571Z",
+    "updatedAt": "2026-04-25T04:09:41.485Z",
+    "subcategory": {
+      "id": "cmodpib1n001apj7v5zq91a3x",
+      "name": "Restaurantes",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.987Z",
+      "updatedAt": "2026-04-25T02:14:50.987Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pd0003pj3acdqqhzmh",
+    "date": "2026-03-24T00:00:00.000Z",
+    "accountingDate": "2026-03-24T00:00:00.000Z",
+    "amount": "7080",
+    "business": "Aramco",
+    "reason": "Minimarket",
+    "source": "CREDIT_CARD",
+    "rawDescription": "ARAMCO",
+    "reviewed": true,
+    "subcategoryId": "cmodq7xvf000xpjuc6xpz035r",
+    "createdAt": "2026-04-25T02:48:11.569Z",
+    "updatedAt": "2026-04-25T04:09:44.142Z",
+    "subcategory": {
+      "id": "cmodq7xvf000xpjuc6xpz035r",
+      "name": "Minimarket",
+      "budget": null,
+      "categoryId": "cmodpib1i000tpj7v3xr02mks",
+      "createdAt": "2026-04-25T02:34:46.971Z",
+      "updatedAt": "2026-04-25T02:34:46.971Z",
+      "category": {
+        "id": "cmodpib1i000tpj7v3xr02mks",
+        "name": "Esencial variable",
+        "kind": "EXPENSE",
+        "budget": "650000",
+        "createdAt": "2026-04-25T02:14:50.982Z",
+        "updatedAt": "2026-04-25T02:43:05.631Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6p80001pj3aze9ugbsw",
+    "date": "2026-03-24T00:00:00.000Z",
+    "accountingDate": "2026-03-24T00:00:00.000Z",
+    "amount": "11004",
+    "business": "STGO PET STORE MAX",
+    "reason": "Gastos de Mara",
+    "source": "CREDIT_CARD",
+    "rawDescription": "STGO PET STORE MAX",
+    "reviewed": true,
+    "subcategoryId": "cmodqimn8001mpjyoc0pinlvv",
+    "createdAt": "2026-04-25T02:48:11.565Z",
+    "updatedAt": "2026-04-25T04:09:48.209Z",
+    "subcategory": {
+      "id": "cmodqimn8001mpjyoc0pinlvv",
+      "name": "Mara",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:43:05.636Z",
+      "updatedAt": "2026-04-25T02:43:05.636Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  },
+  {
+    "id": "cmodqp6pp000zpj39uf7phs0n",
+    "date": "2026-03-23T00:00:00.000Z",
+    "accountingDate": "2026-03-23T00:00:00.000Z",
+    "amount": "1800",
+    "business": "Serrano64ESTC",
+    "reason": "Compra menor",
+    "source": "BANK",
+    "rawDescription": "MERCADOPAGO*SERRANO64ESTC",
+    "reviewed": true,
+    "subcategoryId": "cmodpib1p001epj7vmue7ioy2",
+    "createdAt": "2026-04-25T02:48:11.582Z",
+    "updatedAt": "2026-04-25T04:09:58.634Z",
+    "subcategory": {
+      "id": "cmodpib1p001epj7vmue7ioy2",
+      "name": "Salidas",
+      "budget": null,
+      "categoryId": "cmodpib1m0016pj7vlafzg7t7",
+      "createdAt": "2026-04-25T02:14:50.989Z",
+      "updatedAt": "2026-04-25T02:14:50.989Z",
+      "category": {
+        "id": "cmodpib1m0016pj7vlafzg7t7",
+        "name": "No esencial",
+        "kind": "EXPENSE",
+        "budget": "300000",
+        "createdAt": "2026-04-25T02:14:50.986Z",
+        "updatedAt": "2026-04-25T02:43:05.634Z"
+      }
+    }
+  }
+]
