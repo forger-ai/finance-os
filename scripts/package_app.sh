@@ -7,6 +7,10 @@ APP_VERSION="$(python3 -c "import json;print(json.load(open('$ROOT_DIR/manifest.
 OUT_DIR="${1:-$ROOT_DIR/tmp/dist}"
 OUT_FILE="${2:-$APP_NAME-$APP_VERSION.zip}"
 
+if [[ "$OUT_DIR" != /* ]]; then
+  OUT_DIR="$ROOT_DIR/$OUT_DIR"
+fi
+
 mkdir -p "$OUT_DIR"
 
 STAGE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/${APP_NAME}.stage.XXXXXX")"
