@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import app.database_ext  # noqa: F401 - registers models before init_db
-
 from app.database import init_db
 from app.routes import categories, health, imports, movements
 
