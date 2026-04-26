@@ -8,6 +8,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+import app.database_ext  # noqa: F401 - registers models before init_db
+
 from app.database import init_db
 from app.routes import categories, health, imports, movements
 
@@ -34,7 +36,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     def _startup() -> None:
-        init_db()
+        init_db()  # models already registered via database_ext
 
     @app.exception_handler(ValueError)
     async def _value_error_handler(_request, exc: ValueError):  # type: ignore[no-untyped-def]
