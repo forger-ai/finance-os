@@ -144,6 +144,22 @@ cd frontend && npm run verify
 
 `verify.py` corre `ruff`, `pyright` y un smoke test sobre el endpoint `/health`. `npm run verify` corre `eslint` y `tsc --noEmit`.
 
+## Publicación al catálogo
+
+El flujo de publicación usa **GitHub Release** (no push directo a `main`):
+
+1. Merge a `main` con CI verde.
+2. Crear tag/release con formato `finance-os/vX.Y.Z`.
+3. El workflow `Release App`:
+   - corre verify/build backend+frontend,
+   - genera `finance-os-X.Y.Z.zip`,
+   - sube el ZIP al release,
+   - abre PR automático en `forger-ai/apps-catalog` para actualizar el `manifest.json` del catálogo.
+
+Secret requerido en este repo:
+
+- `APPS_CATALOG_TOKEN`: PAT con permisos `contents` y `pull_requests` sobre `forger-ai/apps-catalog`.
+
 ## Uso con agentes
 
 El proyecto está pensado para ser operado con apoyo de agentes (Claude, Codex, etc.). El flujo ideal es:

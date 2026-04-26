@@ -1,0 +1,210 @@
+name: Release App
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finance-os-release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read release metadata from manifest
+        id: meta
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path('manifest.json').read_text())
+          catalog = manifest.get('catalog', {})
+          release = catalog.get('release', {})
+
+          name = manifest['name']
+          version = manifest['version']
+          tag_template = release.get('tag_template', '{name}/v{version}')
+          asset_template = release.get('asset_name_template', '{name}-{version}.zip')
+
+          expected_tag = tag_template.format(name=name, version=version)
+          asset_name = asset_template.format(name=name, version=version)
+
+          out = {
+            'app_name': name,
+            'app_version': version,
+            'release_repository': release.get('repository', '${{ github.repository }}'),
+            'tag_template': tag_template,
+            'asset_name_template': asset_template,
+            'expected_tag': expected_tag,
+            'asset_name': asset_name,
+            'catalog_repository': release.get('catalog_repository', ''),
+            'catalog_manifest_path': release.get('catalog_manifest_path', ''),
+          }
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+            for k, v in out.items():
+              f.write(f'{k}={v}\n')
+          PY
+
+      - name: Validate release tag + repo
+        env:
+          EXPECTED_TAG: ${{ steps.meta.outputs.expected_tag }}
+          ACTUAL_TAG: ${{ github.event.release.tag_name }}
+          EXPECTED_REPO: ${{ steps.meta.outputs.release_repository }}
+          ACTUAL_REPO: ${{ github.repository }}
+          CATALOG_REPO: ${{ steps.meta.outputs.catalog_repository }}
+          CATALOG_PATH: ${{ steps.meta.outputs.catalog_manifest_path }}
+        run: |
+          test "$EXPECTED_REPO" = "$ACTUAL_REPO" || {
+            echo "manifest expects release repo '$EXPECTED_REPO' but workflow is running in '$ACTUAL_REPO'"
+            exit 1
+          }
+          test "$EXPECTED_TAG" = "$ACTUAL_TAG" || {
+            echo "release tag mismatch: expected '$EXPECTED_TAG', got '$ACTUAL_TAG'"
+            exit 1
+          }
+          test -n "$CATALOG_REPO" || {
+            echo "catalog_repository is missing in manifest catalog.release"
+            exit 1
+          }
+          test -n "$CATALOG_PATH" || {
+            echo "catalog_manifest_path is missing in manifest catalog.release"
+            exit 1
+          }
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Backend verify
+        working-directory: backend
+        run: |
+          uv sync
+          uv run python scripts/verify.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Frontend verify + build
+        working-directory: frontend
+        run: |
+          npm install
+          npm run verify
+          npm run build
+
+      - name: Build release zip
+        env:
+          ASSET_NAME: ${{ steps.meta.outputs.asset_name }}
+        run: |
+          mkdir -p tmp/dist
+          ./scripts/package_app.sh tmp/dist "$ASSET_NAME"
+
+      - name: Compute checksums
+        id: artifact
+        env:
+          ASSET_NAME: ${{ steps.meta.outputs.asset_name }}
+        run: |
+          ASSET_PATH="tmp/dist/$ASSET_NAME"
+          SHA256="$(shasum -a 256 "$ASSET_PATH" | awk '{print $1}')"
+          SIZE="$(wc -c < "$ASSET_PATH" | tr -d ' ')"
+          PUBLISHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          {
+            echo "sha256=$SHA256"
+            echo "size=$SIZE"
+            echo "published_at=$PUBLISHED_AT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload zip to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+          ASSET_NAME: ${{ steps.meta.outputs.asset_name }}
+        run: |
+          gh release upload "$TAG" "tmp/dist/$ASSET_NAME" --clobber
+
+      - name: Ensure catalog token exists
+        env:
+          APPS_CATALOG_TOKEN: ${{ secrets.APPS_CATALOG_TOKEN }}
+        run: |
+          test -n "$APPS_CATALOG_TOKEN" || {
+            echo "Missing secret APPS_CATALOG_TOKEN (repo scope with contents+pull_requests on apps-catalog)."
+            exit 1
+          }
+
+      - name: Checkout apps-catalog
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.meta.outputs.catalog_repository }}
+          token: ${{ secrets.APPS_CATALOG_TOKEN }}
+          path: apps-catalog
+
+      - name: Update app manifest in catalog
+        env:
+          APP_VERSION: ${{ steps.meta.outputs.app_version }}
+          RELEASE_REPOSITORY: ${{ steps.meta.outputs.release_repository }}
+          SHA256: ${{ steps.artifact.outputs.sha256 }}
+          SIZE: ${{ steps.artifact.outputs.size }}
+          PUBLISHED_AT: ${{ steps.artifact.outputs.published_at }}
+          TAG_TEMPLATE: ${{ steps.meta.outputs.tag_template }}
+          ASSET_TEMPLATE: ${{ steps.meta.outputs.asset_name_template }}
+          CATALOG_MANIFEST_PATH: ${{ steps.meta.outputs.catalog_manifest_path }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path('apps-catalog') / os.environ['CATALOG_MANIFEST_PATH']
+          if not path.exists():
+            raise SystemExit(f'manifest not found: {path}')
+
+          manifest = json.loads(path.read_text())
+          catalog = manifest.setdefault('catalog', {})
+          release = catalog.setdefault('release', {})
+
+          manifest['version'] = os.environ['APP_VERSION']
+          release['repository'] = os.environ['RELEASE_REPOSITORY']
+          release['tag_template'] = release.get('tag_template', os.environ['TAG_TEMPLATE'])
+          release['asset_name_template'] = release.get('asset_name_template', os.environ['ASSET_TEMPLATE'])
+          release['checksum_sha256'] = os.environ['SHA256']
+          release['file_size_bytes'] = int(os.environ['SIZE'])
+          release['published_at'] = os.environ['PUBLISHED_AT']
+
+          path.write_text(json.dumps(manifest, indent=2) + '\n')
+          PY
+
+      - name: Create PR in apps-catalog
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.APPS_CATALOG_TOKEN }}
+          path: apps-catalog
+          commit-message: 'chore(release): ${{ steps.meta.outputs.app_name }} v${{ steps.meta.outputs.app_version }}'
+          branch: chore/release-${{ steps.meta.outputs.app_name }}-${{ steps.meta.outputs.app_version }}
+          delete-branch: true
+          title: 'chore(release): ${{ steps.meta.outputs.app_name }} v${{ steps.meta.outputs.app_version }}'
+          body: |
+            Automated release PR from `${{ github.repository }}`.
+
+            - App: `${{ steps.meta.outputs.app_name }}`
+            - Version: `${{ steps.meta.outputs.app_version }}`
+            - Tag: `${{ github.event.release.tag_name }}`
+            - SHA256: `${{ steps.artifact.outputs.sha256 }}`
+            - Size: `${{ steps.artifact.outputs.size }}` bytes
+          base: main
+          labels: release, automated

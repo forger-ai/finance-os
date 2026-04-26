@@ -26,7 +26,14 @@
     "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances — all without sending your data anywhere.",
     "category": "finance",
     "permissions": ["app_data", "user_selected_imports", "app_exports", "ai_api"],
-    "supported_platforms": ["darwin_arm64", "darwin_x64"]
+    "supported_platforms": ["darwin_arm64", "darwin_x64"],
+    "release": {
+      "repository": "forger-ai/finance-os",
+      "tag_template": "{name}/v{version}",
+      "asset_name_template": "{name}-{version}.zip",
+      "catalog_repository": "forger-ai/apps-catalog",
+      "catalog_manifest_path": "vite-fastapi-sqlite/finance-os/manifest.json"
+    }
   },
   "services": [
     {

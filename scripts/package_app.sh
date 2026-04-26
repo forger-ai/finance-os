@@ -2,10 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="finance-os-lite"
-STAMP="$(date +%Y%m%d_%H%M%S)"
+APP_NAME="$(python3 -c "import json;print(json.load(open('$ROOT_DIR/manifest.json'))['name'])")"
+APP_VERSION="$(python3 -c "import json;print(json.load(open('$ROOT_DIR/manifest.json'))['version'])")"
 OUT_DIR="${1:-$ROOT_DIR/tmp/dist}"
-OUT_FILE="${2:-$APP_NAME-$STAMP.zip}"
+OUT_FILE="${2:-$APP_NAME-$APP_VERSION.zip}"
 
 mkdir -p "$OUT_DIR"
 

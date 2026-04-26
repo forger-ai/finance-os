@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: finance-os-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Backend verify
+        working-directory: backend
+        run: |
+          uv sync
+          uv run python scripts/verify.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Frontend verify + build
+        working-directory: frontend
+        run: |
+          npm install
+          npm run verify
+          npm run build
