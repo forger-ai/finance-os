@@ -175,10 +175,12 @@ jobs:
             raise SystemExit(f'manifest not found: {path}')
 
           manifest = json.loads(path.read_text())
+          source_manifest = json.loads(Path('manifest.json').read_text())
           catalog = manifest.setdefault('catalog', {})
           release = catalog.setdefault('release', {})
 
           manifest['version'] = os.environ['APP_VERSION']
+          manifest['changelog'] = source_manifest.get('changelog', [])
           release['repository'] = os.environ['RELEASE_REPOSITORY']
           release['tag_template'] = release.get('tag_template', os.environ['TAG_TEMPLATE'])
           release['asset_name_template'] = release.get('asset_name_template', os.environ['ASSET_TEMPLATE'])

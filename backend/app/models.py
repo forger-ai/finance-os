@@ -1,4 +1,4 @@
-"""SQLModel definitions for FinanceOS Lite.
+"""SQLModel definitions for Finance OS.
 
 Mirrors the original Prisma schema but with a few key differences:
 

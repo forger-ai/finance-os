@@ -1,7 +1,7 @@
 [project]
-name = "finance-os-lite-backend"
+name = "finance-os-backend"
 version = "0.1.0"
-description = "FastAPI backend for FinanceOS Lite, a personal finance tool."
+description = "FastAPI backend for Finance OS, a personal finance tool."
 requires-python = ">=3.10"
 
 dependencies = [

@@ -1,4 +1,4 @@
-"""FastAPI application entry point for FinanceOS Lite."""
+"""FastAPI application entry point for Finance OS."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ def _allowed_origins() -> list[str]:
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="FinanceOS Lite",
+        title="Finance OS",
         version="0.1.0",
         description="Personal finance API. Backend for the Vite + React frontend.",
     )

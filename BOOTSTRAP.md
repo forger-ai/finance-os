@@ -1,6 +1,6 @@
 # BOOTSTRAP
 
-Esta guía explica cómo comenzar `FinanceOS Lite` desde cero.
+Esta guía explica cómo comenzar `Finance OS` desde cero.
 
 Si eres un agente y el usuario todavía no ha instalado nada, guíalo usando este documento.
 
