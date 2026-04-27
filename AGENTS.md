@@ -4,8 +4,6 @@
 
 Este archivo es la fuente principal de contexto funcional y operativo de Finance OS para agentes.
 
-`APP.md` no debe usarse como fuente de verdad. Si existe en alguna instalacion antigua, tratala como documentacion legada y prioriza siempre este `AGENTS.md`.
-
 `manifest.json` describe instalacion, servicios, stack y scripts disponibles. No es una lista de capacidades visibles para el usuario.
 
 Las skills y scripts son herramientas internas del agente. Pueden usarse para cumplir tareas del usuario, pero no deben presentarse como interfaz de usuario normal.
