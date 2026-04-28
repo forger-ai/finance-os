@@ -174,19 +174,22 @@ jobs:
           if not path.exists():
             raise SystemExit(f'manifest not found: {path}')
 
+          source_manifest = json.loads(Path('manifest.json').read_text())
           manifest = json.loads(path.read_text())
           catalog = manifest.setdefault('catalog', {})
           release = catalog.setdefault('release', {})
 
-          manifest['version'] = os.environ['APP_VERSION']
-          release['repository'] = os.environ['RELEASE_REPOSITORY']
-          release['tag_template'] = release.get('tag_template', os.environ['TAG_TEMPLATE'])
-          release['asset_name_template'] = release.get('asset_name_template', os.environ['ASSET_TEMPLATE'])
-          release['checksum_sha256'] = os.environ['SHA256']
-          release['file_size_bytes'] = int(os.environ['SIZE'])
-          release['published_at'] = os.environ['PUBLISHED_AT']
+          source_catalog = source_manifest.setdefault('catalog', {})
+          source_release = source_catalog.setdefault('release', {})
+          source_manifest['version'] = os.environ['APP_VERSION']
+          source_release['repository'] = os.environ['RELEASE_REPOSITORY']
+          source_release['tag_template'] = release.get('tag_template', os.environ['TAG_TEMPLATE'])
+          source_release['asset_name_template'] = release.get('asset_name_template', os.environ['ASSET_TEMPLATE'])
+          source_release['checksum_sha256'] = os.environ['SHA256']
+          source_release['file_size_bytes'] = int(os.environ['SIZE'])
+          source_release['published_at'] = os.environ['PUBLISHED_AT']
 
-          path.write_text(json.dumps(manifest, indent=2) + '\n')
+          path.write_text(json.dumps(source_manifest, indent=2) + '\n')
           PY
 
       - name: Create PR in apps-catalog
