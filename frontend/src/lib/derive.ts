@@ -90,6 +90,116 @@ export function toMovementRows(movements: MovementRead[]): MovementRow[] {
   return movements.map(toMovementRow);
 }
 
+export type ClassificationMemoryEntry = {
+  business: string;
+  businessKey: string;
+  categoryId: string;
+  categoryName: string;
+  subcategoryId: string | null;
+  subcategoryName: string | null;
+  count: number;
+};
+
+function normalizeBusinessKey(value: string): string {
+  // Mirror the backend's ``normalize_key``: strip diacritics, lowercase, trim.
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function classificationKey(
+  categoryId: string,
+  subcategoryId: string | null,
+): string {
+  return `${categoryId}|${subcategoryId ?? ""}`;
+}
+
+/**
+ * Build a ``business → dominant classification`` map from movements the user
+ * has already reviewed. Subcategory may be null (category-only).
+ */
+export function buildClassificationMemory(
+  movements: MovementRead[],
+): Map<string, ClassificationMemoryEntry> {
+  type Counts = Map<string, number>;
+  const counts = new Map<string, Counts>();
+  const totalCounts = new Map<string, number>();
+  const display = new Map<string, string>();
+  const decode = new Map<
+    string,
+    {
+      categoryId: string;
+      categoryName: string;
+      subcategoryId: string | null;
+      subcategoryName: string | null;
+    }
+  >();
+
+  for (const movement of movements) {
+    if (!movement.reviewed) continue;
+    const key = normalizeBusinessKey(movement.business || "");
+    if (!key) continue;
+    if (!display.has(key)) display.set(key, movement.business);
+    totalCounts.set(key, (totalCounts.get(key) ?? 0) + 1);
+    const cKey = classificationKey(
+      movement.category_id,
+      movement.subcategory_id,
+    );
+    const inner = counts.get(key) ?? new Map();
+    inner.set(cKey, (inner.get(cKey) ?? 0) + 1);
+    counts.set(key, inner);
+    if (!decode.has(cKey)) {
+      decode.set(cKey, {
+        categoryId: movement.category_id,
+        categoryName: movement.category_name,
+        subcategoryId: movement.subcategory_id,
+        subcategoryName: movement.subcategory_name,
+      });
+    }
+  }
+
+  const result = new Map<string, ClassificationMemoryEntry>();
+  for (const [key, inner] of counts) {
+    let bestKey = "";
+    let bestCount = 0;
+    for (const [cKey, count] of inner) {
+      if (count > bestCount) {
+        bestCount = count;
+        bestKey = cKey;
+      }
+    }
+    const info = decode.get(bestKey);
+    if (!info) continue;
+    result.set(key, {
+      business: display.get(key) ?? key,
+      businessKey: key,
+      categoryId: info.categoryId,
+      categoryName: info.categoryName,
+      subcategoryId: info.subcategoryId,
+      subcategoryName: info.subcategoryName,
+      count: totalCounts.get(key) ?? 0,
+    });
+  }
+  return result;
+}
+
+export function suggestSubcategoryFor(
+  movement: MovementRead,
+  memory: Map<string, ClassificationMemoryEntry>,
+): ClassificationMemoryEntry | null {
+  const entry = memory.get(normalizeBusinessKey(movement.business || ""));
+  if (!entry) return null;
+  if (
+    entry.categoryId === movement.category_id &&
+    entry.subcategoryId === movement.subcategory_id
+  ) {
+    return null;
+  }
+  return entry;
+}
+
 export function toDashboardSummary(
   movements: MovementRead[],
   summary: SummaryRead,

@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import {
   Box,
   Chip,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -12,6 +14,7 @@ import {
   Stack,
   Switch,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -25,7 +28,7 @@ import {
   type MovementRow,
 } from "./ClassificationEditor";
 import {
-  updateMovementAccountingDate,
+  deleteMovement,
   updateMovementReviewed,
 } from "@/api/movements";
 import type { MovementRead } from "@/api/types";
@@ -36,107 +39,178 @@ type Props = {
   categories: CategoryOption[];
   movements: MovementRow[];
   onMovementChange: (movement: MovementRead) => void;
+  onMovementDelete: (movementId: string) => void;
 };
 
 type FilterValue = "ALL" | "BANK" | "CREDIT_CARD" | "MANUAL";
 type ReviewFilter = "ALL" | "REVIEWED" | "PENDING";
 
-function MovementsFilters({
-  query,
-  reviewFilter,
-  setQuery,
-  setReviewFilter,
-  setSourceFilter,
-  sourceFilter,
-}: {
+const ALL = "ALL" as const;
+
+type FiltersProps = {
+  categories: CategoryOption[];
+  categoryFilter: string;
+  dateFrom: string;
+  dateTo: string;
   query: string;
   reviewFilter: ReviewFilter;
+  setCategoryFilter: (value: string) => void;
+  setDateFrom: (value: string) => void;
+  setDateTo: (value: string) => void;
   setQuery: (value: string) => void;
   setReviewFilter: (value: ReviewFilter) => void;
   setSourceFilter: (value: FilterValue) => void;
+  setSubcategoryFilter: (value: string) => void;
   sourceFilter: FilterValue;
-}) {
+  subcategoryFilter: string;
+};
+
+function MovementsFilters({
+  categories,
+  categoryFilter,
+  dateFrom,
+  dateTo,
+  query,
+  reviewFilter,
+  setCategoryFilter,
+  setDateFrom,
+  setDateTo,
+  setQuery,
+  setReviewFilter,
+  setSourceFilter,
+  setSubcategoryFilter,
+  sourceFilter,
+  subcategoryFilter,
+}: FiltersProps) {
+  // When a specific category is selected we restrict the subcategory dropdown
+  // to its children. With "Todas" we let the user pick any subcategory.
+  const subcategoryOptions = useMemo(() => {
+    if (categoryFilter === ALL) {
+      return categories.flatMap((cat) =>
+        cat.subcategories.map((sub) => ({
+          id: sub.id,
+          label: `${cat.name} / ${sub.name}`,
+        })),
+      );
+    }
+    const target = categories.find((cat) => cat.id === categoryFilter);
+    return (
+      target?.subcategories.map((sub) => ({ id: sub.id, label: sub.name })) ??
+      []
+    );
+  }, [categories, categoryFilter]);
+
   return (
-    <Paper sx={{ p: 1.5 }}>
-      <Stack
-        direction={{ xs: "column", lg: "row" }}
-        spacing={2}
+    <Paper sx={{ p: 1.25 }}>
+      <Box
         sx={{
-          alignItems: { lg: "center" },
-          justifyContent: "space-between",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 1,
+          alignItems: "center",
         }}
       >
-        <Box>
-          <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
-            {es.movements.filtersTitle}
-          </Typography>
-          <Typography color="text.secondary" sx={{ fontSize: 13, mt: 0.5 }}>
-            {es.movements.filtersSubtitle}
-          </Typography>
-        </Box>
-
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={1.25}
-          sx={{
-            width: { xs: "100%", lg: "auto" },
-            flexWrap: "wrap",
-            rowGap: 1,
+        <TextField
+          placeholder={es.movements.searchPlaceholder}
+          size="small"
+          sx={{ flex: "1 1 220px", minWidth: 180 }}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchRounded fontSize="small" />
+                </InputAdornment>
+              ),
+            },
           }}
-        >
-          <TextField
-            placeholder={es.movements.searchPlaceholder}
-            size="small"
-            sx={{ width: { xs: "100%", md: 340 } }}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchRounded fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 150 } }}>
-            <InputLabel>{es.movements.sourceLabel}</InputLabel>
-            <Select
-              label={es.movements.sourceLabel}
-              value={sourceFilter}
-              onChange={(event) =>
-                setSourceFilter(event.target.value as FilterValue)
-              }
-            >
-              <MenuItem value="ALL">{es.movements.sources.all}</MenuItem>
-              <MenuItem value="BANK">{es.movements.sources.bank}</MenuItem>
-              <MenuItem value="CREDIT_CARD">
-                {es.movements.sources.creditCard}
+        />
+        <FormControl size="small" sx={{ flex: "1 1 160px", minWidth: 140 }}>
+          <InputLabel>{es.movements.categoryLabel}</InputLabel>
+          <Select
+            label={es.movements.categoryLabel}
+            value={categoryFilter}
+            onChange={(event) => setCategoryFilter(event.target.value)}
+          >
+            <MenuItem value={ALL}>{es.movements.allCategories}</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                {cat.name}
               </MenuItem>
-              <MenuItem value="MANUAL">{es.movements.sources.manual}</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 170 } }}>
-            <InputLabel>{es.movements.reviewLabel}</InputLabel>
-            <Select
-              label={es.movements.reviewLabel}
-              value={reviewFilter}
-              onChange={(event) =>
-                setReviewFilter(event.target.value as ReviewFilter)
-              }
-            >
-              <MenuItem value="ALL">{es.movements.reviewFilters.all}</MenuItem>
-              <MenuItem value="PENDING">
-                {es.movements.reviewFilters.pending}
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ flex: "1 1 180px", minWidth: 160 }}>
+          <InputLabel>{es.movements.subcategoryLabel}</InputLabel>
+          <Select
+            label={es.movements.subcategoryLabel}
+            value={subcategoryFilter}
+            disabled={subcategoryOptions.length === 0}
+            onChange={(event) => setSubcategoryFilter(event.target.value)}
+          >
+            <MenuItem value={ALL}>{es.movements.allSubcategories}</MenuItem>
+            {subcategoryOptions.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.label}
               </MenuItem>
-              <MenuItem value="REVIEWED">
-                {es.movements.reviewFilters.reviewed}
-              </MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
-      </Stack>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ flex: "0 1 130px", minWidth: 110 }}>
+          <InputLabel>{es.movements.sourceLabel}</InputLabel>
+          <Select
+            label={es.movements.sourceLabel}
+            value={sourceFilter}
+            onChange={(event) =>
+              setSourceFilter(event.target.value as FilterValue)
+            }
+          >
+            <MenuItem value="ALL">{es.movements.sources.all}</MenuItem>
+            <MenuItem value="BANK">{es.movements.sources.bank}</MenuItem>
+            <MenuItem value="CREDIT_CARD">
+              {es.movements.sources.creditCard}
+            </MenuItem>
+            <MenuItem value="MANUAL">{es.movements.sources.manual}</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ flex: "0 1 140px", minWidth: 120 }}>
+          <InputLabel>{es.movements.reviewLabel}</InputLabel>
+          <Select
+            label={es.movements.reviewLabel}
+            value={reviewFilter}
+            onChange={(event) =>
+              setReviewFilter(event.target.value as ReviewFilter)
+            }
+          >
+            <MenuItem value="ALL">{es.movements.reviewFilters.all}</MenuItem>
+            <MenuItem value="PENDING">
+              {es.movements.reviewFilters.pending}
+            </MenuItem>
+            <MenuItem value="REVIEWED">
+              {es.movements.reviewFilters.reviewed}
+            </MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          label={es.movements.dateFromLabel}
+          size="small"
+          type="date"
+          value={dateFrom}
+          onChange={(event) => setDateFrom(event.target.value)}
+          sx={{ flex: "0 1 150px", minWidth: 130 }}
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label={es.movements.dateToLabel}
+          size="small"
+          type="date"
+          value={dateTo}
+          onChange={(event) => setDateTo(event.target.value)}
+          sx={{ flex: "0 1 150px", minWidth: 130 }}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Box>
     </Paper>
   );
 }
@@ -145,10 +219,26 @@ export function MovementsTable({
   categories,
   movements,
   onMovementChange,
+  onMovementDelete,
 }: Props) {
   const [query, setQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<FilterValue>("ALL");
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("ALL");
+  const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
+  const [subcategoryFilter, setSubcategoryFilter] = useState<string>(ALL);
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+
+  // Reset the subcategory filter when its parent category no longer matches.
+  useEffect(() => {
+    if (subcategoryFilter === ALL) return;
+    if (categoryFilter === ALL) return;
+    const target = categories.find((cat) => cat.id === categoryFilter);
+    const stillValid = target?.subcategories.some(
+      (sub) => sub.id === subcategoryFilter,
+    );
+    if (!stillValid) setSubcategoryFilter(ALL);
+  }, [categories, categoryFilter, subcategoryFilter]);
 
   const filteredMovements = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -167,72 +257,78 @@ export function MovementsTable({
         (reviewFilter === "REVIEWED" && movement.reviewed) ||
         (reviewFilter === "PENDING" && !movement.reviewed);
 
-      return matchesQuery && matchesSource && matchesReview;
+      const matchesCategory =
+        categoryFilter === ALL || movement.category_id === categoryFilter;
+
+      const matchesSubcategory =
+        subcategoryFilter === ALL ||
+        movement.subcategory_id === subcategoryFilter;
+
+      const accountingDay = isoDateOnly(movement.accounting_date);
+      const matchesDateFrom = !dateFrom || accountingDay >= dateFrom;
+      const matchesDateTo = !dateTo || accountingDay <= dateTo;
+
+      return (
+        matchesQuery &&
+        matchesSource &&
+        matchesReview &&
+        matchesCategory &&
+        matchesSubcategory &&
+        matchesDateFrom &&
+        matchesDateTo
+      );
     });
-  }, [movements, query, reviewFilter, sourceFilter]);
+  }, [
+    categoryFilter,
+    dateFrom,
+    dateTo,
+    movements,
+    query,
+    reviewFilter,
+    sourceFilter,
+    subcategoryFilter,
+  ]);
 
   const columns = useMemo<GridColDef<MovementRow>[]>(
     () => [
       {
-        field: "accountingDateLabel",
-        headerName: es.movements.columns.accountingDate,
-        width: 168,
-        sortable: false,
-        renderCell: (params: GridRenderCellParams<MovementRow>) => (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <TextField
-              size="small"
-              type="date"
-              value={isoDateOnly(params.row.accounting_date)}
-              onChange={(event) => {
-                void updateMovementAccountingDate({
-                  movementId: params.row.id,
-                  accountingDate: event.target.value,
-                })
-                  .then(onMovementChange)
-                  .catch((error: unknown) => console.error(error));
-              }}
-              sx={{ width: 150 }}
-            />
-          </Box>
-        ),
-      },
-      {
         field: "business",
         headerName: es.movements.columns.movement,
-        minWidth: 300,
-        flex: 1.2,
+        minWidth: 220,
+        flex: 1.4,
         sortable: false,
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
-          <Box sx={{ py: 1 }}>
-            <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+          <Box sx={{ py: 1, minWidth: 0 }}>
+            <Typography
+              sx={{
+                fontSize: 14,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+            >
               {params.row.business}
             </Typography>
-            <Typography color="text.secondary" sx={{ fontSize: 13, mt: 0.25 }}>
-              {params.row.reason}
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: 12,
+                mt: 0.25,
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+            >
+              {params.row.accountingDateLabel} · {params.row.reason}
             </Typography>
-            {params.row.raw_description ? (
-              <Typography
-                color="text.secondary"
-                sx={{ fontSize: 11, mt: 0.5 }}
-              >
-                {params.row.raw_description}
-              </Typography>
-            ) : null}
           </Box>
         ),
       },
       {
         field: "source",
         headerName: es.movements.columns.source,
-        width: 138,
+        width: 100,
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
           <Chip label={params.row.source} size="small" variant="outlined" />
         ),
@@ -240,12 +336,13 @@ export function MovementsTable({
       {
         field: "amountLabel",
         headerName: es.movements.columns.amount,
-        width: 142,
+        width: 120,
       },
       {
         field: "classification",
         headerName: es.movements.columns.classification,
-        width: 360,
+        minWidth: 240,
+        flex: 1,
         sortable: false,
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
           <Box
@@ -269,8 +366,10 @@ export function MovementsTable({
       {
         field: "reviewed",
         headerName: es.movements.columns.reviewed,
-        width: 122,
+        width: 92,
         sortable: false,
+        align: "center",
+        headerAlign: "center",
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
           <Switch
             checked={params.row.reviewed}
@@ -285,31 +384,74 @@ export function MovementsTable({
           />
         ),
       },
+      {
+        field: "actions",
+        headerName: es.movements.columns.actions,
+        width: 70,
+        sortable: false,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params: GridRenderCellParams<MovementRow>) => (
+          <Tooltip title={es.movements.deleteTooltip}>
+            <IconButton
+              color="error"
+              size="small"
+              onClick={() => {
+                if (!window.confirm(es.movements.deleteConfirm)) return;
+                void deleteMovement(params.row.id)
+                  .then(() => onMovementDelete(params.row.id))
+                  .catch((error: unknown) => console.error(error));
+              }}
+            >
+              <DeleteOutlineRounded fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ),
+      },
     ],
-    [categories, onMovementChange],
+    [categories, onMovementChange, onMovementDelete],
   );
 
   return (
     <Stack spacing={2}>
       <MovementsFilters
+        categories={categories}
+        categoryFilter={categoryFilter}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
         query={query}
         reviewFilter={reviewFilter}
+        setCategoryFilter={setCategoryFilter}
+        setDateFrom={setDateFrom}
+        setDateTo={setDateTo}
         setQuery={setQuery}
         setReviewFilter={setReviewFilter}
         setSourceFilter={setSourceFilter}
+        setSubcategoryFilter={setSubcategoryFilter}
         sourceFilter={sourceFilter}
+        subcategoryFilter={subcategoryFilter}
       />
 
-      <Paper sx={{ height: "calc(100vh - 240px)", minHeight: 480, p: 0 }}>
+      <Paper
+        sx={{
+          height: "calc(100vh - 240px)",
+          minHeight: 480,
+          p: 0,
+          width: "100%",
+          maxWidth: "100%",
+          overflow: "hidden",
+        }}
+      >
         <DataGrid
           columns={columns}
           disableColumnMenu
           disableRowSelectionOnClick
           pageSizeOptions={[25, 50, 100]}
           rows={filteredMovements}
-          rowHeight={82}
+          rowHeight={64}
           sx={{
             border: 0,
+            width: "100%",
             "& .MuiDataGrid-columnHeaders": {
               borderBottom: "1px solid",
               borderColor: "divider",

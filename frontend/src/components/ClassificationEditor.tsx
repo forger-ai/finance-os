@@ -1,21 +1,27 @@
 import { useState } from "react";
 import {
+  Box,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import {
   updateMovementAccountingDate,
+  updateMovementCategoryOnly,
   updateMovementSubcategory,
 } from "@/api/movements";
+import { ApiError } from "@/api/utils";
 import type { MovementRead } from "@/api/types";
 import type { CategoryOption, MovementRow } from "@/lib/derive";
 import { isoDateOnly } from "@/api/utils";
 
 export type { CategoryOption, MovementRow } from "@/lib/derive";
+
+const NO_SUBCATEGORY = "__none__";
 
 type Props = {
   movement: MovementRow;
@@ -24,6 +30,12 @@ type Props = {
   reviewLayout?: boolean;
   onChange: (movement: MovementRead) => void;
 };
+
+function describeError(error: unknown): string {
+  if (error instanceof ApiError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "No se pudo guardar el cambio.";
+}
 
 export function ClassificationEditor({
   movement,
@@ -38,6 +50,8 @@ export function ClassificationEditor({
     movementId: movement.id,
     subcategoryId: movement.subcategory_id,
   });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const isCurrentMovement = draftValues.movementId === movement.id;
   const selectedCategoryId = isCurrentMovement
     ? draftValues.categoryId
@@ -53,41 +67,81 @@ export function ClassificationEditor({
     categories.find((category) => category.id === selectedCategoryId) ??
     categories[0];
 
+  const handleApiResult = (updated: MovementRead) => {
+    setErrorMessage(null);
+    onChange(updated);
+  };
+
+  const handleApiError = (error: unknown) => {
+    setErrorMessage(describeError(error));
+  };
+
   const handleCategoryChange = (nextCategoryId: string) => {
     const nextCategory =
       categories.find((category) => category.id === nextCategoryId) ??
       categories[0];
-    const nextSubcategoryId = nextCategory.subcategories[0]?.id;
+    if (!nextCategory) return;
+
+    // If the new category has subcategories, default to the first one. If it
+    // doesn't, save as category-only.
+    const firstSubId = nextCategory.subcategories[0]?.id ?? null;
+
     setDraftValues({
       accountingDate: selectedAccountingDate,
-      categoryId: nextCategoryId,
+      categoryId: nextCategory.id,
       movementId: movement.id,
-      subcategoryId: nextSubcategoryId ?? selectedSubcategoryId,
+      subcategoryId: firstSubId,
     });
-    if (!nextSubcategoryId) {
-      return;
+    setErrorMessage(null);
+
+    if (firstSubId) {
+      void updateMovementSubcategory({
+        movementId: movement.id,
+        subcategoryId: firstSubId,
+      })
+        .then(handleApiResult)
+        .catch(handleApiError);
+    } else {
+      void updateMovementCategoryOnly({
+        movementId: movement.id,
+        categoryId: nextCategory.id,
+      })
+        .then(handleApiResult)
+        .catch(handleApiError);
     }
-    void updateMovementSubcategory({
-      movementId: movement.id,
-      subcategoryId: nextSubcategoryId,
-    })
-      .then(onChange)
-      .catch((error: unknown) => console.error(error));
   };
 
-  const handleSubcategoryChange = (nextSubcategoryId: string) => {
+  const handleSubcategoryChange = (rawValue: string) => {
+    if (rawValue === NO_SUBCATEGORY) {
+      setDraftValues({
+        accountingDate: selectedAccountingDate,
+        categoryId: selectedCategoryId,
+        movementId: movement.id,
+        subcategoryId: null,
+      });
+      setErrorMessage(null);
+      void updateMovementCategoryOnly({
+        movementId: movement.id,
+        categoryId: selectedCategoryId,
+      })
+        .then(handleApiResult)
+        .catch(handleApiError);
+      return;
+    }
+
     setDraftValues({
       accountingDate: selectedAccountingDate,
       categoryId: selectedCategoryId,
       movementId: movement.id,
-      subcategoryId: nextSubcategoryId,
+      subcategoryId: rawValue,
     });
+    setErrorMessage(null);
     void updateMovementSubcategory({
       movementId: movement.id,
-      subcategoryId: nextSubcategoryId,
+      subcategoryId: rawValue,
     })
-      .then(onChange)
-      .catch((error: unknown) => console.error(error));
+      .then(handleApiResult)
+      .catch(handleApiError);
   };
 
   const handleAccountingDateChange = (nextAccountingDate: string) => {
@@ -97,13 +151,19 @@ export function ClassificationEditor({
       movementId: movement.id,
       subcategoryId: selectedSubcategoryId,
     });
+    setErrorMessage(null);
     void updateMovementAccountingDate({
       movementId: movement.id,
       accountingDate: nextAccountingDate,
     })
-      .then(onChange)
-      .catch((error: unknown) => console.error(error));
+      .then(handleApiResult)
+      .catch(handleApiError);
   };
+
+  const subOptions = activeCategory?.subcategories ?? [];
+  const showSubSelect = subOptions.length > 0;
+  // The Select wants a string value; ``null`` becomes the sentinel "no sub".
+  const subSelectValue = selectedSubcategoryId ?? NO_SUBCATEGORY;
 
   if (reviewLayout) {
     return (
@@ -134,54 +194,82 @@ export function ClassificationEditor({
             </Select>
           </FormControl>
 
-          <FormControl fullWidth size="small">
-            <InputLabel>Sub clasificacion</InputLabel>
-            <Select
-              label="Sub clasificacion"
-              value={selectedSubcategoryId}
-              onChange={(event) => handleSubcategoryChange(event.target.value)}
-            >
-              {activeCategory?.subcategories.map((subcategory) => (
-                <MenuItem key={subcategory.id} value={subcategory.id}>
-                  {subcategory.name}
+          {showSubSelect ? (
+            <FormControl fullWidth size="small">
+              <InputLabel>Sub clasificacion</InputLabel>
+              <Select
+                label="Sub clasificacion"
+                value={subSelectValue}
+                onChange={(event) =>
+                  handleSubcategoryChange(event.target.value)
+                }
+              >
+                <MenuItem value={NO_SUBCATEGORY}>
+                  <em>Sin subcategoría</em>
                 </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                {subOptions.map((subcategory) => (
+                  <MenuItem key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : null}
         </Stack>
+        {errorMessage ? (
+          <Typography color="error" sx={{ fontSize: 12 }}>
+            {errorMessage}
+          </Typography>
+        ) : null}
       </Stack>
     );
   }
 
   if (dense) {
     return (
-      <Stack direction="row" spacing={1} sx={{ minWidth: 0, width: "100%" }}>
-        <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
-          <Select
-            value={selectedCategoryId}
-            onChange={(event) => handleCategoryChange(event.target.value)}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <Box sx={{ minWidth: 0, width: "100%" }}>
+        <Stack direction="row" spacing={1} sx={{ minWidth: 0, width: "100%" }}>
+          <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
+            <Select
+              value={selectedCategoryId}
+              onChange={(event) => handleCategoryChange(event.target.value)}
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
-          <Select
-            value={selectedSubcategoryId}
-            onChange={(event) => handleSubcategoryChange(event.target.value)}
-          >
-            {activeCategory?.subcategories.map((subcategory) => (
-              <MenuItem key={subcategory.id} value={subcategory.id}>
-                {subcategory.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
+          {showSubSelect ? (
+            <FormControl size="small" sx={{ flex: 1, minWidth: 0 }}>
+              <Select
+                value={subSelectValue}
+                onChange={(event) =>
+                  handleSubcategoryChange(event.target.value)
+                }
+              >
+                <MenuItem value={NO_SUBCATEGORY}>
+                  <em>—</em>
+                </MenuItem>
+                {subOptions.map((subcategory) => (
+                  <MenuItem key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <Box sx={{ flex: 1, minWidth: 0 }} />
+          )}
+        </Stack>
+        {errorMessage ? (
+          <Typography color="error" sx={{ fontSize: 11, mt: 0.5 }}>
+            {errorMessage}
+          </Typography>
+        ) : null}
+      </Box>
     );
   }
 
@@ -213,21 +301,31 @@ export function ClassificationEditor({
           </Select>
         </FormControl>
 
-        <FormControl fullWidth size="small">
-          <InputLabel>Subcategoria</InputLabel>
-          <Select
-            label="Subcategoria"
-            value={selectedSubcategoryId}
-            onChange={(event) => handleSubcategoryChange(event.target.value)}
-          >
-            {activeCategory?.subcategories.map((subcategory) => (
-              <MenuItem key={subcategory.id} value={subcategory.id}>
-                {subcategory.name}
+        {showSubSelect ? (
+          <FormControl fullWidth size="small">
+            <InputLabel>Subcategoria</InputLabel>
+            <Select
+              label="Subcategoria"
+              value={subSelectValue}
+              onChange={(event) => handleSubcategoryChange(event.target.value)}
+            >
+              <MenuItem value={NO_SUBCATEGORY}>
+                <em>Sin subcategoría</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {subOptions.map((subcategory) => (
+                <MenuItem key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        ) : null}
       </Stack>
+      {errorMessage ? (
+        <Typography color="error" sx={{ fontSize: 12 }}>
+          {errorMessage}
+        </Typography>
+      ) : null}
     </Stack>
   );
 }

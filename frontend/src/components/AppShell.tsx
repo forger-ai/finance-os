@@ -36,7 +36,12 @@ export function AppShell({
 }) {
   return (
     <Box
-      sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        overflowX: "hidden",
+      }}
     >
       <AppBar
         color="inherit"
@@ -151,11 +156,18 @@ export function AppShell({
         component="main"
         sx={{
           flexGrow: 1,
-          width: "100%",
+          // Critical: cap the main column to "viewport − drawer width" so its
+          // children can't push the page wider than the screen on md+. Below
+          // md the drawer is hidden so the main can take 100%.
+          width: { xs: "100%", md: `calc(100% - ${drawerWidth}px)` },
+          minWidth: 0,
+          overflowX: "hidden",
         }}
       >
         <Toolbar sx={{ minHeight: `${appBarHeight}px !important` }} />
-        <Box sx={{ px: { xs: 1.5, md: 2.5 }, py: 2 }}>{children}</Box>
+        <Box sx={{ px: { xs: 1.5, md: 2.5 }, py: 2, minWidth: 0 }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );

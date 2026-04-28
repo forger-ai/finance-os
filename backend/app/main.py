@@ -9,8 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import app.database_ext  # noqa: F401 - registers models before init_db
-from app.database import init_db
-from app.routes import categories, health, imports, movements
+from app.database import engine, init_db
+from app.routes import categories, health, imports, movements, settings as settings_routes
+from app.services.bootstrap import ensure_unclassified_subcategory
 
 
 def _allowed_origins() -> list[str]:
@@ -36,6 +37,10 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     def _startup() -> None:
         init_db()  # models already registered via database_ext
+        from sqlmodel import Session
+
+        with Session(engine) as session:
+            ensure_unclassified_subcategory(session)
 
     @app.exception_handler(ValueError)
     async def _value_error_handler(_request, exc: ValueError):  # type: ignore[no-untyped-def]
@@ -45,6 +50,7 @@ def create_app() -> FastAPI:
     app.include_router(categories.router)
     app.include_router(movements.router)
     app.include_router(imports.router)
+    app.include_router(settings_routes.router)
 
     return app
 

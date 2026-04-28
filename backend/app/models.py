@@ -84,13 +84,28 @@ class Subcategory(SQLModel, table=True):
     movements: list["Movement"] = Relationship(back_populates="subcategory")
 
 
+class Setting(SQLModel, table=True):
+    """Key-value app settings persisted in the database.
+
+    Keys are namespaced strings (e.g. ``llm.openai.api_key``). Values are stored
+    as text — callers serialize/deserialize. Used today for LLM credentials so
+    the user can manage them from the UI instead of redeploying with env vars.
+    """
+
+    __tablename__ = "setting"
+
+    key: str = Field(primary_key=True)
+    value: str | None = Field(default=None)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
 class Movement(SQLModel, table=True):
     __tablename__ = "movement"
     __table_args__ = (
         Index("ix_movement_date", "date"),
         Index("ix_movement_accounting_date", "accounting_date"),
+        Index("ix_movement_category_date", "category_id", "date"),
         Index("ix_movement_subcategory_date", "subcategory_id", "date"),
-        Index("ix_movement_subcategory_accounting_date", "subcategory_id", "accounting_date"),
     )
 
     id: str = Field(default_factory=generate_id, primary_key=True)
@@ -103,8 +118,16 @@ class Movement(SQLModel, table=True):
     source: MovementSource
     raw_description: str | None = Field(default=None)
     reviewed: bool = Field(default=False)
-    subcategory_id: str = Field(foreign_key="subcategory.id", ondelete="RESTRICT")
+    # ``category_id`` is the source of truth for classification — every movement
+    # belongs to a category. ``subcategory_id`` is optional: when present its
+    # ``category_id`` must match the movement's, but a category without
+    # subcategories can still hold movements directly.
+    category_id: str = Field(foreign_key="category.id", ondelete="RESTRICT")
+    subcategory_id: str | None = Field(
+        default=None, foreign_key="subcategory.id", ondelete="RESTRICT"
+    )
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
 
+    category: "Category" = Relationship()
     subcategory: "Subcategory" = Relationship(back_populates="movements")

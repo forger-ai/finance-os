@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import AddRounded from "@mui/icons-material/AddRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import SaveRounded from "@mui/icons-material/SaveRounded";
 import SettingsSuggestRounded from "@mui/icons-material/SettingsSuggestRounded";
@@ -15,11 +16,16 @@ import {
   Paper,
   Select,
   Stack,
+  Tab,
+  Tabs,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { LLMSettingsTab } from "./LLMSettingsTab";
 import {
+  createCategory,
+  createSubcategory,
   deleteCategory,
   deleteSubcategory,
   moveCategorySubcategories,
@@ -28,6 +34,7 @@ import {
   renameSubcategory,
   updateCategoryBudget,
 } from "@/api/categories";
+import type { CategoryKind } from "@/api/types";
 import type { SettingsCategory, SettingsSubcategory } from "@/lib/derive";
 import { ApiError } from "@/api/utils";
 import { es } from "@/i18n/es";
@@ -51,8 +58,11 @@ function describeError(error: unknown, fallback: string) {
   return fallback;
 }
 
+type SettingsTab = "categories" | "llm";
+
 export function SettingsView({ categories, onChanged }: Props) {
   const [message, setMessage] = useState<string | null>(null);
+  const [tab, setTab] = useState<SettingsTab>("categories");
 
   const allSubcategories = useMemo(
     () => categories.flatMap((category) => category.subcategories),
@@ -61,47 +71,41 @@ export function SettingsView({ categories, onChanged }: Props) {
 
   return (
     <Stack spacing={2.5}>
-      <Box>
-        <Typography
-          sx={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-          }}
-        >
-          {es.views.settingsAdministration}
-        </Typography>
-        <Typography
-          sx={{
-            mt: 0.5,
-            fontSize: { xs: 30, md: 40 },
-            fontWeight: 800,
-            letterSpacing: "-0.05em",
-          }}
-        >
-          {es.views.settingsTitle}
-        </Typography>
-      </Box>
+      <Tabs
+        value={tab}
+        onChange={(_, value: SettingsTab) => setTab(value)}
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+      >
+        <Tab value="categories" label={es.settings.tabs.categories} />
+        <Tab value="llm" label={es.settings.tabs.llm} />
+      </Tabs>
 
-      {message ? (
-        <Alert onClose={() => setMessage(null)} severity="info">
-          {message}
-        </Alert>
-      ) : null}
+      {tab === "categories" ? (
+        <>
+          {message ? (
+            <Alert onClose={() => setMessage(null)} severity="info">
+              {message}
+            </Alert>
+          ) : null}
 
-      <Stack spacing={2}>
-        {categories.map((category) => (
-          <CategoryCard
-            allCategories={categories}
-            allSubcategories={allSubcategories}
-            category={category}
-            key={category.id}
-            onChanged={onChanged}
-            onMessage={setMessage}
-          />
-        ))}
-      </Stack>
+          <CreateCategoryForm onChanged={onChanged} onMessage={setMessage} />
+
+          <Stack spacing={2}>
+            {categories.map((category) => (
+              <CategoryCard
+                allCategories={categories}
+                allSubcategories={allSubcategories}
+                category={category}
+                key={category.id}
+                onChanged={onChanged}
+                onMessage={setMessage}
+              />
+            ))}
+          </Stack>
+        </>
+      ) : (
+        <LLMSettingsTab />
+      )}
     </Stack>
   );
 }
@@ -145,6 +149,20 @@ function CategoryCard({
     }
   };
 
+  const moveCategoryTargets = useMemo(
+    () => allCategories.filter((item) => item.id !== category.id),
+    [allCategories, category.id],
+  );
+  const noOtherCategories = moveCategoryTargets.length === 0;
+  const noSubcategoriesHere = category.subcategories.length === 0;
+  const moveSubsDisabled =
+    noOtherCategories || noSubcategoriesHere || !targetCategoryId;
+  const moveSubsHelper = noOtherCategories
+    ? es.settings.noOtherCategoriesHint
+    : noSubcategoriesHere
+      ? es.settings.noSubcategoriesToMoveHint
+      : null;
+
   const runMoveSubcategories = async () => {
     if (!targetCategoryId) {
       onMessage("Debes elegir una categoría de destino.");
@@ -156,6 +174,7 @@ function CategoryCard({
         targetCategoryId,
       });
       onMessage(es.settings.subcategoriesMoved);
+      setTargetCategoryId("");
       await onChanged();
     } catch (error) {
       onMessage(describeError(error, "No se pudieron mover las subcategorías."));
@@ -237,29 +256,39 @@ function CategoryCard({
                 <SaveRounded />
               </IconButton>
             </Tooltip>
-            <FormControl size="small" sx={{ minWidth: 220 }}>
+            <FormControl
+              size="small"
+              sx={{ minWidth: 220 }}
+              disabled={noOtherCategories || noSubcategoriesHere}
+            >
               <InputLabel>{es.settings.moveSubcategoriesLabel}</InputLabel>
               <Select
                 label={es.settings.moveSubcategoriesLabel}
                 value={targetCategoryId}
                 onChange={(event) => setTargetCategoryId(event.target.value)}
               >
-                {allCategories
-                  .filter((item) => item.id !== category.id)
-                  .map((item) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  ))}
+                {moveCategoryTargets.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
-            <Button
-              startIcon={<SwapHorizRounded />}
-              variant="outlined"
-              onClick={() => void runMoveSubcategories()}
+            <Tooltip
+              title={moveSubsHelper ?? ""}
+              disableHoverListener={!moveSubsHelper}
             >
-              {es.settings.moveButton}
-            </Button>
+              <span>
+                <Button
+                  startIcon={<SwapHorizRounded />}
+                  variant="outlined"
+                  onClick={() => void runMoveSubcategories()}
+                  disabled={moveSubsDisabled}
+                >
+                  {es.settings.moveButton}
+                </Button>
+              </span>
+            </Tooltip>
             <Tooltip title={es.settings.deleteCategoryTooltip}>
               <span>
                 <IconButton
@@ -284,9 +313,173 @@ function CategoryCard({
               subcategory={subcategory}
             />
           ))}
+          <CreateSubcategoryRow
+            categoryId={category.id}
+            onChanged={onChanged}
+            onMessage={onMessage}
+          />
         </Stack>
       </Stack>
     </Paper>
+  );
+}
+
+function CreateCategoryForm({
+  onChanged,
+  onMessage,
+}: {
+  onChanged: () => Promise<void> | void;
+  onMessage: (value: string | null) => void;
+}) {
+  const [name, setName] = useState("");
+  const [kind, setKind] = useState<CategoryKind>("EXPENSE");
+  const [budget, setBudget] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      onMessage("El nombre no puede estar vacío.");
+      return;
+    }
+    let budgetValue: number | null = null;
+    if (budget.trim()) {
+      const parsed = Number(budget.trim().replace(",", "."));
+      if (Number.isNaN(parsed)) {
+        onMessage("El budget debe ser un número válido.");
+        return;
+      }
+      budgetValue = parsed;
+    }
+
+    setBusy(true);
+    try {
+      await createCategory({ name: trimmed, kind, budget: budgetValue });
+      onMessage(es.settings.categoryCreated);
+      setName("");
+      setBudget("");
+      setKind("EXPENSE");
+      await onChanged();
+    } catch (error) {
+      onMessage(describeError(error, "No se pudo crear la categoría."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 2 }} variant="outlined">
+      <Stack spacing={1.5}>
+        <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
+          {es.settings.newCategoryTitle}
+        </Typography>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={1.25}
+          sx={{ alignItems: { md: "center" } }}
+        >
+          <TextField
+            label={es.settings.newCategoryNameLabel}
+            size="small"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            sx={{ minWidth: 220, flex: 1 }}
+          />
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel>{es.settings.newCategoryKindLabel}</InputLabel>
+            <Select
+              label={es.settings.newCategoryKindLabel}
+              value={kind}
+              onChange={(event) => setKind(event.target.value as CategoryKind)}
+            >
+              <MenuItem value="EXPENSE">{es.settings.kindLabels.EXPENSE}</MenuItem>
+              <MenuItem value="INCOME">{es.settings.kindLabels.INCOME}</MenuItem>
+              <MenuItem value="UNCHARGEABLE">
+                {es.settings.kindLabels.UNCHARGEABLE}
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label={es.settings.budgetLabel}
+            size="small"
+            value={budget}
+            onChange={(event) => setBudget(event.target.value)}
+            sx={{ minWidth: 140 }}
+          />
+          <Button
+            startIcon={<AddRounded />}
+            variant="contained"
+            onClick={() => void submit()}
+            disabled={busy}
+          >
+            {es.settings.createButton}
+          </Button>
+        </Stack>
+      </Stack>
+    </Paper>
+  );
+}
+
+function CreateSubcategoryRow({
+  categoryId,
+  onChanged,
+  onMessage,
+}: {
+  categoryId: string;
+  onChanged: () => Promise<void> | void;
+  onMessage: (value: string | null) => void;
+}) {
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      onMessage("El nombre no puede estar vacío.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await createSubcategory({ name: trimmed, categoryId });
+      onMessage(es.settings.subcategoryCreated);
+      setName("");
+      await onChanged();
+    } catch (error) {
+      onMessage(describeError(error, "No se pudo crear la subcategoría."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={1}
+      sx={{
+        alignItems: { sm: "center" },
+        pt: 0.5,
+      }}
+    >
+      <TextField
+        label={es.settings.newSubcategoryLabel}
+        size="small"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") void submit();
+        }}
+        sx={{ minWidth: 260, flex: 1 }}
+      />
+      <Button
+        startIcon={<AddRounded />}
+        variant="outlined"
+        size="small"
+        onClick={() => void submit()}
+        disabled={busy}
+      >
+        {es.settings.addSubcategoryButton}
+      </Button>
+    </Stack>
   );
 }
 
@@ -324,6 +517,19 @@ function SubcategoryRow({
     }
   };
 
+  const moveTargets = useMemo(
+    () => allSubcategories.filter((item) => item.id !== subcategory.id),
+    [allSubcategories, subcategory.id],
+  );
+  const noMoveTargets = moveTargets.length === 0;
+  const noMovements = subcategory.movementCount === 0;
+  const moveDisabled = noMoveTargets || noMovements || !targetSubcategoryId;
+  const moveHelper = noMoveTargets
+    ? es.settings.noOtherSubcategoriesHint
+    : noMovements
+      ? es.settings.noMovementsToMoveHint
+      : null;
+
   const runMoveMovements = async () => {
     if (!targetSubcategoryId) {
       onMessage("Debes elegir una subcategoría de destino.");
@@ -335,6 +541,7 @@ function SubcategoryRow({
         targetSubcategoryId,
       });
       onMessage(es.settings.movementsReassigned);
+      setTargetSubcategoryId("");
       await onChanged();
     } catch (error) {
       onMessage(describeError(error, "No se pudieron mover los movimientos."));
@@ -404,30 +611,42 @@ function SubcategoryRow({
         </Stack>
 
         <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
-          <FormControl size="small" sx={{ minWidth: 260 }}>
+          <FormControl
+            size="small"
+            sx={{ minWidth: 260 }}
+            disabled={noMoveTargets || noMovements}
+          >
             <InputLabel>{es.settings.sendAllLabel}</InputLabel>
             <Select
               label={es.settings.sendAllLabel}
               value={targetSubcategoryId}
               onChange={(event) => setTargetSubcategoryId(event.target.value)}
             >
-              {allSubcategories
-                .filter((item) => item.id !== subcategory.id)
-                .map((item) => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.categoryName} / {item.name}
-                  </MenuItem>
-                ))}
+              {moveTargets.map((item) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.categoryName} / {item.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-          <Button
-            startIcon={<SwapHorizRounded />}
-            variant="contained"
-            onClick={() => void runMoveMovements()}
-          >
-            {es.settings.sendAllButton}
-          </Button>
+          <Tooltip title={moveHelper ?? ""} disableHoverListener={!moveHelper}>
+            <span>
+              <Button
+                startIcon={<SwapHorizRounded />}
+                variant="contained"
+                onClick={() => void runMoveMovements()}
+                disabled={moveDisabled}
+              >
+                {es.settings.sendAllButton}
+              </Button>
+            </span>
+          </Tooltip>
         </Stack>
+        {moveHelper ? (
+          <Typography color="text.secondary" sx={{ fontSize: 12, pl: 0.5 }}>
+            {moveHelper}
+          </Typography>
+        ) : null}
       </Stack>
     </Paper>
   );
