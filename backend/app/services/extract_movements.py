@@ -22,6 +22,7 @@ from sqlmodel import Session, select
 
 from app.models import Movement, MovementSource, Subcategory
 from app.services.bootstrap import UNCLASSIFIED_NAME, ensure_unclassified_subcategory
+from app.services.classification import resolve_movement_classification
 from app.services.classification_memory import (
     MemoryEntry,
     build_classification_memory,
@@ -304,6 +305,11 @@ def extract_movements_from_file(
 
             amount_cents = to_positive_cents(item.amount)
             sub = _resolve_subcategory(item.subcategory_name, subcategory_map, fallback)
+            classification = resolve_movement_classification(
+                session,
+                category_id=sub.category_id,
+                subcategory_id=sub.id,
+            )
 
             duplicate_key = _build_duplicate_key(
                 amount_cents=amount_cents,
@@ -323,8 +329,10 @@ def extract_movements_from_file(
                 source=source,
                 raw_description=item.raw_description or None,
                 reviewed=False,
-                category_id=sub.category_id,
-                subcategory_id=sub.id,
+                category_id=classification.category.id,
+                subcategory_id=classification.subcategory.id
+                if classification.subcategory is not None
+                else None,
             )
             session.add(movement)
             session.commit()

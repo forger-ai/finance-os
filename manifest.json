@@ -89,6 +89,7 @@
     "upsert_categories": "cd backend && uv run python scripts/upsert_categories.py",
     "edit_movement": "cd backend && uv run python scripts/edit_movement.py",
     "delete_movement": "cd backend && uv run python scripts/delete_movement.py",
+    "verify_data_integrity": "cd backend && uv run python scripts/verify_data_integrity.py",
     "verify": "cd backend && uv run python scripts/verify.py"
   },
   "skills": [

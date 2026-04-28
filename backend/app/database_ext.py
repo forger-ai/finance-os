@@ -111,8 +111,46 @@ def _normalize_movement_amounts() -> None:
         conn.execute(text("UPDATE movement SET amount_cents = ABS(amount_cents)"))
 
 
+def _repair_movement_classifications() -> None:
+    """Repair legacy category/subcategory mismatches.
+
+    The runtime invariant is enforced in writers. This repair is only for local
+    databases that were already left with ``movement.category_id`` pointing to a
+    different category than ``movement.subcategory_id``.
+    """
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
+    with engine.begin() as conn:
+        rows = conn.execute(
+            text("SELECT name FROM sqlite_master WHERE type='table' AND name='movement'")
+        ).fetchall()
+        if not rows:
+            return
+        conn.execute(
+            text(
+                """
+                UPDATE movement
+                SET category_id = (
+                    SELECT subcategory.category_id
+                    FROM subcategory
+                    WHERE subcategory.id = movement.subcategory_id
+                )
+                WHERE subcategory_id IS NOT NULL
+                  AND EXISTS (
+                    SELECT 1
+                    FROM subcategory
+                    WHERE subcategory.id = movement.subcategory_id
+                      AND subcategory.category_id != movement.category_id
+                  )
+                """
+            )
+        )
+
+
 def init_app_db() -> None:
     """Run Finance OS schema setup using the shared database helper."""
     _migrate_movement_schema()
     init_db()
+    _repair_movement_classifications()
     _normalize_movement_amounts()

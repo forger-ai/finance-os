@@ -93,6 +93,10 @@ The importer expects movement data with these concepts:
 - `subcategory`: target subcategory.
 - `reviewed`: whether the movement is already confirmed by the user.
 
+Classification invariant: if a movement has a subcategory, that subcategory must
+belong to the same category stored on the movement. Do not create or preserve
+category/subcategory mismatches.
+
 Accepted aliases include Spanish names such as:
 
 - `fecha`

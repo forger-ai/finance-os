@@ -4,6 +4,7 @@ Performs:
 
 - ``ruff check`` over the project (lint + import order)
 - ``pyright`` type checking on ``app/`` and ``scripts/``
+- a data integrity check for category/subcategory invariants
 - a smoke test that imports the FastAPI app and hits ``/health`` with TestClient
 
 Usage:
@@ -64,6 +65,7 @@ def main() -> int:
     ok = True
     ok = run("Ruff", ["uv", "run", "ruff", "check", "app", "scripts"]) and ok
     ok = run("Pyright", ["uv", "run", "pyright"]) and ok
+    ok = run("Data integrity", ["uv", "run", "python", "scripts/verify_data_integrity.py"]) and ok
     ok = smoke_test() and ok
     print("\n" + ("All checks passed." if ok else "Some checks failed."))
     return 0 if ok else 1

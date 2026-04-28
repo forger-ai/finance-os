@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import Category, Movement, MovementSource, Subcategory, utcnow
+from app.models import Category, Movement, MovementSource, utcnow
 from app.schemas import (
     ActionResult,
     MovementCreate,
@@ -17,6 +17,10 @@ from app.schemas import (
     SummarySourceCounts,
 )
 from app.services.bootstrap import UNCLASSIFIED_NAME
+from app.services.classification import (
+    ClassificationError,
+    resolve_movement_classification,
+)
 from app.services.classification_memory import (
     build_classification_memory,
     memory_index,
@@ -71,19 +75,14 @@ def create_movement(
     payload: MovementCreate,
     session: Session = Depends(get_session),
 ) -> MovementRead:
-    category = session.get(Category, payload.category_id)
-    if category is None:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada.")
-    sub: Subcategory | None = None
-    if payload.subcategory_id is not None:
-        sub = session.get(Subcategory, payload.subcategory_id)
-        if sub is None:
-            raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
-        if sub.category_id != category.id:
-            raise HTTPException(
-                status_code=400,
-                detail="La subcategoría no pertenece a la categoría indicada.",
-            )
+    try:
+        classification = resolve_movement_classification(
+            session,
+            category_id=payload.category_id,
+            subcategory_id=payload.subcategory_id,
+        )
+    except ClassificationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     raw_date = parse_date_input(payload.date)
     accounting_date = (
@@ -98,8 +97,10 @@ def create_movement(
         source=payload.source,
         raw_description=payload.raw_description,
         reviewed=payload.reviewed,
-        category_id=category.id,
-        subcategory_id=sub.id if sub is not None else None,
+        category_id=classification.category.id,
+        subcategory_id=classification.subcategory.id
+        if classification.subcategory is not None
+        else None,
     )
     session.add(movement)
     session.commit()
@@ -119,29 +120,38 @@ def update_movement(
 
     fields = payload.model_fields_set
 
-    # Categoría/subcategoría: priorizamos subcategory_id (incluye categoría
-    # implícita); si solo viene category_id, limpiamos la sub. ``clear_subcategory``
-    # permite forzar el caso "categoría sola" sobre un movimiento ya clasificado.
-    if "subcategory_id" in fields and payload.subcategory_id is not None:
-        sub = session.get(Subcategory, payload.subcategory_id)
-        if sub is None:
-            raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
-        movement.subcategory_id = sub.id
-        movement.category_id = sub.category_id
-    elif "category_id" in fields and payload.category_id is not None:
-        category = session.get(Category, payload.category_id)
-        if category is None:
-            raise HTTPException(status_code=404, detail="Categoría no encontrada.")
-        movement.category_id = category.id
-        # If the existing subcategory no longer belongs to the new category,
-        # clear it. The user can pick a fresh sub afterwards if they want.
-        if movement.subcategory_id is not None:
-            current_sub = session.get(Subcategory, movement.subcategory_id)
-            if current_sub is None or current_sub.category_id != category.id:
-                movement.subcategory_id = None
-
-    if payload.clear_subcategory:
-        movement.subcategory_id = None
+    classification_changed = (
+        "category_id" in fields or "subcategory_id" in fields or bool(payload.clear_subcategory)
+    )
+    if classification_changed:
+        next_category_id = (
+            payload.category_id
+            if "category_id" in fields and payload.category_id is not None
+            else movement.category_id
+        )
+        next_subcategory_id = (
+            None
+            if payload.clear_subcategory
+            else (
+                payload.subcategory_id
+                if "subcategory_id" in fields
+                else movement.subcategory_id
+            )
+        )
+        try:
+            classification = resolve_movement_classification(
+                session,
+                category_id=next_category_id,
+                subcategory_id=next_subcategory_id,
+            )
+        except ClassificationError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        movement.category_id = classification.category.id
+        movement.subcategory_id = (
+            classification.subcategory.id
+            if classification.subcategory is not None
+            else None
+        )
 
     if "reviewed" in fields and payload.reviewed is not None:
         movement.reviewed = payload.reviewed
@@ -224,8 +234,20 @@ def apply_classification_memory(
             and match.category_id == movement.category_id
         ):
             continue
-        movement.category_id = match.category_id
-        movement.subcategory_id = match.subcategory_id
+        try:
+            classification = resolve_movement_classification(
+                session,
+                category_id=match.category_id,
+                subcategory_id=match.subcategory_id,
+            )
+        except ClassificationError:
+            continue
+        movement.category_id = classification.category.id
+        movement.subcategory_id = (
+            classification.subcategory.id
+            if classification.subcategory is not None
+            else None
+        )
         movement.updated_at = utcnow()
         session.add(movement)
         updated += 1

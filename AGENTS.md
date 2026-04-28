@@ -220,6 +220,8 @@ Reglas:
 
 - Antes de importar, revisar categorias/subcategorias disponibles.
 - Normalizar columnas y fechas.
+- Mantener la invariante de clasificacion: si un movimiento tiene subcategoria,
+  esa subcategoria debe pertenecer a la misma categoria del movimiento.
 - Mantener trazabilidad entre fuente original, descripcion raw y fecha contable.
 - Revisar errores de importacion.
 - Informar al usuario cuantas filas se cargaron y cuales requieren revision.

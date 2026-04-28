@@ -22,6 +22,7 @@ from sqlmodel import Session, select
 
 from app.models import Category, Movement, MovementSource, Subcategory
 from app.services.bootstrap import UNCLASSIFIED_NAME, ensure_unclassified_subcategory
+from app.services.classification import resolve_movement_classification
 from app.services.classification_memory import (
     build_classification_memory,
     memory_index,
@@ -322,6 +323,11 @@ def import_movements_from_csv(
                 normalize_key(category_name) == unclassified
                 or (sub is not None and normalize_key(sub.name) == unclassified)
             )
+            classification = resolve_movement_classification(
+                session,
+                category_id=category_id,
+                subcategory_id=sub.id if sub is not None else None,
+            )
             initial_reviewed = (
                 False
                 if is_unclassified
@@ -337,8 +343,10 @@ def import_movements_from_csv(
                 source=normalized_source,
                 raw_description=raw_description or None,
                 reviewed=initial_reviewed,
-                category_id=category_id,
-                subcategory_id=sub.id if sub is not None else None,
+                category_id=classification.category.id,
+                subcategory_id=classification.subcategory.id
+                if classification.subcategory is not None
+                else None,
             )
             session.add(movement)
             session.commit()
