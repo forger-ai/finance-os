@@ -1,8 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.5",
+      "summary": "Improves AI-assisted imports, classification consistency, and review workflows.",
+      "changes": [
+        "Adds AI-assisted import and review improvements for statements and movement files.",
+        "Keeps stored movement amounts as positive magnitudes while category kind represents direction.",
+        "Enforces category and subcategory consistency across imports, edits, and verification.",
+        "Adds local data integrity verification and supporting agent guidance."
+      ]
+    },
     {
       "version": "0.1.4",
       "summary": "Refreshes agent and install documentation.",
@@ -34,7 +44,7 @@
   "catalog": {
     "display_name": "Finance OS",
     "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
-    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances \u2014 all without sending your data anywhere.",
+    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances -- all without sending your data anywhere.",
     "category": "finance",
     "capabilities": [
       {
