@@ -12,6 +12,7 @@ backend/data/*.sqlite-journal
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+frontend/*.tsbuildinfo
 
 # Editor
 .idea/

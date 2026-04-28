@@ -1,74 +1,74 @@
-# FinanceOS Lite
+# Finance OS Lite
 
-Aplicación personal para consolidar, revisar y clasificar movimientos financieros con ayuda de agentes. Esta versión "Lite" del proyecto FinanceOS reemplaza el stack original Next.js + Prisma + PostgreSQL por un stack más liviano y portable: **FastAPI + SQLite + Vite + React**, ideal para correr en local con Docker o Forger.
+Personal application for consolidating, reviewing, and classifying financial movements with agent assistance. This Lite version of Finance OS replaces the original Next.js + Prisma + PostgreSQL stack with a lighter and more portable stack: **FastAPI + SQLite + Vite + React**, suited for local use with Docker or Forger.
 
-La idea del proyecto sigue siendo la misma: no es un SaaS multiusuario, es una herramienta para una sola persona, con base de datos privada y flujo operado por su dueño.
+The project idea is the same: it is not a multi-user SaaS. It is a tool for one person, with a private database and a flow operated by its owner.
 
 ## Stack
 
 - **Backend**: Python 3.12 · FastAPI · SQLModel · SQLite · `uv`
 - **Frontend**: TypeScript · React 18 · Vite · MUI (Material UI) · `@mui/x-data-grid` · `@mui/x-charts`
-- **Empaquetado**: Docker Compose (opcional)
+- **Packaging**: Docker Compose (optional)
 
-## Estructura
+## Structure
 
-```
+```text
 finance-os-lite/
-  backend/                  Python API + scripts CLI
-    app/                    FastAPI app, modelos, rutas y servicios
+  backend/                  Python API + CLI scripts
+    app/                    FastAPI app, models, routes, and services
     scripts/                Init DB, import CSV, edit, verify
-    data/                   SQLite (generado en tiempo de ejecución)
+    data/                   SQLite, generated at runtime
     pyproject.toml
     Dockerfile
-  frontend/                 SPA Vite + React
+  frontend/                 Vite + React SPA
     src/
-      api/                  Capa HTTP que consume al backend
-      components/           Componentes UI (Dashboard, Movimientos, etc.)
-      lib/                  Helpers de formato y derivaciones
-      i18n/                 Textos en español
-      theme/                Tema MUI dark
+      api/                  HTTP layer that consumes the backend
+      components/           UI components (Dashboard, Movements, etc.)
+      lib/                  Formatting and derived-data helpers
+      i18n/                 Spanish UI copy
+      theme/                MUI dark theme
     package.json
     Dockerfile
-  skills/load-movements/    Skill para que agentes carguen movimientos
+  skills/load-movements/    Skill for agents to load movements
   docker-compose.yml
   manifest.json
 ```
 
-## Requisitos
+## Requirements
 
-Una de las dos opciones:
+Use one of these options:
 
-- **Docker** (recomendado): solo necesitas Docker y Docker Compose.
-- **Local**: Python 3.12+ con `uv`, y Node.js 20+ con npm.
+- **Docker** (recommended): Docker and Docker Compose.
+- **Local**: Python 3.12+ with `uv`, and Node.js 20+ with npm.
 
-## Cómo empezar (Docker)
+## Getting Started (Docker)
 
-1. Clona este repositorio.
-2. Levanta los servicios:
+1. Clone this repository.
+2. Start the services:
 
    ```bash
    docker compose up --build
    ```
 
-3. Prepara la base local en otra terminal:
+3. Prepare the local database in another terminal:
 
    ```bash
    docker compose exec backend uv run python scripts/init_db.py
    ```
 
-4. Listo:
+4. Done:
    - Frontend: http://localhost:5180
-   - API: http://localhost:8000 (Swagger UI en `/docs`)
+   - API: http://localhost:8000 (Swagger UI at `/docs`)
 
-La base de datos vive en `./backend/data/finance_os.sqlite` y persiste entre reinicios.
+The database lives in `./backend/data/finance_os.sqlite` and persists between restarts.
 
-## Cómo empezar (local sin Docker)
+## Getting Started (Local without Docker)
 
 ### Backend
 
 ```bash
 cd backend
-uv sync                # crea .venv e instala deps
+uv sync
 uv run python scripts/init_db.py
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -81,19 +81,19 @@ npm install
 npm run dev
 ```
 
-Abre http://localhost:5180.
+Open http://localhost:5180.
 
-## Variables de entorno
+## Environment Variables
 
-| Variable             | Defecto                                              | Dónde      |
+| Variable             | Default                                              | Where      |
 | -------------------- | ---------------------------------------------------- | ---------- |
 | `DATABASE_URL`       | `sqlite:///<repo>/backend/data/finance_os.sqlite`    | backend    |
 | `CORS_ORIGINS`       | `http://localhost:5180,http://127.0.0.1:5180`        | backend    |
 | `VITE_API_BASE_URL`  | `http://localhost:8000`                              | frontend   |
 
-## Scripts CLI (backend)
+## Backend CLI Scripts
 
-Todos corren con `uv` desde `backend/`:
+All commands run with `uv` from `backend/`:
 
 ```bash
 uv run python scripts/init_db.py
@@ -106,30 +106,30 @@ uv run python scripts/import_movements.py path/to/movements.csv
 uv run python scripts/verify.py
 ```
 
-Cuando uses Docker, anteponé `docker compose exec backend ` a cada uno.
+When using Docker, prefix each command with `docker compose exec backend `.
 
-## Importación de movimientos
+## Movement Import
 
-El importador acepta el mismo CSV canónico que la versión Next.js original. Columnas reconocidas (con alias en español):
+The importer accepts the same canonical CSV as the original Next.js version. Recognized columns, including Spanish aliases:
 
-- `date` / `fecha` (obligatorio)
-- `amount` / `monto` (obligatorio)
-- `business` / `comercio` (obligatorio)
-- `reason` / `descripcion` / `detalle` / `glosa` (obligatorio)
-- `subcategory` / `subcategoria` (obligatorio)
-- `source` / `fuente` (opcional, default `MANUAL`; valores: `BANK`, `CREDIT_CARD`, `MANUAL`)
-- `accountingDate` / `fecha contable` (opcional, default = `date`)
-- `raw_description` / `descripcionoriginal` (opcional)
-- `reviewed` / `revisado` (opcional, default `false`)
+- `date` / `fecha` (required)
+- `amount` / `monto` (required)
+- `business` / `comercio` (required)
+- `reason` / `descripcion` / `detalle` / `glosa` (required)
+- `subcategory` / `subcategoria` (required)
+- `source` / `fuente` (optional, default `MANUAL`; values: `BANK`, `CREDIT_CARD`, `MANUAL`)
+- `accountingDate` / `fecha contable` (optional, default = `date`)
+- `raw_description` / `descripcionoriginal` (optional)
+- `reviewed` / `revisado` (optional, default `false`)
 
-La deduplicación se basa en fecha raw + monto + comercio + razón + fuente + raw description, igual que la versión original.
+Deduplication is based on raw date + amount + merchant + reason + source + raw description, matching the original version.
 
-## Modelo mental de datos
+## Data Mental Model
 
-- `date`: fecha raw/original del movimiento. Se usa para detectar duplicados al importar.
-- `accountingDate`: fecha contable. Define dónde cae el movimiento en el dashboard mensual.
+- `date`: raw/original movement date. Used to detect duplicates during import.
+- `accountingDate`: accounting date. Defines where the movement lands in the monthly dashboard.
 
-## Verificación
+## Verification
 
 ```bash
 # Backend
@@ -139,36 +139,36 @@ cd backend && uv run python scripts/verify.py
 cd frontend && npm run verify
 ```
 
-`verify.py` corre `ruff`, `pyright` y un smoke test sobre el endpoint `/health`. `npm run verify` corre `eslint` y `tsc --noEmit`.
+`verify.py` runs `ruff`, `pyright`, and a smoke test against the `/health` endpoint. `npm run verify` runs `eslint` and `tsc --noEmit`.
 
-## Publicación al catálogo
+## Catalog Publication
 
-El flujo de publicación usa **GitHub Release** (no push directo a `main`):
+Publication uses **GitHub Release** and not a direct push to `main`:
 
-1. Merge a `main` con CI verde.
-2. Crear tag/release con formato `finance-os/vX.Y.Z`.
-3. El workflow `Release App`:
-   - corre verify/build backend+frontend,
-   - genera `finance-os-X.Y.Z.zip`,
-   - sube el ZIP al release,
-   - abre PR automático en `forger-ai/apps-catalog` para actualizar el `manifest.json` del catálogo.
+1. Merge to `main` with green CI.
+2. Create a tag/release using the format `finance-os/vX.Y.Z`.
+3. The `Release App` workflow:
+   - verifies/builds backend and frontend,
+   - generates `finance-os-X.Y.Z.zip`,
+   - uploads the ZIP to the release,
+   - opens an automatic PR in `forger-ai/apps-catalog` to update the catalog `manifest.json`.
 
-Secret requerido en este repo:
+Required secret in this repo:
 
-- `APPS_CATALOG_TOKEN`: PAT con permisos `contents` y `pull_requests` sobre `forger-ai/apps-catalog`.
+- `APPS_CATALOG_TOKEN`: PAT with `contents` and `pull_requests` permissions for `forger-ai/apps-catalog`.
 
-## Uso con agentes
+## Agent Use
 
-El proyecto está pensado para ser operado con apoyo de agentes (Claude, Codex, etc.). El flujo ideal es:
+The project is designed to be operated with agent support (Claude, Codex, etc.). The ideal flow is:
 
-1. El humano entrega un documento fuente (imagen, PDF, captura, estado de cuenta).
-2. El agente interpreta el material y lo normaliza a CSV canónico.
-3. El agente usa la skill `skills/load-movements` para cargar el CSV con `scripts/import_movements.py`.
-4. El humano revisa la clasificación y la `accountingDate` desde la UI.
+1. The human provides a source document (image, PDF, screenshot, account statement).
+2. The agent interprets the material and normalizes it to canonical CSV.
+3. The agent uses the `skills/load-movements` skill to load the CSV with `scripts/import_movements.py`.
+4. The human reviews classification and `accountingDate` from the UI.
 
-## Alcance
+## Scope
 
-- Herramienta personal.
-- Un único operador.
-- Base de datos privada.
-- Sin hardening de producto, ni objetivos de escala, ni autenticación.
+- Personal tool.
+- Single operator.
+- Private database.
+- No product hardening, scale objectives, or authentication.

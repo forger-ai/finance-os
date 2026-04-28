@@ -36,6 +36,7 @@ rsync -a \
   --exclude 'frontend/node_modules/' \
   --exclude 'frontend/dist/' \
   --exclude 'frontend/.vite/' \
+  --exclude 'frontend/*.tsbuildinfo' \
   "$ROOT_DIR/" "$STAGE_DIR/$APP_NAME/"
 
 # Asegura que data exista pero sin bases locales ni backups.
@@ -46,6 +47,7 @@ find "$STAGE_DIR/$APP_NAME/backend/data" -type f \( -name '*.sqlite' -o -name '*
 find "$STAGE_DIR/$APP_NAME/frontend" -type d -name 'node_modules' -prune -exec rm -rf {} +
 find "$STAGE_DIR/$APP_NAME/frontend" -type d -name 'dist' -prune -exec rm -rf {} +
 find "$STAGE_DIR/$APP_NAME/frontend" -type d -name '.vite' -prune -exec rm -rf {} +
+find "$STAGE_DIR/$APP_NAME/frontend" -type f -name '*.tsbuildinfo' -delete
 
 ZIP_PATH="$OUT_DIR/$OUT_FILE"
 rm -f "$ZIP_PATH"
