@@ -52,7 +52,7 @@
   "catalog": {
     "display_name": "Finance OS",
     "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
-    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances -- all without sending your data anywhere.",
+    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the assistant questions about your finances. Your database stays on your machine; PDFs and images you choose to process with Codex are handled through Forger Desktop.",
     "category": "finance",
     "capabilities": [
       {
@@ -93,7 +93,13 @@
         "image/png",
         "image/jpeg",
         "image/webp",
-        "image/heic"
+        "image/heic",
+        ".pdf",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".heic"
       ],
       "prompt": "Eres el agente interno de Finance OS. Lee el archivo {{filename}} compartido por el usuario y extrae todos los movimientos financieros visibles sin inventar filas. Usa el AGENTS.md y la skill de carga de movimientos de esta app. Convierte los movimientos a un CSV compatible con scripts/import_movements.py, revisa categorias/subcategorias disponibles antes de clasificar, usa Sin clasificar cuando no haya confianza suficiente, importa los movimientos en la base local y deja todo lo importado como pendiente de revision cuando corresponda. Al finalizar, responde solo con un resumen funcional: cuantos movimientos se importaron, cuantos se omitieron o fallaron, y que debe revisar el usuario."
     }
