@@ -27,22 +27,26 @@ router = APIRouter(prefix="/api", tags=["categories"])
 def _serialize_category(category: Category, session: Session) -> CategoryRead:
     subcategories = sorted(category.subcategories, key=lambda sub: sub.name.lower())
     sub_reads: list[SubcategoryRead] = []
-    total_movements = 0
     for sub in subcategories:
         count = session.exec(
             select(Movement).where(Movement.subcategory_id == sub.id)
         ).all()
-        movement_count = len(count)
-        total_movements += movement_count
         sub_reads.append(
             SubcategoryRead(
                 id=sub.id,
                 name=sub.name,
                 budget=to_pesos(sub.budget) if sub.budget is not None else None,
                 category_id=sub.category_id,
-                movement_count=movement_count,
+                movement_count=len(count),
             )
         )
+    # Total movements for the category counts everything assigned to it,
+    # including movements that are category-only (no subcategory).
+    total_movements = len(
+        session.exec(
+            select(Movement).where(Movement.category_id == category.id)
+        ).all()
+    )
     return CategoryRead(
         id=category.id,
         name=category.name,
@@ -130,9 +134,7 @@ def delete_category(
         raise HTTPException(status_code=404, detail="Categoría no encontrada.")
 
     movement_count = session.exec(
-        select(Movement)
-        .join(Subcategory, Movement.subcategory_id == Subcategory.id)
-        .where(Subcategory.category_id == category_id)
+        select(Movement).where(Movement.category_id == category_id)
     ).all()
     if movement_count:
         raise HTTPException(
@@ -183,6 +185,7 @@ def move_category_subcategories(
             ).all()
             for movement in movements:
                 movement.subcategory_id = existing_target.id
+                movement.category_id = payload.target_category_id
                 movement.updated_at = utcnow()
                 session.add(movement)
             session.delete(sub)
@@ -190,6 +193,26 @@ def move_category_subcategories(
             sub.category_id = payload.target_category_id
             sub.updated_at = utcnow()
             session.add(sub)
+            # Movements riding on this subcategory need their cached
+            # ``category_id`` synced too.
+            movements = session.exec(
+                select(Movement).where(Movement.subcategory_id == sub.id)
+            ).all()
+            for movement in movements:
+                movement.category_id = payload.target_category_id
+                movement.updated_at = utcnow()
+                session.add(movement)
+    # Movements that lived in this category WITHOUT a subcategory also need
+    # to follow.
+    orphan_movements = session.exec(
+        select(Movement)
+        .where(Movement.category_id == category_id)
+        .where(Movement.subcategory_id.is_(None))  # type: ignore[union-attr]
+    ).all()
+    for movement in orphan_movements:
+        movement.category_id = payload.target_category_id
+        movement.updated_at = utcnow()
+        session.add(movement)
 
     try:
         session.commit()
@@ -333,7 +356,8 @@ def move_subcategory_movements(
         select(Movement).where(Movement.subcategory_id == subcategory_id)
     ).all()
     for movement in movements:
-        movement.subcategory_id = payload.target_subcategory_id
+        movement.subcategory_id = target.id
+        movement.category_id = target.category_id
         movement.updated_at = utcnow()
         session.add(movement)
     session.commit()

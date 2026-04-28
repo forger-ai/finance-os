@@ -1,8 +1,43 @@
 import { request } from "./utils";
-import type { ActionResult, CategoryRead, SubcategoryRead } from "./types";
+import type {
+  ActionResult,
+  CategoryKind,
+  CategoryRead,
+  SubcategoryRead,
+} from "./types";
 
 export function listCategories(): Promise<CategoryRead[]> {
   return request<CategoryRead[]>("/api/categories");
+}
+
+export function createCategory(input: {
+  name: string;
+  kind: CategoryKind;
+  budget?: number | null;
+}): Promise<CategoryRead> {
+  return request<CategoryRead>("/api/categories", {
+    method: "POST",
+    body: {
+      name: input.name,
+      kind: input.kind,
+      budget: input.budget ?? null,
+    },
+  });
+}
+
+export function createSubcategory(input: {
+  name: string;
+  categoryId: string;
+  budget?: number | null;
+}): Promise<SubcategoryRead> {
+  return request<SubcategoryRead>("/api/subcategories", {
+    method: "POST",
+    body: {
+      name: input.name,
+      category_id: input.categoryId,
+      budget: input.budget ?? null,
+    },
+  });
 }
 
 export function renameCategory(input: {

@@ -32,12 +32,14 @@ export type MovementRead = {
   source: MovementSource;
   raw_description: string | null;
   reviewed: boolean;
-  subcategory_id: string;
-  subcategory_name: string;
   category_id: string;
   category_name: string;
   category_kind: CategoryKind;
   category_budget: number | null;
+  // Subcategory is optional under the new model: a movement can belong to a
+  // category alone when the category has no subcategories.
+  subcategory_id: string | null;
+  subcategory_name: string | null;
 };
 
 export type SummaryRead = {

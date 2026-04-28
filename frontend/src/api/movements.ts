@@ -19,6 +19,24 @@ export function updateMovementSubcategory(input: {
   });
 }
 
+/**
+ * Assign a movement to a category only (no subcategory). Used when the user
+ * picks a category that has no subcategories, or explicitly demotes a fully
+ * classified movement to category-only.
+ */
+export function updateMovementCategoryOnly(input: {
+  movementId: string;
+  categoryId: string;
+}): Promise<MovementRead> {
+  return request<MovementRead>(`/api/movements/${input.movementId}`, {
+    method: "PATCH",
+    body: {
+      category_id: input.categoryId,
+      clear_subcategory: true,
+    },
+  });
+}
+
 export function updateMovementReviewed(input: {
   movementId: string;
   reviewed: boolean;
@@ -43,4 +61,13 @@ export function deleteMovement(movementId: string): Promise<ActionResult> {
   return request<ActionResult>(`/api/movements/${movementId}`, {
     method: "DELETE",
   });
+}
+
+export type ApplyClassificationMemoryResult = { updated: number };
+
+export function applyClassificationMemory(): Promise<ApplyClassificationMemoryResult> {
+  return request<ApplyClassificationMemoryResult>(
+    "/api/movements/apply-classification-memory",
+    { method: "POST" },
+  );
 }

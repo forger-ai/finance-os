@@ -25,10 +25,13 @@ export const es = {
     monthSelectorSubtitle:
       "El dashboard recalcula categorías, subcategorías y presupuesto según el periodo.",
     breakdownTitle: "Desglose por subcategoria",
+    breakdownTitleByCategory: "Desglose por categoria",
     breakdownSubtitleAll:
       "Participación de las subcategorías con más gasto.",
     breakdownSubtitleFiltered: (categoryName: string) =>
       `Participación dentro de ${categoryName}.`,
+    breakdownToggleCategory: "Categoría",
+    breakdownToggleSubcategory: "Subcategoría",
     consideredTitle: "Movimientos considerados",
     consideredSubtitleAll: "Todos los movimientos considerados",
     consideredSubtitleCategory: (categoryName: string) =>
@@ -53,8 +56,14 @@ export const es = {
   },
   movements: {
     filtersTitle: "Filtros",
-    filtersSubtitle: "Búsqueda, fuente y estado de revisión.",
+    filtersSubtitle: "Búsqueda, fuente, clasificación, fechas y estado de revisión.",
     searchPlaceholder: "Buscar comercio o descripción",
+    categoryLabel: "Categoría",
+    subcategoryLabel: "Subcategoría",
+    allCategories: "Todas las categorías",
+    allSubcategories: "Todas las subcategorías",
+    dateFromLabel: "Desde",
+    dateToLabel: "Hasta",
     sourceLabel: "Fuente",
     sources: {
       all: "Todas",
@@ -75,7 +84,11 @@ export const es = {
       amount: "Monto",
       classification: "Clasificación",
       reviewed: "Revisado",
+      actions: "Eliminar",
     },
+    deleteTooltip: "Eliminar movimiento",
+    deleteConfirm:
+      "¿Eliminar este movimiento? Esta acción no se puede deshacer.",
   },
   review: {
     nothingTitle: "No hay movimientos para revisar.",
@@ -85,8 +98,63 @@ export const es = {
     datesEyebrow: "Fechas",
     originalDescription: "Descripcion original",
     confirmAndContinue: "Confirmar y seguir",
+    suggestionTitle: "Sugerencia basada en tu historial",
+    suggestionHint: (business: string, count: number) =>
+      `Has clasificado "${business}" antes ${count} ${count === 1 ? "vez" : "veces"}.`,
+    suggestionApply: "Aplicar sugerencia",
+    applyMemoryButton: "Aplicar memoria a pendientes",
+    applyMemoryEmpty: "No hay sugerencias nuevas que aplicar.",
+    applyMemorySuccess: (count: number) =>
+      `${count} ${count === 1 ? "movimiento" : "movimientos"} pre-clasificado${count === 1 ? "" : "s"}.`,
+    upload: {
+      eyebrow: "Importar movimientos",
+      title: "Sube un estado de cuenta o transferencia",
+      hint: "CSV, XLSX, PDF o captura (PNG/JPG). Las extracciones de PDF e imagen usan IA y aparecen como pendientes.",
+      ctaIdle: "Elegir archivo",
+      ctaDrop: "Suelta el archivo",
+      processing: "Procesando…",
+      summary: (inserted: number, failed: number) =>
+        `${inserted} movimiento(s) importado(s)${failed > 0 ? `, ${failed} con error` : ""}.`,
+      summaryNothing: "No se encontraron movimientos.",
+      errorsHeader: "Errores:",
+      genericError: "No se pudo procesar el archivo.",
+    },
   },
   settings: {
+    tabs: {
+      categories: "Categorías",
+      llm: "API Keys",
+    },
+    llm: {
+      securityNote:
+        "Las claves se guardan en la base de datos local del backend. No las compartas y bórralas si ya no las necesitas.",
+      statusSet: "Configurada",
+      statusUnset: "No configurada",
+      openaiHint:
+        "Se usa para extraer movimientos desde PDFs y capturas de estados de cuenta.",
+      apiKeyLabel: "API key",
+      apiKeyPlaceholderSet: "sk-...",
+      apiKeyPlaceholderReplace: "Pega una nueva clave para reemplazar la actual",
+      modelLabel: "Modelo",
+      modelHelp: (defaultModel: string) =>
+        `Default: ${defaultModel}. Cambia solo si sabes lo que haces.`,
+      modelCustom: "Custom…",
+      modelCustomHint: "Escribe el ID exacto del modelo.",
+      modelCustomLabel: "Model ID",
+      saveButton: "Guardar",
+      clearKeyTooltip: "Borrar API key",
+      saved: "Configuración guardada.",
+      cleared: "API key eliminada.",
+      nothingToSave: "No hay cambios para guardar.",
+    },
+    newCategoryTitle: "Nueva categoría",
+    newCategoryNameLabel: "Nombre",
+    newCategoryKindLabel: "Tipo",
+    newSubcategoryLabel: "Nueva subcategoría",
+    addSubcategoryButton: "Agregar",
+    createButton: "Crear",
+    categoryCreated: "Categoría creada.",
+    subcategoryCreated: "Subcategoría creada.",
     deleteCategoryTooltip: "Eliminar categoría",
     deleteSubcategoryTooltip: "Eliminar subcategoría",
     saveNameTooltip: "Guardar nombre",
@@ -107,6 +175,13 @@ export const es = {
     subcategoryUpdated: "Subcategoría actualizada.",
     subcategoryDeleted: "Subcategoría eliminada.",
     movementsReassigned: "Movimientos reasignados.",
+    noOtherSubcategoriesHint:
+      "Crea otra subcategoría primero para poder mover los movimientos.",
+    noMovementsToMoveHint: "Esta subcategoría no tiene movimientos para mover.",
+    noOtherCategoriesHint:
+      "Crea otra categoría primero para poder mover las subcategorías.",
+    noSubcategoriesToMoveHint:
+      "Esta categoría no tiene subcategorías para mover.",
     kindLabels: {
       INCOME: "Ingreso",
       EXPENSE: "Gasto",

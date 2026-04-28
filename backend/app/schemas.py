@@ -85,16 +85,21 @@ class MovementRead(_Base):
     source: MovementSource
     raw_description: str | None
     reviewed: bool
-    subcategory_id: str
-    subcategory_name: str
     category_id: str
     category_name: str
     category_kind: CategoryKind
     category_budget: float | None
+    subcategory_id: str | None = None
+    subcategory_name: str | None = None
 
 
 class MovementUpdate(_Base):
+    category_id: str | None = None
     subcategory_id: str | None = None
+    # Sentinel: when the client sends ``"clear_subcategory": true`` we strip the
+    # subcategory regardless of what ``subcategory_id`` says, so the user can
+    # demote a fully-classified movement to category-only.
+    clear_subcategory: bool | None = None
     reviewed: bool | None = None
     accounting_date: str | None = Field(default=None, description="YYYY-MM-DD")
     date: str | None = Field(default=None, description="YYYY-MM-DD")
@@ -116,7 +121,8 @@ class MovementCreate(_Base):
     source: MovementSource = MovementSource.MANUAL
     raw_description: str | None = None
     reviewed: bool = False
-    subcategory_id: str
+    category_id: str
+    subcategory_id: str | None = None
 
 
 # --------------------------------------------------------------------------- summary

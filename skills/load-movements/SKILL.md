@@ -85,13 +85,17 @@ The importer expects movement data with these concepts:
 
 - `date`: original/raw transaction date.
 - `accountingDate`: accounting date, when available. If absent, it usually defaults to `date`.
-- `amount`: signed amount.
+- `amount`: positive amount magnitude. Do not encode financial direction in the sign; direction comes from the selected category's `kind`.
 - `business`: merchant, counterparty, or business name.
 - `reason`: description, reason, memo, detail, or glosa.
 - `source`: `BANK`, `CREDIT_CARD`, or `MANUAL`.
 - `raw_description`: original unmodified source description when available.
 - `subcategory`: target subcategory.
 - `reviewed`: whether the movement is already confirmed by the user.
+
+Classification invariant: if a movement has a subcategory, that subcategory must
+belong to the same category stored on the movement. Do not create or preserve
+category/subcategory mismatches.
 
 Accepted aliases include Spanish names such as:
 

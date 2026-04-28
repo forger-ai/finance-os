@@ -155,6 +155,25 @@ La skill puede crear archivos intermedios, normalizar columnas, consultar memori
 
 El usuario solo debe ver el resultado funcional: que se cargo, que no se pudo cargar, que necesita revision y que decisiones de clasificacion fueron tomadas.
 
+### Skill `skills/stack-database-extension`
+
+Audiencia: agente.
+
+Tarea principal: modificar_aplicacion.
+
+Uso: cuando se cambian modelos SQLModel, inicializacion de base de datos, migraciones SQLite, mounts de Docker Compose relacionados con `app.database` o scripts internos que dependen de la base.
+
+Esta skill documenta el patron de stack vigente:
+
+- `commons/backend/database.py` sigue siendo el helper compartido de base de datos;
+- Docker Compose monta ese helper compartido sobre `app/database.py`;
+- Finance OS registra modelos y mantiene migraciones propias en `backend/app/database_ext.py`;
+- el backend y los scripts internos usan el inicializador de app para no saltarse migraciones especificas.
+
+No resolver problemas de migracion quitando el mount de `commons/backend/database.py` salvo que el usuario pida explicitamente romper el contrato del stack. Si una migracion depende de tablas o datos de Finance OS, debe vivir en la extension local de Finance OS y no en commons.
+
+No presentar esta skill al usuario final como una herramienta de uso. Hacia el usuario, explicar solo el impacto funcional: "ajuste la preparacion de la base local" o "la app vuelve a abrir sin errores de datos", segun corresponda.
+
 ### Script `init_db`
 
 Audiencia: agente.
@@ -166,18 +185,6 @@ Uso: crear tablas cuando la base todavia no esta inicializada.
 No decir al usuario: comandos, rutas o detalles de SQLModel.
 
 Explicar al usuario como: "prepare la base local de la app" solo si es relevante.
-
-### Script `seed`
-
-Audiencia: agente.
-
-Tipo: mantenimiento interno.
-
-Uso: cargar categorias iniciales o datos base definidos por la app.
-
-No ejecutar si puede sobrescribir o duplicar datos sin revisar comportamiento.
-
-Explicar al usuario como: "deje listas las categorias iniciales" si corresponde.
 
 ### Script `list_categories`
 
@@ -213,6 +220,8 @@ Reglas:
 
 - Antes de importar, revisar categorias/subcategorias disponibles.
 - Normalizar columnas y fechas.
+- Mantener la invariante de clasificacion: si un movimiento tiene subcategoria,
+  esa subcategoria debe pertenecer a la misma categoria del movimiento.
 - Mantener trazabilidad entre fuente original, descripcion raw y fecha contable.
 - Revisar errores de importacion.
 - Informar al usuario cuantas filas se cargaron y cuales requieren revision.

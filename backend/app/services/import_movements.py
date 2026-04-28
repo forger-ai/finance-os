@@ -4,8 +4,8 @@ Mirrors the behavior of ``scripts/db/import-movements.mjs`` from the original
 Next.js project:
 
 - accepts the canonical English column names plus Spanish aliases
-- detects probable duplicates using raw date + amount + business + reason +
-  source + raw description
+- skips rows whose ``(date, amount)`` pair already exists — catches duplicates
+  even across formats (CSV + PDF + image)
 - maps subcategory names case- and accent-insensitively
 - inserts rows individually so a single bad row never blocks the rest
 """
@@ -14,30 +14,55 @@ from __future__ import annotations
 
 import csv
 import io
-import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
 from sqlmodel import Session, select
 
-from app.models import Movement, MovementSource, Subcategory
+from app.models import Category, Movement, MovementSource, Subcategory
+from app.services.bootstrap import UNCLASSIFIED_NAME, ensure_unclassified_subcategory
+from app.services.classification import resolve_movement_classification
+from app.services.classification_memory import (
+    build_classification_memory,
+    memory_index,
+)
 from app.utils import (
     normalize_key,
-    normalize_text,
     parse_boolean,
     parse_date_input,
     to_cents,
+    to_positive_cents,
 )
 
-# Field aliases mirror the Node importer's ``pick`` helper.
+# Field aliases. Includes the canonical English names plus common Chilean bank
+# export columns. ``normalize_key`` strips diacritics and lowercases, so e.g.
+# "Descripción" matches "descripcion".
 _ALIASES: dict[str, list[str]] = {
-    "date": ["date", "fecha"],
-    "amount": ["amount", "monto"],
-    "business": ["business", "buisness", "comercio"],
-    "reason": ["reason", "descripcion", "detalle", "glosa"],
+    "date": ["date", "fecha", "fechamovimiento", "fecha movimiento"],
+    "amount": ["amount", "monto", "valor", "importe"],
+    "charge": ["cargo", "debito", "debe", "montocargo", "monto cargo"],
+    "credit": ["abono", "credito", "haber", "montoabono", "monto abono"],
+    "business": ["business", "buisness", "comercio", "merchant"],
+    "reason": [
+        "reason",
+        "descripcion",
+        "detalle",
+        "glosa",
+        "concepto",
+        "operacion",
+        "movimiento",
+    ],
     "subcategory": ["subcategory", "subcategoria", "sub_category"],
     "source": ["source", "origen", "fuente"],
-    "accounting_date": ["accountingdate", "accounting_date", "fecha contable", "fechacontable"],
+    "accounting_date": [
+        "accountingdate",
+        "accounting_date",
+        "fecha contable",
+        "fechacontable",
+        "fechacargo",
+        "fecha cargo",
+    ],
     "raw_description": [
         "rawdescription",
         "raw_description",
@@ -70,34 +95,75 @@ class ImportOutcome:
         }
 
 
+_HEADER_PARENS = re.compile(r"\([^)]*\)")
+_HEADER_WS = re.compile(r"\s+")
+
+
+def _normalize_header(value: str) -> str:
+    """Aggressively normalize a column header for alias matching.
+
+    On top of ``normalize_key`` (lowercase + strip accents) we also drop
+    parenthesized suffixes and currency markers — bank exports love things
+    like ``Monto cargo ($)`` or ``Saldo (CLP)`` where the actual semantic
+    label is just ``monto cargo`` / ``saldo``.
+    """
+    base = normalize_key(value)
+    base = _HEADER_PARENS.sub("", base)
+    base = base.replace("$", " ").replace("clp", " ")
+    return _HEADER_WS.sub(" ", base).strip()
+
+
 def _pick(record: dict[str, str], aliases: list[str]) -> str:
-    normalized = {normalize_key(key): value for key, value in record.items()}
+    normalized = {_normalize_header(key): value for key, value in record.items()}
     for alias in aliases:
         if alias in normalized:
             return normalized[alias]
     return ""
 
 
-def _build_duplicate_key(
-    *,
-    amount_cents: int,
-    business: str,
-    date: datetime,
-    raw_description: str | None,
-    reason: str,
-    source: MovementSource,
-) -> str:
-    return json.dumps(
-        {
-            "amount_cents": amount_cents,
-            "business": normalize_text(business),
-            "date": date.isoformat(),
-            "rawDescription": normalize_text(raw_description),
-            "reason": normalize_text(reason),
-            "source": source.value,
-        },
-        sort_keys=True,
+def _parse_optional_amount(text: str) -> int:
+    """Convert a charge/credit cell to integer cents. Empty/zero → 0."""
+    if not text or text.strip() in {"", "0", "0.0", "0,0", "-"}:
+        return 0
+    try:
+        return abs(to_cents(text))
+    except ValueError:
+        return 0
+
+
+def has_recognizable_schema(text: str) -> bool:
+    """Cheap pre-check used by callers to decide whether to fall back to LLM.
+
+    True when the header row exposes both a date column and at least one of
+    ``amount``/``cargo``/``abono``. Below that bar we can't even attempt a
+    deterministic import.
+    """
+    records = parse_csv_text(text)
+    if not records:
+        return False
+    headers = {_normalize_header(key) for key in records[0] if key != "__row"}
+    has_date = any(alias in headers for alias in _ALIASES["date"])
+    has_amount = any(
+        alias in headers
+        for alias in (
+            _ALIASES["amount"] + _ALIASES["charge"] + _ALIASES["credit"]
+        )
     )
+    return has_date and has_amount
+
+
+def _build_duplicate_key(*, amount_cents: int, date: datetime) -> str:
+    """Identify duplicates by ``(day, amount)`` pair.
+
+    Looser than full-row equality on purpose: lets us catch the same movement
+    coming in via different formats (CSV header names, LLM-extracted PDF,
+    screenshot OCR) where ``business`` and ``raw_description`` may differ even
+    though the underlying transaction is the same.
+
+    Trade-off: two genuinely distinct transactions with the same amount on the
+    same day will collide. The user can add the second one manually if needed.
+    """
+    return f"{date.date().isoformat()}|{abs(amount_cents)}"
 
 
 def parse_csv_text(text: str) -> list[dict[str, str]]:
@@ -136,20 +202,26 @@ def import_movements_from_csv(
     if not records:
         return ImportOutcome(file=file_label, inserted=0, failed=0)
 
+    fallback_sub = ensure_unclassified_subcategory(session)
+    fallback_category_id = fallback_sub.category_id
+
     subcategories = session.exec(select(Subcategory)).all()
     subcategory_map: dict[str, Subcategory] = {
         normalize_key(sub.name): sub for sub in subcategories
     }
+    subcategory_by_id: dict[str, Subcategory] = {sub.id: sub for sub in subcategories}
+
+    categories = session.exec(select(Category)).all()
+    category_by_id: dict[str, Category] = {cat.id: cat for cat in categories}
+
+    # Memory of past business → classification choices made by the user.
+    memory_lookup = memory_index(build_classification_memory(session))
 
     existing_movements = session.exec(select(Movement)).all()
     known_keys: set[str] = {
         _build_duplicate_key(
             amount_cents=movement.amount_cents,
-            business=movement.business,
             date=movement.date,
-            raw_description=movement.raw_description,
-            reason=movement.reason,
-            source=movement.source,
         )
         for movement in existing_movements
     }
@@ -162,6 +234,8 @@ def import_movements_from_csv(
         try:
             date_text = _pick(record, _ALIASES["date"])
             amount_text = _pick(record, _ALIASES["amount"])
+            charge_text = _pick(record, _ALIASES["charge"])
+            credit_text = _pick(record, _ALIASES["credit"])
             business = _pick(record, _ALIASES["business"])
             reason = _pick(record, _ALIASES["reason"])
             subcategory_name = _pick(record, _ALIASES["subcategory"])
@@ -170,15 +244,56 @@ def import_movements_from_csv(
             raw_description = _pick(record, _ALIASES["raw_description"])
             reviewed_text = _pick(record, _ALIASES["reviewed"])
 
-            if not (date_text and amount_text and business and reason and subcategory_name):
-                raise ValueError(
-                    "Missing one of required columns: date, amount, business, "
-                    "reason, subcategory"
-                )
+            if not date_text:
+                raise ValueError("Falta la columna de fecha en esta fila.")
 
-            sub = subcategory_map.get(normalize_key(subcategory_name))
-            if sub is None:
-                raise ValueError(f"Unknown subcategory: {subcategory_name}")
+            # Movement amounts are stored as positive magnitudes. Direction is
+            # represented by the resolved category kind, not by the sign.
+            if amount_text:
+                amount_cents = to_positive_cents(amount_text)
+            else:
+                charge_cents = _parse_optional_amount(charge_text)
+                credit_cents = _parse_optional_amount(credit_text)
+                if charge_cents == 0 and credit_cents == 0:
+                    raise ValueError(
+                        "Falta el monto: no encontré columnas amount/monto/cargo/abono "
+                        "con valor."
+                    )
+                amount_cents = charge_cents or credit_cents
+
+            # Reason / business defaults: bank exports rarely have ``business``
+            # as a separate column, so we derive it from the description.
+            reason_value = (reason or raw_description or "").strip()
+            business_value = (business or reason_value or "—").strip()
+            if not reason_value:
+                reason_value = business_value
+
+            # Classification resolution:
+            #   1. Explicit subcategory column in the file → derive category from sub.
+            #   2. Memory match for this business → copy its category (and sub if any).
+            #   3. Fallback to the bootstrap "Sin clasificar" category.
+            sub: Subcategory | None
+            category_id: str
+            if subcategory_name:
+                resolved_sub = subcategory_map.get(normalize_key(subcategory_name))
+                if resolved_sub is None:
+                    raise ValueError(
+                        f"Subcategoría desconocida: {subcategory_name}"
+                    )
+                sub = resolved_sub
+                category_id = resolved_sub.category_id
+            else:
+                memory_match = memory_lookup.get(normalize_key(business_value))
+                if memory_match is not None and memory_match.category_id in category_by_id:
+                    category_id = memory_match.category_id
+                    sub = (
+                        subcategory_by_id.get(memory_match.subcategory_id)
+                        if memory_match.subcategory_id is not None
+                        else None
+                    )
+                else:
+                    category_id = fallback_category_id
+                    sub = fallback_sub
 
             raw_date = parse_date_input(date_text)
             accounting_date = (
@@ -188,33 +303,50 @@ def import_movements_from_csv(
             try:
                 normalized_source = MovementSource(normalized_source_text)
             except ValueError as exc:
-                raise ValueError(f"Unknown source: {source_text}") from exc
+                raise ValueError(f"Origen desconocido: {source_text}") from exc
 
-            amount_cents = to_cents(amount_text)
             duplicate_key = _build_duplicate_key(
                 amount_cents=amount_cents,
-                business=business,
                 date=raw_date,
-                raw_description=raw_description or None,
-                reason=reason,
-                source=normalized_source,
             )
             if duplicate_key in known_keys:
-                raise ValueError(
-                    "Possible duplicate detected using raw date, amount, business, "
-                    "reason, source and raw description"
-                )
+                raise ValueError("Ya existe un movimiento con esta fecha y monto.")
+
+            # ``Sin clasificar`` rows always start unreviewed regardless of the
+            # ``reviewed`` cell, so the user is forced to confirm them. Any
+            # category/subcategory whose name matches the placeholder qualifies.
+            unclassified = normalize_key(UNCLASSIFIED_NAME)
+            category_name = (
+                category_by_id[category_id].name if category_id in category_by_id else ""
+            )
+            is_unclassified = (
+                normalize_key(category_name) == unclassified
+                or (sub is not None and normalize_key(sub.name) == unclassified)
+            )
+            classification = resolve_movement_classification(
+                session,
+                category_id=category_id,
+                subcategory_id=sub.id if sub is not None else None,
+            )
+            initial_reviewed = (
+                False
+                if is_unclassified
+                else (parse_boolean(reviewed_text) if reviewed_text != "" else False)
+            )
 
             movement = Movement(
                 date=raw_date,
                 accounting_date=accounting_date,
                 amount_cents=amount_cents,
-                business=business,
-                reason=reason,
+                business=business_value,
+                reason=reason_value,
                 source=normalized_source,
                 raw_description=raw_description or None,
-                reviewed=parse_boolean(reviewed_text) if reviewed_text != "" else False,
-                subcategory_id=sub.id,
+                reviewed=initial_reviewed,
+                category_id=classification.category.id,
+                subcategory_id=classification.subcategory.id
+                if classification.subcategory is not None
+                else None,
             )
             session.add(movement)
             session.commit()

@@ -20,9 +20,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlmodel import Session, select
 
-from app.database import engine, init_db
+from app.database import engine
+from app.database_ext import init_app_db as init_db
 from app.models import Movement, MovementSource, Subcategory, utcnow
-from app.utils import isoformat_z, parse_boolean, parse_date_input, to_cents, to_pesos
+from app.services.classification import (
+    ClassificationError,
+    resolve_movement_classification,
+)
+from app.utils import (
+    isoformat_z,
+    parse_boolean,
+    parse_date_input,
+    to_pesos,
+    to_positive_cents,
+)
 
 
 def main(argv: list[str]) -> int:
@@ -52,7 +63,7 @@ def main(argv: list[str]) -> int:
         if args.accounting_date:
             movement.accounting_date = parse_date_input(args.accounting_date)
         if args.amount:
-            movement.amount_cents = to_cents(args.amount)
+            movement.amount_cents = to_positive_cents(args.amount)
         if args.business:
             movement.business = args.business
         if args.reason:
@@ -72,7 +83,21 @@ def main(argv: list[str]) -> int:
             if sub is None:
                 print(f"Subcategory not found: {args.subcategory}", file=sys.stderr)
                 return 1
-            movement.subcategory_id = sub.id
+            try:
+                classification = resolve_movement_classification(
+                    session,
+                    category_id=sub.category_id,
+                    subcategory_id=sub.id,
+                )
+            except ClassificationError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            movement.category_id = classification.category.id
+            movement.subcategory_id = (
+                classification.subcategory.id
+                if classification.subcategory is not None
+                else None
+            )
 
         movement.updated_at = utcnow()
         session.add(movement)
@@ -80,7 +105,7 @@ def main(argv: list[str]) -> int:
         session.refresh(movement)
 
         sub = movement.subcategory
-        category = sub.category
+        category = movement.category
         payload = {
             "id": movement.id,
             "date": isoformat_z(movement.date),
@@ -92,8 +117,8 @@ def main(argv: list[str]) -> int:
             "rawDescription": movement.raw_description,
             "reviewed": movement.reviewed,
             "subcategory": {
-                "id": sub.id,
-                "name": sub.name,
+                "id": sub.id if sub is not None else None,
+                "name": sub.name if sub is not None else None,
                 "category": {
                     "id": category.id,
                     "name": category.name,

@@ -1,14 +1,20 @@
+import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
 import CalendarTodayRounded from "@mui/icons-material/CalendarTodayRounded";
 import DoneRounded from "@mui/icons-material/DoneRounded";
 import WalletRounded from "@mui/icons-material/WalletRounded";
 import { alpha } from "@mui/material/styles";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { updateMovementReviewed } from "@/api/movements";
+import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
+import {
+  updateMovementCategoryOnly,
+  updateMovementReviewed,
+  updateMovementSubcategory,
+} from "@/api/movements";
 import {
   ClassificationEditor,
   type CategoryOption,
   type MovementRow,
 } from "./ClassificationEditor";
+import type { ClassificationMemoryEntry } from "@/lib/derive";
 import type { MovementRead } from "@/api/types";
 import { es } from "@/i18n/es";
 
@@ -25,12 +31,14 @@ export function ReviewCard({
   categories,
   movement,
   remaining,
+  suggestion,
   total,
   onMovementChange,
 }: {
   categories: CategoryOption[];
   movement: MovementRow | null;
   remaining: number;
+  suggestion: ClassificationMemoryEntry | null;
   total: number;
   onMovementChange: (movement: MovementRead) => void;
 }) {
@@ -173,6 +181,70 @@ export function ReviewCard({
             </Typography>
           </Box>
         </Stack>
+
+        {suggestion ? (
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 1.5,
+              border: "1px solid",
+              borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+              bgcolor: (theme) => alpha(theme.palette.primary.main, 0.07),
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              sx={{ alignItems: { sm: "center" }, justifyContent: "space-between" }}
+            >
+              <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
+                <AutoAwesomeRounded color="primary" sx={{ fontSize: 18 }} />
+                <Stack spacing={0.25}>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700 }}>
+                    {es.review.suggestionTitle}
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ fontSize: 12 }}>
+                    {es.review.suggestionHint(
+                      suggestion.business,
+                      suggestion.count,
+                    )}
+                  </Typography>
+                </Stack>
+              </Stack>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                <Chip
+                  label={
+                    suggestion.subcategoryName
+                      ? `${suggestion.categoryName} / ${suggestion.subcategoryName}`
+                      : suggestion.categoryName
+                  }
+                  size="small"
+                  variant="outlined"
+                />
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => {
+                    const apply = suggestion.subcategoryId
+                      ? updateMovementSubcategory({
+                          movementId: movement.id,
+                          subcategoryId: suggestion.subcategoryId,
+                        })
+                      : updateMovementCategoryOnly({
+                          movementId: movement.id,
+                          categoryId: suggestion.categoryId,
+                        });
+                    void apply
+                      .then(onMovementChange)
+                      .catch((error: unknown) => console.error(error));
+                  }}
+                >
+                  {es.review.suggestionApply}
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        ) : null}
 
         <ClassificationEditor
           categories={categories}

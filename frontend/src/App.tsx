@@ -10,11 +10,14 @@ import {
 import { AppShell, type ViewMode } from "@/components/AppShell";
 import { DashboardView } from "@/components/DashboardView";
 import { MovementsTable } from "@/components/MovementsTable";
+import { MovementsUploader } from "@/components/MovementsUploader";
 import { ReviewCard } from "@/components/ReviewCard";
 import { SettingsView } from "@/components/SettingsView";
 import { listCategories } from "@/api/categories";
 import { listMovements } from "@/api/movements";
 import {
+  buildClassificationMemory,
+  suggestSubcategoryFor,
   type CategoryOption,
   type DashboardSummary,
   type MovementRow,
@@ -76,6 +79,19 @@ export default function App() {
     );
   }, []);
 
+  const handleMovementDelete = useCallback((movementId: string) => {
+    setData((current) =>
+      current === null
+        ? current
+        : {
+            ...current,
+            movements: current.movements.filter(
+              (movement) => movement.id !== movementId,
+            ),
+          },
+    );
+  }, []);
+
   const categoryOptions = useMemo<CategoryOption[]>(
     () => (data ? toCategoryOptions(data.categories) : []),
     [data],
@@ -106,6 +122,18 @@ export default function App() {
     [movementRows],
   );
   const activeReviewMovement: MovementRow | null = reviewQueue[0] ?? null;
+
+  const classificationMemory = useMemo(
+    () => buildClassificationMemory(data?.movements ?? []),
+    [data],
+  );
+  const activeSuggestion = useMemo(
+    () =>
+      activeReviewMovement
+        ? suggestSubcategoryFor(activeReviewMovement, classificationMemory)
+        : null,
+    [activeReviewMovement, classificationMemory],
+  );
 
   if (loading) {
     return (
@@ -172,6 +200,7 @@ export default function App() {
               categories={categoryOptions}
               movements={movementRows}
               onMovementChange={handleMovementChange}
+              onMovementDelete={handleMovementDelete}
             />
           ) : viewMode === "settings" ? (
             <SettingsView
@@ -179,13 +208,17 @@ export default function App() {
               onChanged={() => reload()}
             />
           ) : (
-            <ReviewCard
-              categories={categoryOptions}
-              movement={activeReviewMovement}
-              remaining={reviewQueue.length}
-              total={movementRows.length}
-              onMovementChange={handleMovementChange}
-            />
+            <Stack spacing={2}>
+              <MovementsUploader onUploaded={() => reload()} />
+              <ReviewCard
+                categories={categoryOptions}
+                movement={activeReviewMovement}
+                remaining={reviewQueue.length}
+                suggestion={activeSuggestion}
+                total={movementRows.length}
+                onMovementChange={handleMovementChange}
+              />
+            </Stack>
           )}
         </Stack>
       </AppShell>

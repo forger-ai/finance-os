@@ -9,6 +9,8 @@ import {
   Paper,
   Select,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import {
@@ -231,6 +233,9 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
     [theme.palette.primary.main],
   );
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>(null);
+  const [breakdownMode, setBreakdownMode] = useState<
+    "category" | "subcategory"
+  >("subcategory");
 
   const monthOptions = useMemo(() => {
     const months = Array.from(
@@ -303,21 +308,27 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
   const subcategoryData = useMemo(() => {
     const totals = new Map<string, number>();
     for (const movement of pieMovements) {
-      totals.set(
-        movement.subcategory_name,
-        (totals.get(movement.subcategory_name) ?? 0) + movement.amount,
-      );
+      // The breakdown can be aggregated either at the category level or at
+      // the subcategory level. Movements without a subcategory always roll up
+      // under the category name so they don't disappear in subcategory mode.
+      const label =
+        breakdownMode === "category"
+          ? movement.category_name
+          : (movement.subcategory_name ?? movement.category_name);
+      totals.set(label, (totals.get(label) ?? 0) + movement.amount);
     }
     return Array.from(totals.entries())
+      .filter(([, total]) => total !== 0)
       .map(([name, total], index) => ({
         id: index,
         value: total,
+        signedValue: total,
         label: name,
         color: chartColors[index % chartColors.length],
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8);
-  }, [chartColors, pieMovements]);
+  }, [breakdownMode, chartColors, pieMovements]);
 
   const budgetData = useMemo(() => {
     const totals = new Map<string, { spent: number; budget: number }>();
@@ -362,7 +373,9 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
       );
     }
     return monthlyExpenses.filter(
-      (movement) => movement.subcategory_name === activeFilter.value,
+      (movement) =>
+        (movement.subcategory_name ?? movement.category_name) ===
+        activeFilter.value,
     );
   }, [activeFilter, monthlyExpenses]);
 
@@ -401,6 +414,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
         headerName: es.dashboard.columns.subcategory,
         minWidth: 170,
         flex: 0.7,
+        valueFormatter: (value: unknown) => (value ? String(value) : "—"),
       },
       {
         field: "amountLabel",
@@ -493,7 +507,11 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
           ))}
         </Box>
         <ChartCard
-          title={es.dashboard.breakdownTitle}
+          title={
+            breakdownMode === "category"
+              ? es.dashboard.breakdownTitleByCategory
+              : es.dashboard.breakdownTitle
+          }
           subtitle={
             activeFilter?.type === "category"
               ? es.dashboard.breakdownSubtitleFiltered(activeFilter.value)
@@ -504,10 +522,26 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
             sx={{
               display: "grid",
               gap: 2,
-              gridTemplateRows: "auto auto",
+              gridTemplateRows: "auto auto auto",
               alignItems: "center",
             }}
           >
+            <ToggleButtonGroup
+              size="small"
+              exclusive
+              value={breakdownMode}
+              onChange={(_event, next) => {
+                if (next) setBreakdownMode(next);
+              }}
+              sx={{ alignSelf: "flex-end" }}
+            >
+              <ToggleButton value="category">
+                {es.dashboard.breakdownToggleCategory}
+              </ToggleButton>
+              <ToggleButton value="subcategory">
+                {es.dashboard.breakdownToggleSubcategory}
+              </ToggleButton>
+            </ToggleButtonGroup>
             <PieChart
               height={250}
               margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
@@ -517,10 +551,10 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
                   return;
                 }
                 setActiveFilter((current) =>
-                  current?.type === "subcategory" &&
+                  current?.type === breakdownMode &&
                   current.value === item.label
                     ? null
-                    : { type: "subcategory", value: item.label },
+                    : { type: breakdownMode, value: item.label },
                 );
               }}
               series={[
@@ -546,10 +580,10 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
                   type="button"
                   onClick={() =>
                     setActiveFilter((current) =>
-                      current?.type === "subcategory" &&
+                      current?.type === breakdownMode &&
                       current.value === item.label
                         ? null
-                        : { type: "subcategory", value: item.label },
+                        : { type: breakdownMode, value: item.label },
                     )
                   }
                   direction="row"
@@ -560,14 +594,14 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
                     p: 0.75,
                     border: "1px solid",
                     borderColor:
-                      activeFilter?.type === "subcategory" &&
+                      activeFilter?.type === breakdownMode &&
                       activeFilter.value === item.label
                         ? alpha(item.color, 0.65)
                         : "transparent",
                     borderRadius: 1,
                     color: "inherit",
                     bgcolor:
-                      activeFilter?.type === "subcategory" &&
+                      activeFilter?.type === breakdownMode &&
                       activeFilter.value === item.label
                         ? alpha(item.color, 0.1)
                         : "transparent",
@@ -600,7 +634,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
                     color="text.secondary"
                     sx={{ fontSize: 13, fontWeight: 600 }}
                   >
-                    {formatCurrency(item.value)}
+                    {formatCurrency(item.signedValue)}
                   </Typography>
                 </Stack>
               ))}

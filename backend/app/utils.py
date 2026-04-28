@@ -35,6 +35,16 @@ def to_cents(value: str | float | int) -> int:
     return int(round(float(text) * 100))
 
 
+def to_positive_cents(value: str | float | int) -> int:
+    """Convert a movement amount to positive integer cents.
+
+    Movement direction is represented by ``Category.kind``. Stored movement
+    amounts are magnitudes, so imports that provide signed values are
+    normalized before persistence.
+    """
+    return abs(to_cents(value))
+
+
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _DMY = re.compile(r"^(\d{2})[/-](\d{2})[/-](\d{2}|\d{4})$")
 

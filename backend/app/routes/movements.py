@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, ConfigDict
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import Category, Movement, MovementSource, Subcategory, utcnow
+from app.models import Category, Movement, MovementSource, utcnow
 from app.schemas import (
     ActionResult,
     MovementCreate,
@@ -15,14 +16,29 @@ from app.schemas import (
     SummaryRead,
     SummarySourceCounts,
 )
-from app.utils import parse_action_date, parse_date_input, to_cents, to_pesos
+from app.services.bootstrap import UNCLASSIFIED_NAME
+from app.services.classification import (
+    ClassificationError,
+    resolve_movement_classification,
+)
+from app.services.classification_memory import (
+    build_classification_memory,
+    memory_index,
+)
+from app.utils import (
+    normalize_key,
+    parse_action_date,
+    parse_date_input,
+    to_pesos,
+    to_positive_cents,
+)
 
 router = APIRouter(prefix="/api", tags=["movements"])
 
 
 def _serialize_movement(movement: Movement) -> MovementRead:
+    category = movement.category
     sub = movement.subcategory
-    category = sub.category
     return MovementRead(
         id=movement.id,
         date=movement.date,
@@ -33,12 +49,12 @@ def _serialize_movement(movement: Movement) -> MovementRead:
         source=movement.source,
         raw_description=movement.raw_description,
         reviewed=movement.reviewed,
-        subcategory_id=sub.id,
-        subcategory_name=sub.name,
         category_id=category.id,
         category_name=category.name,
         category_kind=category.kind,
         category_budget=to_pesos(category.budget) if category.budget is not None else None,
+        subcategory_id=sub.id if sub is not None else None,
+        subcategory_name=sub.name if sub is not None else None,
     )
 
 
@@ -59,9 +75,15 @@ def create_movement(
     payload: MovementCreate,
     session: Session = Depends(get_session),
 ) -> MovementRead:
-    sub = session.get(Subcategory, payload.subcategory_id)
-    if sub is None:
-        raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
+    try:
+        classification = resolve_movement_classification(
+            session,
+            category_id=payload.category_id,
+            subcategory_id=payload.subcategory_id,
+        )
+    except ClassificationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     raw_date = parse_date_input(payload.date)
     accounting_date = (
         parse_date_input(payload.accounting_date) if payload.accounting_date else raw_date
@@ -69,13 +91,16 @@ def create_movement(
     movement = Movement(
         date=raw_date,
         accounting_date=accounting_date,
-        amount_cents=to_cents(payload.amount),
+        amount_cents=to_positive_cents(payload.amount),
         business=payload.business,
         reason=payload.reason,
         source=payload.source,
         raw_description=payload.raw_description,
         reviewed=payload.reviewed,
-        subcategory_id=payload.subcategory_id,
+        category_id=classification.category.id,
+        subcategory_id=classification.subcategory.id
+        if classification.subcategory is not None
+        else None,
     )
     session.add(movement)
     session.commit()
@@ -94,11 +119,40 @@ def update_movement(
         raise HTTPException(status_code=404, detail="Movimiento no encontrado.")
 
     fields = payload.model_fields_set
-    if "subcategory_id" in fields and payload.subcategory_id is not None:
-        sub = session.get(Subcategory, payload.subcategory_id)
-        if sub is None:
-            raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
-        movement.subcategory_id = payload.subcategory_id
+
+    classification_changed = (
+        "category_id" in fields or "subcategory_id" in fields or bool(payload.clear_subcategory)
+    )
+    if classification_changed:
+        next_category_id = (
+            payload.category_id
+            if "category_id" in fields and payload.category_id is not None
+            else movement.category_id
+        )
+        next_subcategory_id = (
+            None
+            if payload.clear_subcategory
+            else (
+                payload.subcategory_id
+                if "subcategory_id" in fields
+                else movement.subcategory_id
+            )
+        )
+        try:
+            classification = resolve_movement_classification(
+                session,
+                category_id=next_category_id,
+                subcategory_id=next_subcategory_id,
+            )
+        except ClassificationError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        movement.category_id = classification.category.id
+        movement.subcategory_id = (
+            classification.subcategory.id
+            if classification.subcategory is not None
+            else None
+        )
+
     if "reviewed" in fields and payload.reviewed is not None:
         movement.reviewed = payload.reviewed
     if "accounting_date" in fields and payload.accounting_date is not None:
@@ -106,7 +160,7 @@ def update_movement(
     if "date" in fields and payload.date is not None:
         movement.date = parse_action_date(payload.date)
     if "amount" in fields and payload.amount is not None:
-        movement.amount_cents = to_cents(payload.amount)
+        movement.amount_cents = to_positive_cents(payload.amount)
     if "business" in fields and payload.business is not None:
         movement.business = payload.business
     if "reason" in fields and payload.reason is not None:
@@ -134,6 +188,73 @@ def delete_movement(
     session.delete(movement)
     session.commit()
     return ActionResult()
+
+
+class ClassificationMemoryApplyResult(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
+    updated: int
+
+
+@router.post(
+    "/movements/apply-classification-memory",
+    response_model=ClassificationMemoryApplyResult,
+)
+def apply_classification_memory(
+    session: Session = Depends(get_session),
+) -> ClassificationMemoryApplyResult:
+    """Pre-classify pending movements using the user's confirmed history.
+
+    For every pending (``reviewed=false``) movement currently in "Sin
+    clasificar", look up its business in the memory built from
+    ``reviewed=true`` movements. When the memory has a dominant subcategory,
+    move the movement there but keep ``reviewed=false`` — it's a suggestion,
+    not a confirmation, so the user still gets it in the review queue.
+    """
+    memory = build_classification_memory(session)
+    if not memory:
+        return ClassificationMemoryApplyResult(updated=0)
+    lookup = memory_index(memory)
+
+    # Pending movements that are still in the bootstrap "Sin clasificar"
+    # category — that's our pool to backfill.
+    candidates = session.exec(
+        select(Movement)
+        .join(Category, Movement.category_id == Category.id)
+        .where(Movement.reviewed.is_(False))  # type: ignore[union-attr]
+        .where(Category.name == UNCLASSIFIED_NAME)
+    ).all()
+
+    updated = 0
+    for movement in candidates:
+        match = lookup.get(normalize_key(movement.business or ""))
+        if match is None:
+            continue
+        if (
+            match.subcategory_id == movement.subcategory_id
+            and match.category_id == movement.category_id
+        ):
+            continue
+        try:
+            classification = resolve_movement_classification(
+                session,
+                category_id=match.category_id,
+                subcategory_id=match.subcategory_id,
+            )
+        except ClassificationError:
+            continue
+        movement.category_id = classification.category.id
+        movement.subcategory_id = (
+            classification.subcategory.id
+            if classification.subcategory is not None
+            else None
+        )
+        movement.updated_at = utcnow()
+        session.add(movement)
+        updated += 1
+
+    if updated:
+        session.commit()
+    return ClassificationMemoryApplyResult(updated=updated)
 
 
 @router.get("/summary", response_model=SummaryRead)
