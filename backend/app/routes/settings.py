@@ -11,7 +11,8 @@ from app.services.settings import (
     DEFAULT_OPENAI_MODEL,
     LLM_OPENAI_API_KEY,
     LLM_OPENAI_MODEL,
-    get_setting,
+    get_openai_api_key,
+    get_openai_model,
     mask_secret,
     set_setting,
 )
@@ -56,8 +57,8 @@ class LLMOpenAIUpdate(_Base):
 
 @router.get("/settings/llm", response_model=LLMSettingsRead)
 def read_llm_settings(session: Session = Depends(get_session)) -> LLMSettingsRead:
-    api_key = get_setting(session, LLM_OPENAI_API_KEY)
-    model = get_setting(session, LLM_OPENAI_MODEL) or DEFAULT_OPENAI_MODEL
+    api_key = get_openai_api_key(session)
+    model = get_openai_model(session)
     return LLMSettingsRead(
         providers=[
             LLMProviderRead(

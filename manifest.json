@@ -36,11 +36,22 @@
     "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
     "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances \u2014 all without sending your data anywhere.",
     "category": "finance",
-    "permissions": [
-      "app_data",
-      "user_selected_imports",
-      "app_exports",
-      "ai_api"
+    "capabilities": [
+      {
+        "id": "local_finance_data",
+        "title": "Guardar tus finanzas localmente",
+        "description": "Mantiene movimientos, categorias y presupuestos en una base de datos local."
+      },
+      {
+        "id": "user_selected_imports",
+        "title": "Importar archivos que eliges",
+        "description": "Carga cartolas o planillas seleccionadas por ti para convertirlas en movimientos."
+      },
+      {
+        "id": "ai_assisted_imports",
+        "title": "Usar IA para leer documentos",
+        "description": "Puede usar una API key configurada por ti para extraer movimientos desde PDFs o imagenes."
+      }
     ],
     "supported_platforms": [
       "darwin_arm64",
@@ -54,6 +65,14 @@
       "catalog_manifest_path": "vite-fastapi-sqlite/finance-os/manifest.json"
     }
   },
+  "appSecrets": [
+    {
+      "name": "openai_api_key",
+      "label": "OpenAI API Key",
+      "required": false,
+      "usage": "Permite importar movimientos desde PDFs e imagenes usando OpenAI."
+    }
+  ],
   "services": [
     {
       "name": "backend",
