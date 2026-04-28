@@ -21,6 +21,9 @@ trap cleanup EXIT
 
 rsync -a \
   --exclude '.git/' \
+  --exclude '.git' \
+  --exclude '**/.git' \
+  --exclude '**/.git/' \
   --exclude '.gitignore' \
   --exclude '.DS_Store' \
   --exclude '.idea/' \
@@ -41,6 +44,7 @@ rsync -a \
 
 # Asegura que data exista pero sin bases locales ni backups.
 mkdir -p "$STAGE_DIR/$APP_NAME/backend/data"
+find "$STAGE_DIR/$APP_NAME" -name '.git' -exec rm -rf {} + 2>/dev/null || true
 find "$STAGE_DIR/$APP_NAME/backend" -type d -name '__pycache__' -prune -exec rm -rf {} +
 find "$STAGE_DIR/$APP_NAME/backend" -type f -name '*.pyc' -delete
 find "$STAGE_DIR/$APP_NAME/backend/data" -type f \( -name '*.sqlite' -o -name '*.sqlite-*' -o -name '*.db' -o -name '*.backup*' \) -delete
