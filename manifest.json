@@ -1,8 +1,16 @@
 {
   "name": "finance-os",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.6",
+      "summary": "Hardens release packaging to exclude Git metadata.",
+      "changes": [
+        "Excludes root and nested .git metadata from app release packages.",
+        "Adds a defensive cleanup pass before creating the release ZIP."
+      ]
+    },
     {
       "version": "0.1.5",
       "summary": "Improves AI-assisted imports, classification consistency, and review workflows.",
