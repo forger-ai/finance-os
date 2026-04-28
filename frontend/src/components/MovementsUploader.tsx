@@ -21,12 +21,74 @@ import { es } from "@/i18n/es";
 type UploaderState =
   | { kind: "idle" }
   | { kind: "uploading"; filename: string }
+  | {
+      kind: "codex";
+      filename: string;
+      runId: string;
+      status: ForgerCodexTaskStatus;
+      progressLog: string[];
+    }
+  | { kind: "codexDone"; filename: string; resultText: string }
   | { kind: "done"; result: ImportResult }
   | { kind: "error"; message: string };
 
 const ACCEPTED =
   ".csv,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*,text/csv," +
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+const CODEX_TEMPLATE_ID = "extract_movements_from_statement";
+
+function isCodexDocument(file: File): boolean {
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
+  return (
+    type === "application/pdf" ||
+    type.startsWith("image/") ||
+    [".pdf", ".png", ".jpg", ".jpeg", ".webp", ".heic"].some((ext) =>
+      name.endsWith(ext),
+    )
+  );
+}
+
+function readFileBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = typeof reader.result === "string" ? reader.result : "";
+      resolve(value.includes(",") ? value.split(",").pop() ?? "" : value);
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("read_failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
+  const api = window.forgerApp;
+  if (!api) {
+    throw new Error(es.review.upload.codexUnavailable);
+  }
+  const initial = await api.getCodexTask(runId);
+  if (
+    initial?.status === "completed" ||
+    initial?.status === "failed" ||
+    initial?.status === "canceled"
+  ) {
+    return initial;
+  }
+  return new Promise((resolve) => {
+    const unsubscribe = api.onCodexTaskUpdated((event) => {
+      if (event.task.runId !== runId) return;
+      if (
+        event.task.status === "completed" ||
+        event.task.status === "failed" ||
+        event.task.status === "canceled"
+      ) {
+        unsubscribe();
+        resolve(event.task);
+      }
+    });
+  });
+}
 
 export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
   const [state, setState] = useState<UploaderState>({ kind: "idle" });
@@ -59,6 +121,52 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
     async (file: File) => {
       setState({ kind: "uploading", filename: file.name });
       try {
+        if (isCodexDocument(file)) {
+          if (!window.forgerApp) {
+            throw new Error(es.review.upload.codexUnavailable);
+          }
+          const dataBase64 = await readFileBase64(file);
+          const started = await window.forgerApp.startCodexTask({
+            templateId: CODEX_TEMPLATE_ID,
+            variables: { filename: file.name },
+            attachments: [
+              {
+                name: file.name,
+                mimeType: file.type || undefined,
+                dataBase64,
+              },
+            ],
+          });
+          setState({
+            kind: "codex",
+            filename: file.name,
+            runId: started.runId,
+            status: started.status,
+            progressLog: started.progressLog ?? [],
+          });
+          const unsubscribe = window.forgerApp.onCodexTaskUpdated((event) => {
+            if (event.task.runId !== started.runId) return;
+            setState({
+              kind: "codex",
+              filename: file.name,
+              runId: event.task.runId,
+              status: event.task.status,
+              progressLog: event.task.progressLog ?? [],
+            });
+          });
+          const completed = await waitForCodexTask(started.runId);
+          unsubscribe();
+          if (completed.status !== "completed") {
+            throw new Error(completed.error || es.review.upload.genericError);
+          }
+          setState({
+            kind: "codexDone",
+            filename: file.name,
+            resultText: completed.resultText || es.review.upload.codexDone,
+          });
+          onUploaded();
+          return;
+        }
         const result = await extractMovementsFromFile(file);
         setState({ kind: "done", result });
         if (result.inserted > 0) {
@@ -153,7 +261,7 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
                 )
               }
               variant="outlined"
-              disabled={memoryBusy || state.kind === "uploading"}
+              disabled={memoryBusy || state.kind === "uploading" || state.kind === "codex"}
               onClick={() => void onApplyMemory()}
             >
               {es.review.applyMemoryButton}
@@ -167,11 +275,11 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
                 )
               }
               variant="contained"
-              disabled={state.kind === "uploading"}
+              disabled={state.kind === "uploading" || state.kind === "codex"}
               onClick={onPick}
               sx={{ minWidth: 180 }}
             >
-              {state.kind === "uploading"
+              {state.kind === "uploading" || state.kind === "codex"
                 ? es.review.upload.processing
                 : dragActive
                   ? es.review.upload.ctaDrop
@@ -198,7 +306,14 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
           onChange={onChange}
         />
 
-        <Collapse in={state.kind === "done" || state.kind === "error"}>
+        <Collapse
+          in={
+            state.kind === "done" ||
+            state.kind === "error" ||
+            state.kind === "codex" ||
+            state.kind === "codexDone"
+          }
+        >
           {state.kind === "done" ? (
             <Alert
               severity={
@@ -240,6 +355,39 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
                     </Box>
                   </Box>
                 ) : null}
+              </Stack>
+            </Alert>
+          ) : state.kind === "codex" ? (
+            <Alert severity="info" sx={{ mt: 0.5 }}>
+              <Stack spacing={0.75}>
+                <Typography sx={{ fontWeight: 600 }}>
+                  {es.review.upload.codexStatus(state.status)}
+                </Typography>
+                {state.progressLog.length > 0 ? (
+                  <Box
+                    component="ul"
+                    sx={{ m: 0, pl: 2, fontSize: 12, lineHeight: 1.5 }}
+                  >
+                    {state.progressLog.slice(-5).map((entry, index) => (
+                      <li key={`${entry}-${index}`}>{entry}</li>
+                    ))}
+                  </Box>
+                ) : null}
+              </Stack>
+            </Alert>
+          ) : state.kind === "codexDone" ? (
+            <Alert
+              severity="success"
+              onClose={() => setState({ kind: "idle" })}
+              sx={{ mt: 0.5 }}
+            >
+              <Stack spacing={0.75}>
+                <Typography sx={{ fontWeight: 600 }}>
+                  {es.review.upload.codexDone}
+                </Typography>
+                <Typography sx={{ whiteSpace: "pre-wrap", fontSize: 13 }}>
+                  {state.resultText}
+                </Typography>
               </Stack>
             </Alert>
           ) : state.kind === "error" ? (

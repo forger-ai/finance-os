@@ -67,8 +67,8 @@
       },
       {
         "id": "ai_assisted_imports",
-        "title": "Usar IA para leer documentos",
-        "description": "Puede usar una API key configurada por ti para extraer movimientos desde PDFs o imagenes."
+        "title": "Usar Codex para leer documentos",
+        "description": "Procesa PDFs e imagenes mediante Codex provisto por Forger, sin API key propia dentro de la app."
       }
     ],
     "supported_platforms": [
@@ -83,12 +83,19 @@
       "catalog_manifest_path": "vite-fastapi-sqlite/finance-os/manifest.json"
     }
   },
-  "appSecrets": [
+  "promptTemplates": [
     {
-      "name": "openai_api_key",
-      "label": "OpenAI API Key",
-      "required": false,
-      "usage": "Permite importar movimientos desde PDFs e imagenes usando OpenAI."
+      "id": "extract_movements_from_statement",
+      "title": "Extraer movimientos desde cartola PDF o imagen",
+      "description": "Lee un documento financiero compartido por el usuario, normaliza movimientos y los carga en Finance OS como pendientes de revision.",
+      "acceptedFileTypes": [
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/heic"
+      ],
+      "prompt": "Eres el agente interno de Finance OS. Lee el archivo {{filename}} compartido por el usuario y extrae todos los movimientos financieros visibles sin inventar filas. Usa el AGENTS.md y la skill de carga de movimientos de esta app. Convierte los movimientos a un CSV compatible con scripts/import_movements.py, revisa categorias/subcategorias disponibles antes de clasificar, usa Sin clasificar cuando no haya confianza suficiente, importa los movimientos en la base local y deja todo lo importado como pendiente de revision cuando corresponda. Al finalizar, responde solo con un resumen funcional: cuantos movimientos se importaron, cuantos se omitieron o fallaron, y que debe revisar el usuario."
     }
   ],
   "services": [

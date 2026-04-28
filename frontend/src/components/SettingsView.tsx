@@ -16,13 +16,10 @@ import {
   Paper,
   Select,
   Stack,
-  Tab,
-  Tabs,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { LLMSettingsTab } from "./LLMSettingsTab";
 import {
   createCategory,
   createSubcategory,
@@ -58,11 +55,8 @@ function describeError(error: unknown, fallback: string) {
   return fallback;
 }
 
-type SettingsTab = "categories" | "llm";
-
 export function SettingsView({ categories, onChanged }: Props) {
   const [message, setMessage] = useState<string | null>(null);
-  const [tab, setTab] = useState<SettingsTab>("categories");
 
   const allSubcategories = useMemo(
     () => categories.flatMap((category) => category.subcategories),
@@ -71,41 +65,26 @@ export function SettingsView({ categories, onChanged }: Props) {
 
   return (
     <Stack spacing={2.5}>
-      <Tabs
-        value={tab}
-        onChange={(_, value: SettingsTab) => setTab(value)}
-        sx={{ borderBottom: 1, borderColor: "divider" }}
-      >
-        <Tab value="categories" label={es.settings.tabs.categories} />
-        <Tab value="llm" label={es.settings.tabs.llm} />
-      </Tabs>
+      {message ? (
+        <Alert onClose={() => setMessage(null)} severity="info">
+          {message}
+        </Alert>
+      ) : null}
 
-      {tab === "categories" ? (
-        <>
-          {message ? (
-            <Alert onClose={() => setMessage(null)} severity="info">
-              {message}
-            </Alert>
-          ) : null}
+      <CreateCategoryForm onChanged={onChanged} onMessage={setMessage} />
 
-          <CreateCategoryForm onChanged={onChanged} onMessage={setMessage} />
-
-          <Stack spacing={2}>
-            {categories.map((category) => (
-              <CategoryCard
-                allCategories={categories}
-                allSubcategories={allSubcategories}
-                category={category}
-                key={category.id}
-                onChanged={onChanged}
-                onMessage={setMessage}
-              />
-            ))}
-          </Stack>
-        </>
-      ) : (
-        <LLMSettingsTab />
-      )}
+      <Stack spacing={2}>
+        {categories.map((category) => (
+          <CategoryCard
+            allCategories={categories}
+            allSubcategories={allSubcategories}
+            category={category}
+            key={category.id}
+            onChanged={onChanged}
+            onMessage={setMessage}
+          />
+        ))}
+      </Stack>
     </Stack>
   );
 }

@@ -7,3 +7,46 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+type ForgerCodexTaskStatus =
+  | "queued"
+  | "running"
+  | "needs_permission"
+  | "completed"
+  | "failed"
+  | "canceled";
+
+type ForgerCodexTaskSummary = {
+  runId: string;
+  appId: string;
+  templateId: string;
+  status: ForgerCodexTaskStatus;
+  createdAt: string;
+  updatedAt: string;
+  resultText?: string;
+  error?: string;
+  progressLog?: string[];
+};
+
+type ForgerCodexTaskEvent = {
+  task: ForgerCodexTaskSummary;
+};
+
+interface Window {
+  forgerApp?: {
+    startCodexTask: (input: {
+      templateId: string;
+      variables?: Record<string, string | number | boolean | null>;
+      attachments?: Array<{
+        name: string;
+        mimeType?: string;
+        dataBase64: string;
+      }>;
+    }) => Promise<ForgerCodexTaskSummary>;
+    getCodexTask: (runId: string) => Promise<ForgerCodexTaskSummary | null>;
+    cancelCodexTask: (runId: string) => Promise<{ success: boolean }>;
+    onCodexTaskUpdated: (
+      listener: (event: ForgerCodexTaskEvent) => void,
+    ) => () => void;
+  };
+}
