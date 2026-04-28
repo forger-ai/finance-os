@@ -15,7 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlmodel import Session
 
-from app.database import engine, init_db
+from app.database import engine
+from app.database_ext import init_app_db as init_db
 from app.services.import_movements import import_movements_from_csv
 
 

@@ -16,7 +16,7 @@ La idea del proyecto sigue siendo la misma: no es un SaaS multiusuario, es una h
 finance-os-lite/
   backend/                  Python API + scripts CLI
     app/                    FastAPI app, modelos, rutas y servicios
-    scripts/                Init DB, seed, import CSV, edit, verify
+    scripts/                Init DB, import CSV, edit, verify
     data/                   SQLite (generado en tiempo de ejecución)
     pyproject.toml
     Dockerfile
@@ -50,11 +50,10 @@ Una de las dos opciones:
    docker compose up --build
    ```
 
-3. Crea las tablas y carga las categorías por defecto en otra terminal:
+3. Prepara la base local en otra terminal:
 
    ```bash
    docker compose exec backend uv run python scripts/init_db.py
-   docker compose exec backend uv run python scripts/seed.py
    ```
 
 4. Listo:
@@ -71,7 +70,6 @@ La base de datos vive en `./backend/data/finance_os.sqlite` y persiste entre rei
 cd backend
 uv sync                # crea .venv e instala deps
 uv run python scripts/init_db.py
-uv run python scripts/seed.py
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
@@ -99,7 +97,6 @@ Todos corren con `uv` desde `backend/`:
 
 ```bash
 uv run python scripts/init_db.py
-uv run python scripts/seed.py
 uv run python scripts/list_categories.py
 uv run python scripts/list_movements.py --limit 50
 uv run python scripts/edit_movement.py --id <movement_id> [--reviewed true]

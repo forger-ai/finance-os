@@ -275,28 +275,24 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
   );
 
   const metrics = useMemo(() => {
-    // Movements store amounts with sign: expenses are negative, income positive.
-    // We sum signed amounts for the balance, and show magnitudes for the
-    // "gastado"/"ahorrado" KPIs so they read as positive numbers.
     const totalIncome = monthlyMovements
       .filter((movement) => movement.category_kind === "INCOME")
       .reduce((total, movement) => total + movement.amount, 0);
-    const totalSpentSigned = monthlyExpenses.reduce(
+    const totalSpent = monthlyExpenses.reduce(
       (total, movement) => total + movement.amount,
       0,
     );
-    const totalSavedSigned = monthlySavings.reduce(
+    const totalSaved = monthlySavings.reduce(
       (total, movement) => total + movement.amount,
       0,
     );
 
-    // Income (+) + spent (−) + savings flow → net balance.
-    const balanceValue = totalIncome + totalSpentSigned + totalSavedSigned;
+    const balanceValue = totalIncome - totalSpent - totalSaved;
     return {
       balance: `${balanceValue >= 0 ? "+" : ""}${formatCurrency(balanceValue)}`,
       totalIncome: formatCurrency(totalIncome),
-      totalSaved: formatCurrency(Math.abs(totalSavedSigned)),
-      totalSpent: formatCurrency(Math.abs(totalSpentSigned)),
+      totalSaved: formatCurrency(totalSaved),
+      totalSpent: formatCurrency(totalSpent),
     };
   }, [monthlyExpenses, monthlyMovements, monthlySavings]);
 
@@ -325,10 +321,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
       .filter(([, total]) => total !== 0)
       .map(([name, total], index) => ({
         id: index,
-        // PieChart needs positive magnitudes — expenses come in as negative
-        // amounts, so we sort/render by their absolute value but keep the
-        // signed total around for the legend.
-        value: Math.abs(total),
+        value: total,
         signedValue: total,
         label: name,
         color: chartColors[index % chartColors.length],

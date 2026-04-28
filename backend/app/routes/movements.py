@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
-
 from pydantic import BaseModel, ConfigDict
+from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import Category, Movement, MovementSource, Subcategory, utcnow
@@ -22,7 +21,13 @@ from app.services.classification_memory import (
     build_classification_memory,
     memory_index,
 )
-from app.utils import normalize_key, parse_action_date, parse_date_input, to_cents, to_pesos
+from app.utils import (
+    normalize_key,
+    parse_action_date,
+    parse_date_input,
+    to_pesos,
+    to_positive_cents,
+)
 
 router = APIRouter(prefix="/api", tags=["movements"])
 
@@ -87,7 +92,7 @@ def create_movement(
     movement = Movement(
         date=raw_date,
         accounting_date=accounting_date,
-        amount_cents=to_cents(payload.amount),
+        amount_cents=to_positive_cents(payload.amount),
         business=payload.business,
         reason=payload.reason,
         source=payload.source,
@@ -145,7 +150,7 @@ def update_movement(
     if "date" in fields and payload.date is not None:
         movement.date = parse_action_date(payload.date)
     if "amount" in fields and payload.amount is not None:
-        movement.amount_cents = to_cents(payload.amount)
+        movement.amount_cents = to_positive_cents(payload.amount)
     if "business" in fields and payload.business is not None:
         movement.business = payload.business
     if "reason" in fields and payload.reason is not None:

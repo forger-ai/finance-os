@@ -20,9 +20,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlmodel import Session, select
 
-from app.database import engine, init_db
+from app.database import engine
+from app.database_ext import init_app_db as init_db
 from app.models import Movement, MovementSource, Subcategory, utcnow
-from app.utils import isoformat_z, parse_boolean, parse_date_input, to_cents, to_pesos
+from app.utils import (
+    isoformat_z,
+    parse_boolean,
+    parse_date_input,
+    to_pesos,
+    to_positive_cents,
+)
 
 
 def main(argv: list[str]) -> int:
@@ -52,7 +59,7 @@ def main(argv: list[str]) -> int:
         if args.accounting_date:
             movement.accounting_date = parse_date_input(args.accounting_date)
         if args.amount:
-            movement.amount_cents = to_cents(args.amount)
+            movement.amount_cents = to_positive_cents(args.amount)
         if args.business:
             movement.business = args.business
         if args.reason:

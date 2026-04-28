@@ -1,4 +1,4 @@
-"""Idempotent seed data the API depends on."""
+"""Idempotent baseline records the API depends on."""
 
 from __future__ import annotations
 

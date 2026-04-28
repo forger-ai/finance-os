@@ -83,7 +83,6 @@
   ],
   "scripts": {
     "init_db": "cd backend && uv run python scripts/init_db.py",
-    "seed": "cd backend && uv run python scripts/seed.py",
     "list_categories": "cd backend && uv run python scripts/list_categories.py",
     "list_movements": "cd backend && uv run python scripts/list_movements.py",
     "import_movements": "cd backend && uv run python scripts/import_movements.py",
@@ -93,6 +92,7 @@
     "verify": "cd backend && uv run python scripts/verify.py"
   },
   "skills": [
-    "./skills/load-movements"
+    "./skills/load-movements",
+    "./skills/stack-database-extension"
   ]
 }

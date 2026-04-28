@@ -85,7 +85,7 @@ The importer expects movement data with these concepts:
 
 - `date`: original/raw transaction date.
 - `accountingDate`: accounting date, when available. If absent, it usually defaults to `date`.
-- `amount`: signed amount.
+- `amount`: positive amount magnitude. Do not encode financial direction in the sign; direction comes from the selected category's `kind`.
 - `business`: merchant, counterparty, or business name.
 - `reason`: description, reason, memo, detail, or glosa.
 - `source`: `BANK`, `CREDIT_CARD`, or `MANUAL`.

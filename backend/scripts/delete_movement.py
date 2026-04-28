@@ -16,7 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlmodel import Session
 
-from app.database import engine, init_db
+from app.database import engine
+from app.database_ext import init_app_db as init_db
 from app.models import Movement
 from app.utils import isoformat_z, to_pesos
 

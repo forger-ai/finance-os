@@ -31,6 +31,7 @@ from app.utils import (
     parse_boolean,
     parse_date_input,
     to_cents,
+    to_positive_cents,
 )
 
 # Field aliases. Includes the canonical English names plus common Chilean bank
@@ -161,7 +162,7 @@ def _build_duplicate_key(*, amount_cents: int, date: datetime) -> str:
     Trade-off: two genuinely distinct transactions with the same amount on the
     same day will collide. The user can add the second one manually if needed.
     """
-    return f"{date.date().isoformat()}|{amount_cents}"
+    return f"{date.date().isoformat()}|{abs(amount_cents)}"
 
 
 def parse_csv_text(text: str) -> list[dict[str, str]]:
@@ -245,11 +246,10 @@ def import_movements_from_csv(
             if not date_text:
                 raise ValueError("Falta la columna de fecha en esta fila.")
 
-            # Resolve amount: prefer the explicit ``amount``/``monto`` column;
-            # otherwise build it from charge (debit) and credit (abono) columns
-            # the way Chilean bank exports usually present things.
+            # Movement amounts are stored as positive magnitudes. Direction is
+            # represented by the resolved category kind, not by the sign.
             if amount_text:
-                amount_cents = to_cents(amount_text)
+                amount_cents = to_positive_cents(amount_text)
             else:
                 charge_cents = _parse_optional_amount(charge_text)
                 credit_cents = _parse_optional_amount(credit_text)
@@ -258,7 +258,7 @@ def import_movements_from_csv(
                         "Falta el monto: no encontré columnas amount/monto/cargo/abono "
                         "con valor."
                     )
-                amount_cents = credit_cents - charge_cents
+                amount_cents = charge_cents or credit_cents
 
             # Reason / business defaults: bank exports rarely have ``business``
             # as a separate column, so we derive it from the description.

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from app.models import Setting, utcnow
 

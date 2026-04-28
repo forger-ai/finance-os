@@ -28,7 +28,7 @@ from app.services.classification_memory import (
 )
 from app.services.import_movements import ImportOutcome, ImportRowError, _build_duplicate_key
 from app.services.settings import get_openai_api_key, get_openai_model
-from app.utils import normalize_key, parse_date_input, to_cents
+from app.utils import normalize_key, parse_date_input, to_positive_cents
 
 _RESPONSE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -54,8 +54,9 @@ _RESPONSE_SCHEMA: dict[str, Any] = {
                     "amount": {
                         "type": "number",
                         "description": (
-                            "Amount in pesos. Negative for expenses/debits, "
-                            "positive for income/credits."
+                            "Absolute amount in pesos. Always return a positive "
+                            "number; financial direction is represented by the "
+                            "chosen subcategory's category kind."
                         ),
                     },
                     "business": {
@@ -127,8 +128,9 @@ def _build_prompt(
         "Return every transaction visible in the document. Do not invent rows. "
         "If a value is not visible, infer the most plausible one from context "
         "but never hallucinate amounts or dates.\n\n"
-        "Sign convention: amount is NEGATIVE for expenses/debits/cargos and "
-        "POSITIVE for income/credits/abonos.\n\n"
+        "Amount convention: return amounts as positive magnitudes. Do not use "
+        "negative signs for expenses/debits/cargos. Financial direction is "
+        "represented by the selected subcategory's category kind.\n\n"
         "Source: use BANK for checking/savings accounts and transfers, "
         "CREDIT_CARD for credit-card statements, MANUAL for anything else.\n\n"
         f"{memory_block}"
@@ -300,7 +302,7 @@ def extract_movements_from_file(
             except ValueError as exc:
                 raise ValueError(f"Unknown source: {item.source}") from exc
 
-            amount_cents = to_cents(item.amount)
+            amount_cents = to_positive_cents(item.amount)
             sub = _resolve_subcategory(item.subcategory_name, subcategory_map, fallback)
 
             duplicate_key = _build_duplicate_key(
