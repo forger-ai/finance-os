@@ -167,6 +167,17 @@
       ]
     }
   ],
+  "mcp": {
+    "type": "http",
+    "context": "./backend",
+    "command": "python -m app.mcp_server",
+    "healthcheck": "/health",
+    "environment": {
+      "DATABASE_URL": "sqlite:////app/data/finance_os.sqlite",
+      "PYTHONPATH": "."
+    },
+    "toolTimeoutSec": 600
+  },
   "scripts": {
     "init_db": "cd backend && uv run python scripts/init_db.py",
     "list_categories": "cd backend && uv run python scripts/list_categories.py",
