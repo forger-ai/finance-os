@@ -1,6 +1,6 @@
 ---
 name: finance-import
-description: Use when the user wants to load, normalize, classify, review, or correct finance movements in Finance OS. This is an internal agent skill: translate user-facing requests into safe data operations without exposing paths, scripts, temporary CSVs, or commands unless the user explicitly asks for technical details.
+description: "Use when the user wants to load, normalize, classify, review, or correct finance movements in Finance OS. This is an internal agent skill: translate user-facing requests into safe data operations without exposing paths, scripts, temporary CSVs, or commands unless the user explicitly asks for technical details."
 ---
 
 # Finance Import
