@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
 import CloudUploadRounded from "@mui/icons-material/CloudUploadRounded";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Alert,
   Box,
@@ -70,6 +72,31 @@ function lastDistinctProgress(entries: string[]): string | null {
     }
   }
   return null;
+}
+
+function CodexMarkdownResult({ text }: { text: string }) {
+  return (
+    <Box
+      sx={{
+        fontSize: 13,
+        lineHeight: 1.55,
+        "& p": { mt: 0, mb: 1 },
+        "& p:last-child": { mb: 0 },
+        "& ul, & ol": { mt: 0, mb: 1, pl: 2.5 },
+        "& li": { mb: 0.35 },
+        "& strong": { fontWeight: 700 },
+        "& code": {
+          px: 0.5,
+          py: 0.1,
+          borderRadius: 0.5,
+          bgcolor: (theme) => alpha(theme.palette.common.white, 0.08),
+          fontSize: "0.92em",
+        },
+      }}
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+    </Box>
+  );
 }
 
 async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
@@ -412,9 +439,7 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
                 <Typography sx={{ fontWeight: 600 }}>
                   {es.review.upload.codexDone}
                 </Typography>
-                <Typography sx={{ whiteSpace: "pre-wrap", fontSize: 13 }}>
-                  {state.resultText}
-                </Typography>
+                <CodexMarkdownResult text={state.resultText} />
               </Stack>
             </Alert>
           ) : state.kind === "error" ? (
