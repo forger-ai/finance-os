@@ -1,8 +1,19 @@
 {
   "name": "finance-os",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.7",
+      "summary": "Adds Codex-assisted statement imports through Forger Desktop.",
+      "changes": [
+        "Routes PDF and image statement imports through Forger Desktop Codex tasks.",
+        "Declares typed prompt arguments for Codex document processing.",
+        "Shows clearer import progress and markdown-formatted Codex results.",
+        "Adds PDF text extraction support for agent-assisted imports.",
+        "Removes in-app OpenAI API key settings from the import flow."
+      ]
+    },
     {
       "version": "0.1.6",
       "summary": "Hardens release packaging to exclude Git metadata.",
