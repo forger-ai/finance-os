@@ -63,6 +63,11 @@ Only mention those details if the user explicitly asks how the import works inte
 7. Review the import result.
 8. Report the outcome in user-facing language.
 
+For PDF statements with selectable text, use the backend dependency `pypdf`
+from inside `backend/` before falling back to visual-only interpretation. If
+`pypdf` returns no usable text or rows, explain that the document does not expose
+structured movement data confidently enough to import without inventing rows.
+
 ## Internal Working Files
 
 If a temporary file is needed, create it inside an internal working location that the app/agent can access.
