@@ -1,8 +1,17 @@
 {
   "name": "finance-os",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.8",
+      "summary": "Adds structured MCP tools for Forger agents.",
+      "changes": [
+        "Declares the Finance OS MCP server in the app manifest.",
+        "Adds structured MCP tools for categories, subcategories, movements, movement edits and deletes, and CSV imports.",
+        "Keeps Finance OS data operations behind app validations instead of direct database manipulation."
+      ]
+    },
     {
       "version": "0.1.7",
       "summary": "Adds Codex-assisted statement imports through Forger Desktop.",
