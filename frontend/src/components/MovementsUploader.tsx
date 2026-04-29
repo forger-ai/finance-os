@@ -62,6 +62,16 @@ function readFileBase64(file: File): Promise<string> {
   });
 }
 
+function lastDistinctProgress(entries: string[]): string | null {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    const entry = entries[index]?.trim();
+    if (entry && entry !== entries[index - 1]?.trim()) {
+      return entry;
+    }
+  }
+  return null;
+}
+
 async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
   const api = window.forgerApp;
   if (!api) {
@@ -367,14 +377,27 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
                 <Typography sx={{ fontWeight: 600 }}>
                   {es.review.upload.codexStatus(state.status)}
                 </Typography>
-                {state.progressLog.length > 0 ? (
+                {lastDistinctProgress(state.progressLog) ? (
                   <Box
-                    component="ul"
-                    sx={{ m: 0, pl: 2, fontSize: 12, lineHeight: 1.5 }}
+                    key={lastDistinctProgress(state.progressLog) ?? "progress"}
+                    sx={{
+                      fontSize: 13,
+                      color: "text.secondary",
+                      lineHeight: 1.5,
+                      "@keyframes codexProgressIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(8px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        },
+                      },
+                      animation: "codexProgressIn 220ms ease-out",
+                    }}
                   >
-                    {state.progressLog.slice(-5).map((entry, index) => (
-                      <li key={`${entry}-${index}`}>{entry}</li>
-                    ))}
+                    {lastDistinctProgress(state.progressLog)}
                   </Box>
                 ) : null}
               </Stack>
