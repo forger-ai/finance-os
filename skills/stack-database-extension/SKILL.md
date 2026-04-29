@@ -1,6 +1,6 @@
 ---
 name: stack-database-extension
-description: Use when changing Finance OS database models, schema initialization, migrations, Docker Compose mounts, or scripts that depend on app.database. Preserve the vite-fastapi-sqlite stack pattern: commons owns the shared database helper; Finance OS owns model registration and app-specific migrations through database_ext.
+description: "Use when changing Finance OS database models, schema initialization, migrations, Docker Compose mounts, or scripts that depend on app.database. Preserve the vite-fastapi-sqlite stack pattern: commons owns the shared database helper; Finance OS owns model registration and app-specific migrations through database_ext."
 ---
 
 # Stack Database Extension

@@ -118,35 +118,23 @@ export const es = {
       summaryNothing: "No se encontraron movimientos.",
       errorsHeader: "Errores:",
       genericError: "No se pudo procesar el archivo.",
+      codexUnavailable:
+        "Abre Finance OS desde Forger para procesar PDFs o imagenes con Codex.",
+      codexDone: "Codex terminó de procesar el documento.",
+      codexStatus: (status: string) => {
+        const labels: Record<string, string> = {
+          queued: "Codex quedó en cola.",
+          running: "Codex está procesando el documento.",
+          needs_permission: "Codex necesita confirmación en Forger.",
+          completed: "Codex completó la tarea.",
+          failed: "Codex no pudo completar la tarea.",
+          canceled: "La tarea de Codex fue cancelada.",
+        };
+        return labels[status] ?? "Codex está procesando el documento.";
+      },
     },
   },
   settings: {
-    tabs: {
-      categories: "Categorías",
-      llm: "API Keys",
-    },
-    llm: {
-      securityNote:
-        "Las claves se guardan en la base de datos local del backend. No las compartas y bórralas si ya no las necesitas.",
-      statusSet: "Configurada",
-      statusUnset: "No configurada",
-      openaiHint:
-        "Se usa para extraer movimientos desde PDFs y capturas de estados de cuenta.",
-      apiKeyLabel: "API key",
-      apiKeyPlaceholderSet: "sk-...",
-      apiKeyPlaceholderReplace: "Pega una nueva clave para reemplazar la actual",
-      modelLabel: "Modelo",
-      modelHelp: (defaultModel: string) =>
-        `Default: ${defaultModel}. Cambia solo si sabes lo que haces.`,
-      modelCustom: "Custom…",
-      modelCustomHint: "Escribe el ID exacto del modelo.",
-      modelCustomLabel: "Model ID",
-      saveButton: "Guardar",
-      clearKeyTooltip: "Borrar API key",
-      saved: "Configuración guardada.",
-      cleared: "API key eliminada.",
-      nothingToSave: "No hay cambios para guardar.",
-    },
     newCategoryTitle: "Nueva categoría",
     newCategoryNameLabel: "Nombre",
     newCategoryKindLabel: "Tipo",

@@ -87,9 +87,8 @@ class Subcategory(SQLModel, table=True):
 class Setting(SQLModel, table=True):
     """Key-value app settings persisted in the database.
 
-    Keys are namespaced strings (e.g. ``llm.openai.api_key``). Values are stored
-    as text — callers serialize/deserialize. Used today for LLM credentials so
-    the user can manage them from the UI instead of redeploying with env vars.
+    Keys are namespaced strings. Values are stored as text; callers
+    serialize/deserialize app-specific preferences.
     """
 
     __tablename__ = "setting"

@@ -11,8 +11,6 @@ services:
     environment:
       DATABASE_URL: sqlite:////app/data/finance_os.dev.sqlite
       CORS_ORIGINS: http://localhost:5180,http://127.0.0.1:5180
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-2024-11-20}
     volumes:
       - ./backend:/app
       - ./backend/data:/app/data

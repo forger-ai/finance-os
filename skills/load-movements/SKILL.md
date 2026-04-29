@@ -1,6 +1,6 @@
 ---
 name: finance-import
-description: Use when the user wants to load, normalize, classify, review, or correct finance movements in Finance OS. This is an internal agent skill: translate user-facing requests into safe data operations without exposing paths, scripts, temporary CSVs, or commands unless the user explicitly asks for technical details.
+description: "Use when the user wants to load, normalize, classify, review, or correct finance movements in Finance OS. This is an internal agent skill: translate user-facing requests into safe data operations without exposing paths, scripts, temporary CSVs, or commands unless the user explicitly asks for technical details."
 ---
 
 # Finance Import
@@ -62,6 +62,11 @@ Only mention those details if the user explicitly asks how the import works inte
 6. Use the local import path, script, or HTTP endpoint that is safest for the current environment.
 7. Review the import result.
 8. Report the outcome in user-facing language.
+
+For PDF statements with selectable text, use the backend dependency `pypdf`
+from inside `backend/` before falling back to visual-only interpretation. If
+`pypdf` returns no usable text or rows, explain that the document does not expose
+structured movement data confidently enough to import without inventing rows.
 
 ## Internal Working Files
 

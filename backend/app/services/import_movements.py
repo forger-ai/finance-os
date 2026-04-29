@@ -132,7 +132,7 @@ def _parse_optional_amount(text: str) -> int:
 
 
 def has_recognizable_schema(text: str) -> bool:
-    """Cheap pre-check used by callers to decide whether to fall back to LLM.
+    """Cheap pre-check used by callers to reject ambiguous tabular layouts.
 
     True when the header row exposes both a date column and at least one of
     ``amount``/``cargo``/``abono``. Below that bar we can't even attempt a
@@ -156,7 +156,7 @@ def _build_duplicate_key(*, amount_cents: int, date: datetime) -> str:
     """Identify duplicates by ``(day, amount)`` pair.
 
     Looser than full-row equality on purpose: lets us catch the same movement
-    coming in via different formats (CSV header names, LLM-extracted PDF,
+    coming in via different formats (CSV header names, Codex-extracted PDF,
     screenshot OCR) where ``business`` and ``raw_description`` may differ even
     though the underlying transaction is the same.
 

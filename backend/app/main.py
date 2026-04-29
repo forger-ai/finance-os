@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse
 from app.database import engine
 from app.database_ext import init_app_db
 from app.routes import categories, health, imports, movements
-from app.routes import settings as settings_routes
 from app.services.bootstrap import ensure_unclassified_subcategory
 
 
@@ -51,7 +50,6 @@ def create_app() -> FastAPI:
     app.include_router(categories.router)
     app.include_router(movements.router)
     app.include_router(imports.router)
-    app.include_router(settings_routes.router)
 
     return app
 

@@ -43,6 +43,8 @@ The user can share financial movements to load them into Finance OS.
 
 Data can come from files or content the agent can interpret, for example CSV, copied text, screenshots, images, PDFs, or account statements. The app works most reliably when the agent can normalize that data into structured movements.
 
+When the user uploads a PDF or image from the Finance OS interface, the app asks Forger Desktop to run Codex with the declared `extract_movements_from_statement` prompt template. Finance OS does not store or use its own model provider API key for that visible flow.
+
 How to explain it to the user:
 
 - "You can share the file or paste the movements, and I can load them into Finance OS."

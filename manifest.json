@@ -1,8 +1,19 @@
 {
   "name": "finance-os",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.7",
+      "summary": "Adds Codex-assisted statement imports through Forger Desktop.",
+      "changes": [
+        "Routes PDF and image statement imports through Forger Desktop Codex tasks.",
+        "Declares typed prompt arguments for Codex document processing.",
+        "Shows clearer import progress and markdown-formatted Codex results.",
+        "Adds PDF text extraction support for agent-assisted imports.",
+        "Removes in-app OpenAI API key settings from the import flow."
+      ]
+    },
     {
       "version": "0.1.6",
       "summary": "Hardens release packaging to exclude Git metadata.",
@@ -52,7 +63,7 @@
   "catalog": {
     "display_name": "Finance OS",
     "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
-    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the built-in AI assistant questions about your finances -- all without sending your data anywhere.",
+    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the assistant questions about your finances. Your database stays on your machine; PDFs and images you choose to process with Codex are handled through Forger Desktop.",
     "category": "finance",
     "capabilities": [
       {
@@ -67,8 +78,8 @@
       },
       {
         "id": "ai_assisted_imports",
-        "title": "Usar IA para leer documentos",
-        "description": "Puede usar una API key configurada por ti para extraer movimientos desde PDFs o imagenes."
+        "title": "Usar Codex para leer documentos",
+        "description": "Procesa PDFs e imagenes mediante Codex provisto por Forger, sin API key propia dentro de la app."
       }
     ],
     "supported_platforms": [
@@ -83,12 +94,39 @@
       "catalog_manifest_path": "vite-fastapi-sqlite/finance-os/manifest.json"
     }
   },
-  "appSecrets": [
+  "promptTemplates": [
     {
-      "name": "openai_api_key",
-      "label": "OpenAI API Key",
-      "required": false,
-      "usage": "Permite importar movimientos desde PDFs e imagenes usando OpenAI."
+      "id": "extract_movements_from_statement",
+      "title": "Extraer movimientos desde cartola PDF o imagen",
+      "description": "Lee un documento financiero compartido por el usuario, normaliza movimientos y los carga en Finance OS como pendientes de revision.",
+      "arguments": [
+        {
+          "name": "statement",
+          "type": "file",
+          "required": true,
+          "acceptedFileTypes": [
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            ".pdf",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".heic"
+          ],
+          "maxBytes": 20971520
+        },
+        {
+          "name": "userNote",
+          "type": "string",
+          "required": false,
+          "maxLength": 2000
+        }
+      ],
+      "prompt": "Eres el agente interno de Finance OS.\n\nObjetivo:\nLee el documento financiero compartido por el usuario e importa sus movimientos en la base local de Finance OS.\n\nArchivo a procesar:\n{{statement}}\n\nNota del usuario:\n{{userNote}}\n\nInstrucciones:\n1. Extrae solo movimientos visibles en el documento. No inventes filas, fechas, montos, comercios, descripciones ni categorias.\n2. Normaliza los movimientos al formato esperado por el script interno import_movements.\n3. Conserva trazabilidad con la descripcion original, fecha contable y fuente del documento.\n4. Antes de clasificar, revisa las categorias y subcategorias disponibles con las herramientas internas de la app.\n5. Si una clasificacion no es clara, usa Sin clasificar o deja el movimiento pendiente de revision segun el flujo existente.\n6. Manten la regla de consistencia: si un movimiento tiene subcategoria, esa subcategoria debe pertenecer a la misma categoria.\n7. Importa los movimientos en la base local usando los scripts internos de Finance OS.\n8. Ejecuta las validaciones disponibles despues de importar.\n9. No modifiques archivos fuera del workspace de Finance OS.\n10. No expongas rutas, comandos ni detalles tecnicos en la respuesta final.\n\nRespuesta final:\nResponde solo con un resumen funcional para mostrar dentro de Finance OS: cuantos movimientos se importaron, cuantos se omitieron o fallaron, que quedo pendiente de revision, y cualquier problema concreto que el usuario deba corregir."
     }
   ],
   "services": [
