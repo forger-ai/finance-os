@@ -128,14 +128,18 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
           const dataBase64 = await readFileBase64(file);
           const started = await window.forgerApp.startCodexTask({
             templateId: CODEX_TEMPLATE_ID,
-            variables: { filename: file.name },
-            attachments: [
-              {
+            arguments: {
+              statement: {
+                type: "file",
                 name: file.name,
                 mimeType: file.type || undefined,
                 dataBase64,
               },
-            ],
+              userNote: {
+                type: "string",
+                value: "",
+              },
+            },
           });
           setState({
             kind: "codex",

@@ -88,20 +88,34 @@
       "id": "extract_movements_from_statement",
       "title": "Extraer movimientos desde cartola PDF o imagen",
       "description": "Lee un documento financiero compartido por el usuario, normaliza movimientos y los carga en Finance OS como pendientes de revision.",
-      "acceptedFileTypes": [
-        "application/pdf",
-        "image/png",
-        "image/jpeg",
-        "image/webp",
-        "image/heic",
-        ".pdf",
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".webp",
-        ".heic"
+      "arguments": [
+        {
+          "name": "statement",
+          "type": "file",
+          "required": true,
+          "acceptedFileTypes": [
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            ".pdf",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".heic"
+          ],
+          "maxBytes": 20971520
+        },
+        {
+          "name": "userNote",
+          "type": "string",
+          "required": false,
+          "maxLength": 2000
+        }
       ],
-      "prompt": "Eres el agente interno de Finance OS. Lee el archivo {{filename}} compartido por el usuario y extrae todos los movimientos financieros visibles sin inventar filas. Usa el AGENTS.md y la skill de carga de movimientos de esta app. Convierte los movimientos a un CSV compatible con scripts/import_movements.py, revisa categorias/subcategorias disponibles antes de clasificar, usa Sin clasificar cuando no haya confianza suficiente, importa los movimientos en la base local y deja todo lo importado como pendiente de revision cuando corresponda. Al finalizar, responde solo con un resumen funcional: cuantos movimientos se importaron, cuantos se omitieron o fallaron, y que debe revisar el usuario."
+      "prompt": "Eres el agente interno de Finance OS.\n\nObjetivo:\nLee el documento financiero compartido por el usuario e importa sus movimientos en la base local de Finance OS.\n\nArchivo a procesar:\n{{statement}}\n\nNota del usuario:\n{{userNote}}\n\nInstrucciones:\n1. Extrae solo movimientos visibles en el documento. No inventes filas, fechas, montos, comercios, descripciones ni categorias.\n2. Normaliza los movimientos al formato esperado por el script interno import_movements.\n3. Conserva trazabilidad con la descripcion original, fecha contable y fuente del documento.\n4. Antes de clasificar, revisa las categorias y subcategorias disponibles con las herramientas internas de la app.\n5. Si una clasificacion no es clara, usa Sin clasificar o deja el movimiento pendiente de revision segun el flujo existente.\n6. Manten la regla de consistencia: si un movimiento tiene subcategoria, esa subcategoria debe pertenecer a la misma categoria.\n7. Importa los movimientos en la base local usando los scripts internos de Finance OS.\n8. Ejecuta las validaciones disponibles despues de importar.\n9. No modifiques archivos fuera del workspace de Finance OS.\n10. No expongas rutas, comandos ni detalles tecnicos en la respuesta final.\n\nRespuesta final:\nResponde solo con un resumen funcional para mostrar dentro de Finance OS: cuantos movimientos se importaron, cuantos se omitieron o fallaron, que quedo pendiente de revision, y cualquier problema concreto que el usuario deba corregir."
     }
   ],
   "services": [

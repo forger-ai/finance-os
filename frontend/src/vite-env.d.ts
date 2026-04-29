@@ -36,12 +36,21 @@ interface Window {
   forgerApp?: {
     startCodexTask: (input: {
       templateId: string;
-      variables?: Record<string, string | number | boolean | null>;
-      attachments?: Array<{
-        name: string;
-        mimeType?: string;
-        dataBase64: string;
-      }>;
+      arguments?: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | null
+        | { type: "string"; value: string }
+        | { type: "file"; name: string; mimeType?: string; dataBase64: string }
+        | Array<{
+            type: "file";
+            name: string;
+            mimeType?: string;
+            dataBase64: string;
+          }>
+      >;
     }) => Promise<ForgerCodexTaskSummary>;
     getCodexTask: (runId: string) => Promise<ForgerCodexTaskSummary | null>;
     cancelCodexTask: (runId: string) => Promise<{ success: boolean }>;
