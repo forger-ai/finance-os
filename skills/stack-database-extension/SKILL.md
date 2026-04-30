@@ -24,7 +24,7 @@ commons/backend/database.py
 In Docker Compose, that helper is mounted over:
 
 ```text
-/app/app/database.py
+/app/src/app/database.py
 ```
 
 That mount is intentional. Do not remove it as the normal fix for app-specific
@@ -40,10 +40,10 @@ The shared helper owns:
 
 Finance OS owns:
 
-- SQLModel table declarations in `backend/app/models.py`;
-- model registration in `backend/app/database_ext.py`;
-- app-specific migrations in `backend/app/database_ext.py`;
-- startup sequencing in `backend/app/main.py`;
+- SQLModel table declarations in `backend/src/app/models.py`;
+- model registration in `backend/src/app/database_ext.py`;
+- app-specific migrations in `backend/src/app/database_ext.py`;
+- startup sequencing in `backend/src/app/main.py`;
 - internal scripts that need Finance OS initialization.
 
 ## Required Pattern
@@ -52,7 +52,7 @@ When Finance OS needs schema behavior beyond `create_all()`, keep the shared
 `app.database` helper mounted from commons and add app-specific behavior in:
 
 ```text
-backend/app/database_ext.py
+backend/src/app/database_ext.py
 ```
 
 Expose an app-level initializer from that file, for example:
@@ -87,7 +87,7 @@ This keeps script behavior aligned with the running app.
 
 ## Migration Rules
 
-Use `backend/app/database_ext.py` for migrations that depend on Finance OS
+Use `backend/src/app/database_ext.py` for migrations that depend on Finance OS
 models, tables, categories, movements, settings, or data semantics.
 
 Do not put Finance OS-specific migrations in `commons/backend/database.py`.

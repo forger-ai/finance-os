@@ -14,9 +14,9 @@ services:
     volumes:
       - ./backend:/app
       - ./backend/data:/app/data
-      - ./commons/backend/database.py:/app/app/database.py
-      - ./commons/backend/health.py:/app/app/health.py
-      - ./commons/backend/cors.py:/app/app/cors.py
+      - ./commons/backend/database.py:/app/src/app/database.py
+      - ./commons/backend/health.py:/app/src/app/health.py
+      - ./commons/backend/cors.py:/app/src/app/cors.py
 
   frontend:
     extends:

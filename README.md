@@ -70,7 +70,7 @@ The database lives in `./backend/data/finance_os.sqlite` and persists between re
 cd backend
 uv sync
 uv run python scripts/init_db.py
-uv run uvicorn app.main:app --reload --port 8000
+uv run fastapi dev src/app/main.py --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend

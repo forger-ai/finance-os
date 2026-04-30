@@ -152,7 +152,7 @@
       "type": "http",
       "context": "./backend",
       "port": 8000,
-      "command": "uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+      "command": "uv run fastapi dev src/app/main.py --host 0.0.0.0 --port 8000",
       "healthcheck": "/health",
       "environment": {
         "DATABASE_URL": "sqlite:///{app_data}/finance_os.sqlite",
@@ -191,20 +191,20 @@
     "healthcheck": "/health",
     "environment": {
       "DATABASE_URL": "sqlite:///{app_data}/finance_os.sqlite",
-      "PYTHONPATH": "."
+      "PYTHONPATH": "./src"
     },
     "toolTimeoutSec": 600
   },
   "scripts": {
-    "init_db": "cd backend && uv run python scripts/init_db.py",
-    "list_categories": "cd backend && uv run python scripts/list_categories.py",
-    "list_movements": "cd backend && uv run python scripts/list_movements.py",
-    "import_movements": "cd backend && uv run python scripts/import_movements.py",
-    "upsert_categories": "cd backend && uv run python scripts/upsert_categories.py",
-    "edit_movement": "cd backend && uv run python scripts/edit_movement.py",
-    "delete_movement": "cd backend && uv run python scripts/delete_movement.py",
-    "verify_data_integrity": "cd backend && uv run python scripts/verify_data_integrity.py",
-    "verify": "cd backend && uv run python scripts/verify.py"
+    "init_db": "cd backend && PYTHONPATH=./src uv run python scripts/init_db.py",
+    "list_categories": "cd backend && PYTHONPATH=./src uv run python scripts/list_categories.py",
+    "list_movements": "cd backend && PYTHONPATH=./src uv run python scripts/list_movements.py",
+    "import_movements": "cd backend && PYTHONPATH=./src uv run python scripts/import_movements.py",
+    "upsert_categories": "cd backend && PYTHONPATH=./src uv run python scripts/upsert_categories.py",
+    "edit_movement": "cd backend && PYTHONPATH=./src uv run python scripts/edit_movement.py",
+    "delete_movement": "cd backend && PYTHONPATH=./src uv run python scripts/delete_movement.py",
+    "verify_data_integrity": "cd backend && PYTHONPATH=./src uv run python scripts/verify_data_integrity.py",
+    "verify": "cd backend && PYTHONPATH=./src uv run python scripts/verify.py"
   },
   "skills": [
     "./skills/load-movements",
