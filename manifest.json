@@ -1,8 +1,17 @@
 {
   "name": "finance-os",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.10",
+      "summary": "Aligns backend packaging with the shared stack source layout.",
+      "changes": [
+        "Moves the backend app package under backend/src for the current stack contract.",
+        "Updates service, MCP, and internal script commands to run with the src-based Python path.",
+        "Keeps Finance OS install and agent operations compatible with current Forger Desktop app runtime expectations."
+      ]
+    },
     {
       "version": "0.1.9",
       "summary": "Marks the app as beta in Forger catalog surfaces.",
