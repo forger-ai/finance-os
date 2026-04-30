@@ -146,7 +146,7 @@ jobs:
           import subprocess
           import sys
           from pathlib import Path
-          from urllib import parse, request
+          from urllib import error, parse, request
 
           secret = os.environ.get('PUBLISH_SECRET', '')
           if not secret:
@@ -208,6 +208,7 @@ jobs:
             method='POST',
             headers={
               'Content-Type': 'application/json',
+              'User-Agent': 'ForgerCatalogPublisher/1.0',
               'X-Forger-Timestamp': timestamp,
               'X-Forger-Signature': f'sha256={signature}',
             },
@@ -215,6 +216,11 @@ jobs:
           try:
             with request.urlopen(req, timeout=30) as response:
               sys.stdout.write(response.read().decode())
+          except error.HTTPError as exc:
+            error_body = exc.read().decode(errors='replace')
+            raise SystemExit(
+              f'Failed to publish to FORGER Cloud: HTTP {exc.code} {exc.reason}\n{error_body}'
+            ) from exc
           except Exception as exc:
             raise SystemExit(f'Failed to publish to FORGER Cloud: {exc}') from exc
           PY
