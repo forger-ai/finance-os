@@ -114,9 +114,7 @@
     "release": {
       "repository": "forger-ai/finance-os",
       "tag_template": "{name}/v{version}",
-      "asset_name_template": "{name}-{version}.zip",
-      "catalog_repository": "forger-ai/apps-catalog",
-      "catalog_manifest_path": "vite-fastapi-sqlite/finance-os/manifest.json"
+      "asset_name_template": "{name}-{version}.zip"
     },
     "beta": true
   },

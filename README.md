@@ -151,11 +151,11 @@ Publication uses **GitHub Release** and not a direct push to `main`:
    - verifies/builds backend and frontend,
    - generates `finance-os-X.Y.Z.zip`,
    - uploads the ZIP to the release,
-   - opens an automatic PR in `forger-ai/apps-catalog` to update the catalog `manifest.json`.
+   - publishes the new version to FORGER Cloud with a signed request.
 
 Required secret in this repo:
 
-- `APPS_CATALOG_TOKEN`: PAT with `contents` and `pull_requests` permissions for `forger-ai/apps-catalog`.
+- `FORGER_CATALOG_PUBLISH_SECRET`: organization secret shared with FORGER Cloud credentials.
 
 ## Agent Use
 
