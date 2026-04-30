@@ -168,8 +168,8 @@ Use when changing SQLModel models, database initialization, SQLite migrations, D
 This skill documents the current stack pattern:
 
 - `commons/backend/database.py` remains the shared database helper;
-- Docker Compose mounts that shared helper over `app/database.py`;
-- Finance OS registers models and keeps its own migrations in `backend/app/database_ext.py`;
+- Docker Compose mounts that shared helper over `src/app/database.py`;
+- Finance OS registers models and keeps its own migrations in `backend/src/app/database_ext.py`;
 - the backend and internal scripts use the app initializer so they do not skip Finance OS-specific migrations.
 
 Do not solve migration issues by removing the `commons/backend/database.py` mount unless the user explicitly asks to break the stack contract. If a migration depends on Finance OS tables or data, it must live in the local Finance OS extension, not in commons.

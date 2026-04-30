@@ -117,7 +117,7 @@ cd backend
 uv sync
 uv run python scripts/init_db.py
 uv run python scripts/seed.py
-uv run uvicorn app.main:app --reload --port 8000
+uv run fastapi dev src/app/main.py --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend

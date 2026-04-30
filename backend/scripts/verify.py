@@ -3,7 +3,7 @@
 Performs:
 
 - ``ruff check`` over the project (lint + import order)
-- ``pyright`` type checking on ``app/`` and ``scripts/``
+- ``pyright`` type checking on ``src/app/`` and ``scripts/``
 - a data integrity check for category/subcategory invariants
 - a smoke test that imports the FastAPI app and hits ``/health`` with TestClient
 
@@ -38,7 +38,7 @@ def run(label: str, command: list[str]) -> bool:
 
 def smoke_test() -> bool:
     print("\n→ Smoke test: GET /health")
-    sys.path.insert(0, str(ROOT))
+    sys.path.insert(0, str(ROOT / "src"))
     os.environ.setdefault("DATABASE_URL", f"sqlite:///{ROOT / 'data' / 'verify.sqlite'}")
     try:
         from fastapi.testclient import TestClient
@@ -63,7 +63,7 @@ def smoke_test() -> bool:
 
 def main() -> int:
     ok = True
-    ok = run("Ruff", ["uv", "run", "ruff", "check", "app", "scripts"]) and ok
+    ok = run("Ruff", ["uv", "run", "ruff", "check", "src/app", "scripts"]) and ok
     ok = run("Pyright", ["uv", "run", "pyright"]) and ok
     ok = run("Data integrity", ["uv", "run", "python", "scripts/verify_data_integrity.py"]) and ok
     ok = smoke_test() and ok
