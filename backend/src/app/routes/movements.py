@@ -124,11 +124,15 @@ def update_movement(
         "category_id" in fields or "subcategory_id" in fields or bool(payload.clear_subcategory)
     )
     if classification_changed:
-        next_category_id = (
-            payload.category_id
-            if "category_id" in fields and payload.category_id is not None
-            else movement.category_id
-        )
+        if "category_id" in fields and payload.category_id is not None:
+            next_category_id = payload.category_id
+        elif "subcategory_id" in fields and not payload.clear_subcategory:
+            # Let the classification service derive the category from the new
+            # subcategory. Otherwise a subcategory picked from another category
+            # gets validated against the movement's previous category.
+            next_category_id = None
+        else:
+            next_category_id = movement.category_id
         next_subcategory_id = (
             None
             if payload.clear_subcategory
