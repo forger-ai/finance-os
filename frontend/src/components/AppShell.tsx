@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 import DashboardRounded from "@mui/icons-material/DashboardRounded";
+import FileUploadRounded from "@mui/icons-material/FileUploadRounded";
+import PaidRounded from "@mui/icons-material/PaidRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
 import TableRowsRounded from "@mui/icons-material/TableRowsRounded";
 import ViewCarouselRounded from "@mui/icons-material/ViewCarouselRounded";
 import {
   AppBar,
   Box,
-  Chip,
+  Button,
   Drawer,
   List,
   ListItemButton,
@@ -16,24 +18,29 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { es } from "@/i18n/es";
+import { useI18n } from "@/i18n";
 
-export type ViewMode = "dashboard" | "movements" | "review" | "settings";
+export type ViewMode =
+  | "load"
+  | "dashboard"
+  | "movements"
+  | "review"
+  | "settings"
+  | "budgets";
 
 const drawerWidth = 232;
 const appBarHeight = 64;
 
 export function AppShell({
   children,
-  summaryLabel,
   viewMode,
   onViewChange,
 }: {
   children: ReactNode;
-  summaryLabel: string;
   viewMode: ViewMode;
   onViewChange: (nextView: ViewMode) => void;
 }) {
+  const es = useI18n();
   return (
     <Box
       sx={{
@@ -67,12 +74,14 @@ export function AppShell({
           >
             {es.app.title}
           </Typography>
-          <Chip
+          <Button
             color="primary"
-            label={summaryLabel}
-            size="small"
-            variant="outlined"
-          />
+            startIcon={<FileUploadRounded />}
+            variant="contained"
+            onClick={() => onViewChange("load")}
+          >
+            {es.load.headerAction}
+          </Button>
         </Toolbar>
       </AppBar>
 
@@ -96,8 +105,20 @@ export function AppShell({
         <Stack sx={{ height: "100%" }}>
           <List sx={{ px: 1.5, py: 1.5 }}>
             <ListItemButton
-              selected={viewMode === "dashboard"}
+              selected={viewMode === "load"}
               sx={{ borderRadius: 1.5 }}
+              onClick={() => onViewChange("load")}
+            >
+              <ListItemIcon sx={{ minWidth: 38 }}>
+                <FileUploadRounded
+                  color={viewMode === "load" ? "primary" : "inherit"}
+                />
+              </ListItemIcon>
+              <ListItemText primary={es.nav.load} />
+            </ListItemButton>
+            <ListItemButton
+              selected={viewMode === "dashboard"}
+              sx={{ borderRadius: 1.5, mt: 0.5 }}
               onClick={() => onViewChange("dashboard")}
             >
               <ListItemIcon sx={{ minWidth: 38 }}>
@@ -130,6 +151,18 @@ export function AppShell({
                 />
               </ListItemIcon>
               <ListItemText primary={es.nav.review} />
+            </ListItemButton>
+            <ListItemButton
+              selected={viewMode === "budgets"}
+              sx={{ borderRadius: 1.5, mt: 0.5 }}
+              onClick={() => onViewChange("budgets")}
+            >
+              <ListItemIcon sx={{ minWidth: 38 }}>
+                <PaidRounded
+                  color={viewMode === "budgets" ? "primary" : "inherit"}
+                />
+              </ListItemIcon>
+              <ListItemText primary={es.nav.budgets} />
             </ListItemButton>
           </List>
 

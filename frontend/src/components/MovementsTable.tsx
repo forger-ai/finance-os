@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import {
   Box,
-  Chip,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   IconButton,
   InputAdornment,
@@ -34,6 +39,7 @@ import {
 import type { MovementRead } from "@/api/types";
 import { isoDateOnly } from "@/api/utils";
 import { es } from "@/i18n/es";
+import { toMovementRow } from "@/lib/derive";
 
 type Props = {
   categories: CategoryOption[];
@@ -228,6 +234,9 @@ export function MovementsTable({
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>(ALL);
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
+  const [editingMovement, setEditingMovement] = useState<MovementRow | null>(
+    null,
+  );
 
   // Reset the subcategory filter when its parent category no longer matches.
   useEffect(() => {
@@ -298,7 +307,15 @@ export function MovementsTable({
         flex: 1.4,
         sortable: false,
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
-          <Box sx={{ py: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              minWidth: 0,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Typography
               sx={{
                 fontSize: 14,
@@ -326,17 +343,14 @@ export function MovementsTable({
         ),
       },
       {
-        field: "source",
-        headerName: es.movements.columns.source,
-        width: 100,
-        renderCell: (params: GridRenderCellParams<MovementRow>) => (
-          <Chip label={params.row.source} size="small" variant="outlined" />
-        ),
-      },
-      {
         field: "amountLabel",
         headerName: es.movements.columns.amount,
         width: 120,
+        renderCell: (params: GridRenderCellParams<MovementRow>) => (
+          <Typography sx={{ fontSize: 14, fontVariantNumeric: "tabular-nums" }}>
+            {params.row.amountLabel}
+          </Typography>
+        ),
       },
       {
         field: "classification",
@@ -347,19 +361,35 @@ export function MovementsTable({
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
           <Box
             sx={{
-              width: "100%",
               minWidth: 0,
-              height: "100%",
+              width: "100%",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center",
             }}
           >
-            <ClassificationEditor
-              categories={categories}
-              dense
-              movement={params.row}
-              onChange={onMovementChange}
-            />
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+            >
+              {params.row.category_name}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: 12,
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+            >
+              {params.row.subcategory_name ?? es.editor.noSubcategory}
+            </Typography>
           </Box>
         ),
       },
@@ -387,29 +417,49 @@ export function MovementsTable({
       {
         field: "actions",
         headerName: es.movements.columns.actions,
-        width: 70,
+        width: 96,
         sortable: false,
         align: "center",
         headerAlign: "center",
         renderCell: (params: GridRenderCellParams<MovementRow>) => (
-          <Tooltip title={es.movements.deleteTooltip}>
-            <IconButton
-              color="error"
-              size="small"
-              onClick={() => {
-                if (!window.confirm(es.movements.deleteConfirm)) return;
-                void deleteMovement(params.row.id)
-                  .then(() => onMovementDelete(params.row.id))
-                  .catch((error: unknown) => console.error(error));
-              }}
-            >
-              <DeleteOutlineRounded fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              alignItems: "center",
+              height: "100%",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Tooltip title={es.movements.editTooltip}>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => setEditingMovement(params.row)}
+              >
+                <EditRounded fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={es.movements.deleteTooltip}>
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => {
+                  if (!window.confirm(es.movements.deleteConfirm)) return;
+                  void deleteMovement(params.row.id)
+                    .then(() => onMovementDelete(params.row.id))
+                    .catch((error: unknown) => console.error(error));
+                }}
+              >
+                <DeleteOutlineRounded fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         ),
       },
     ],
-    [categories, onMovementChange, onMovementDelete],
+    [onMovementChange, onMovementDelete],
   );
 
   return (
@@ -459,6 +509,7 @@ export function MovementsTable({
             "& .MuiDataGrid-cell": {
               borderBottom: "1px solid",
               borderColor: "divider",
+              display: "flex",
               alignItems: "center",
               overflow: "hidden",
             },
@@ -469,6 +520,43 @@ export function MovementsTable({
           }}
         />
       </Paper>
+
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={editingMovement !== null}
+        onClose={() => setEditingMovement(null)}
+      >
+        <DialogTitle>{es.movements.editTitle}</DialogTitle>
+        <DialogContent>
+          {editingMovement ? (
+            <Stack spacing={2} sx={{ pt: 0.5 }}>
+              <Box>
+                <Typography sx={{ fontSize: 18, fontWeight: 800 }}>
+                  {editingMovement.raw_description ?? editingMovement.business}
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontSize: 13, mt: 0.25 }}>
+                  {es.movements.editSubtitle}
+                </Typography>
+              </Box>
+              <ClassificationEditor
+                categories={categories}
+                movement={editingMovement}
+                showAmount
+                onChange={(updated) => {
+                  onMovementChange(updated);
+                  setEditingMovement(toMovementRow(updated));
+                }}
+              />
+            </Stack>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditingMovement(null)}>
+            {es.movements.closeButton}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }

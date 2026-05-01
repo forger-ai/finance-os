@@ -19,13 +19,14 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import { DashboardMetrics } from "./DashboardMetrics";
+import type { BudgetRead } from "@/api/types";
 import type { MovementRow } from "@/lib/derive";
 import {
   formatCompactCurrency,
   formatCurrency,
   formatMonthLabel,
 } from "@/lib/format";
-import { es } from "@/i18n/es";
+import { useI18n, useLocale } from "@/i18n";
 
 function ChartCard({
   title,
@@ -100,6 +101,7 @@ function getRoundedTrackMax(value: number) {
 function BudgetProgressRow({
   active,
   budget,
+  copy,
   maxValue,
   name,
   onSelect,
@@ -107,6 +109,9 @@ function BudgetProgressRow({
 }: {
   active: boolean;
   budget: number;
+  copy: {
+    spentLabel: (amount: string) => string;
+  };
   maxValue: number;
   name: string;
   onSelect: () => void;
@@ -155,7 +160,7 @@ function BudgetProgressRow({
             {name}
           </Typography>
           <Typography color="text.secondary" sx={{ mt: 0.25, fontSize: 12 }}>
-            {es.dashboard.spentLabel(formatCurrency(spent))}
+            {copy.spentLabel(formatCurrency(spent))}
           </Typography>
         </Box>
       </Stack>
@@ -217,8 +222,17 @@ function BudgetProgressRow({
   );
 }
 
-export function DashboardView({ movements }: { movements: MovementRow[] }) {
+export function DashboardView({
+  budgets,
+  movements,
+}: {
+  budgets: BudgetRead[];
+  movements: MovementRow[];
+}) {
   const theme = useTheme();
+  const t = useI18n();
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? "en-US" : "es-CL";
   const chartColors = useMemo(
     () => [
       theme.palette.primary.main,
@@ -246,9 +260,9 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
 
     return months.map((month) => ({
       value: month,
-      label: formatMonthLabel(month),
+      label: formatMonthLabel(month, dateLocale),
     }));
-  }, [movements]);
+  }, [dateLocale, movements]);
 
   const [selectedMonth, setSelectedMonth] = useState(
     monthOptions[0]?.value ?? "",
@@ -290,6 +304,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
     const balanceValue = totalIncome - totalSpent - totalSaved;
     return {
       balance: `${balanceValue >= 0 ? "+" : ""}${formatCurrency(balanceValue)}`,
+      balanceValue,
       totalIncome: formatCurrency(totalIncome),
       totalSaved: formatCurrency(totalSaved),
       totalSpent: formatCurrency(totalSpent),
@@ -330,15 +345,47 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
       .slice(0, 8);
   }, [breakdownMode, chartColors, pieMovements]);
 
+  const selectedBudget = useMemo(() => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    return budgets.find((budget) => budget.year === year && budget.month === month) ?? null;
+  }, [budgets, selectedMonth]);
+
   const budgetData = useMemo(() => {
+    if (!selectedBudget) {
+      return [];
+    }
     const totals = new Map<string, { spent: number; budget: number }>();
+    const categoryBudgets = new Map(
+      selectedBudget.category_budgets.map((row) => [row.category_name, row.amount]),
+    );
+    const subcategoryBudgets = new Map(
+      selectedBudget.subcategory_budgets.map((row) => [
+        `${row.category_name}|${row.subcategory_name}`,
+        row.amount,
+      ]),
+    );
+    for (const [categoryName, budget] of categoryBudgets) {
+      totals.set(categoryName, { spent: 0, budget });
+    }
     for (const movement of monthlyExpenses) {
-      if (movement.category_budget == null) {
+      const subKey = movement.subcategory_name
+        ? `${movement.category_name}|${movement.subcategory_name}`
+        : null;
+      const subBudget = subKey ? subcategoryBudgets.get(subKey) : undefined;
+      if (subBudget != null) {
+        const label = movement.subcategory_name ?? movement.category_name;
+        const current = totals.get(label) ?? { spent: 0, budget: subBudget };
+        current.spent += movement.amount;
+        totals.set(label, current);
+        continue;
+      }
+      const categoryBudget = categoryBudgets.get(movement.category_name);
+      if (categoryBudget == null) {
         continue;
       }
       const current = totals.get(movement.category_name) ?? {
         spent: 0,
-        budget: movement.category_budget,
+        budget: categoryBudget,
       };
       current.spent += movement.amount;
       totals.set(movement.category_name, current);
@@ -350,7 +397,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
         budget: values.budget,
       }))
       .sort((a, b) => b.spent - a.spent);
-  }, [monthlyExpenses]);
+  }, [monthlyExpenses, selectedBudget]);
 
   const maxBudgetValue = useMemo(
     () =>
@@ -383,12 +430,12 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
     () => [
       {
         field: "dateLabel",
-        headerName: es.dashboard.columns.date,
+        headerName: t.dashboard.columns.date,
         width: 116,
       },
       {
         field: "business",
-        headerName: es.dashboard.columns.movement,
+        headerName: t.dashboard.columns.movement,
         minWidth: 260,
         flex: 1,
         sortable: false,
@@ -405,32 +452,33 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
       },
       {
         field: "category_name",
-        headerName: es.dashboard.columns.category,
+        headerName: t.dashboard.columns.category,
         minWidth: 170,
         flex: 0.7,
       },
       {
         field: "subcategory_name",
-        headerName: es.dashboard.columns.subcategory,
+        headerName: t.dashboard.columns.subcategory,
         minWidth: 170,
         flex: 0.7,
-        valueFormatter: (value: unknown) => (value ? String(value) : "—"),
+        valueFormatter: (value: unknown) =>
+          value ? String(value) : t.dashboard.noSubcategory,
       },
       {
         field: "amountLabel",
-        headerName: es.dashboard.columns.amount,
+        headerName: t.dashboard.columns.amount,
         width: 132,
       },
     ],
-    [],
+    [t],
   );
 
   const filterLabel =
     activeFilter == null
-      ? es.dashboard.consideredSubtitleAll
+      ? t.dashboard.consideredSubtitleAll
       : activeFilter.type === "category"
-        ? es.dashboard.consideredSubtitleCategory(activeFilter.value)
-        : es.dashboard.consideredSubtitleSubcategory(activeFilter.value);
+        ? t.dashboard.consideredSubtitleCategory(activeFilter.value)
+        : t.dashboard.consideredSubtitleSubcategory(activeFilter.value);
 
   return (
     <Stack spacing={2}>
@@ -445,10 +493,10 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
         >
           <Box>
             <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
-              {es.dashboard.monthSelectorTitle}
+              {t.dashboard.monthSelectorTitle}
             </Typography>
             <Typography color="text.secondary" sx={{ mt: 0.5, fontSize: 13 }}>
-              {es.dashboard.monthSelectorSubtitle}
+              {t.dashboard.monthSelectorSubtitle}
             </Typography>
           </Box>
           <FormControl size="small" sx={{ minWidth: 240 }}>
@@ -459,11 +507,17 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
                 setActiveFilter(null);
               }}
             >
-              {monthOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+              {monthOptions.length === 0 ? (
+                <MenuItem disabled value="">
+                  {t.dashboard.noMonthOption}
                 </MenuItem>
-              ))}
+              ) : (
+                monthOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </FormControl>
         </Stack>
@@ -485,37 +539,49 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
             gap: 1.25,
           }}
         >
-          {budgetData.map((item) => (
-            <BudgetProgressRow
-              key={item.name}
-              active={
-                activeFilter?.type === "category" &&
-                activeFilter.value === item.name
-              }
-              budget={item.budget}
-              maxValue={maxBudgetValue}
-              name={item.name}
-              onSelect={() =>
-                setActiveFilter((current) =>
-                  current?.type === "category" && current.value === item.name
-                    ? null
-                    : { type: "category", value: item.name },
-                )
-              }
-              spent={item.spent}
-            />
-          ))}
+          {budgetData.length === 0 ? (
+            <Paper sx={{ p: 2 }}>
+              <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
+                {t.dashboard.budgetEmptyTitle}
+              </Typography>
+              <Typography color="text.secondary" sx={{ mt: 0.5, fontSize: 13 }}>
+                {t.dashboard.budgetEmptyHint}
+              </Typography>
+            </Paper>
+          ) : (
+            budgetData.map((item) => (
+              <BudgetProgressRow
+                key={item.name}
+                active={
+                  activeFilter?.type === "category" &&
+                  activeFilter.value === item.name
+                }
+                budget={item.budget}
+                copy={t.dashboard}
+                maxValue={maxBudgetValue}
+                name={item.name}
+                onSelect={() =>
+                  setActiveFilter((current) =>
+                    current?.type === "category" && current.value === item.name
+                      ? null
+                      : { type: "category", value: item.name },
+                  )
+                }
+                spent={item.spent}
+              />
+            ))
+          )}
         </Box>
         <ChartCard
           title={
             breakdownMode === "category"
-              ? es.dashboard.breakdownTitleByCategory
-              : es.dashboard.breakdownTitle
+              ? t.dashboard.breakdownTitleByCategory
+              : t.dashboard.breakdownTitle
           }
           subtitle={
             activeFilter?.type === "category"
-              ? es.dashboard.breakdownSubtitleFiltered(activeFilter.value)
-              : es.dashboard.breakdownSubtitleAll
+              ? t.dashboard.breakdownSubtitleFiltered(activeFilter.value)
+              : t.dashboard.breakdownSubtitleAll
           }
         >
           <Box
@@ -536,41 +602,50 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
               sx={{ alignSelf: "flex-end" }}
             >
               <ToggleButton value="category">
-                {es.dashboard.breakdownToggleCategory}
+                {t.dashboard.breakdownToggleCategory}
               </ToggleButton>
               <ToggleButton value="subcategory">
-                {es.dashboard.breakdownToggleSubcategory}
+                {t.dashboard.breakdownToggleSubcategory}
               </ToggleButton>
             </ToggleButtonGroup>
-            <PieChart
-              height={250}
-              margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-              onItemClick={(_event, itemData) => {
-                const item = subcategoryData[itemData.dataIndex];
-                if (!item) {
-                  return;
-                }
-                setActiveFilter((current) =>
-                  current?.type === breakdownMode &&
-                  current.value === item.label
-                    ? null
-                    : { type: breakdownMode, value: item.label },
-                );
-              }}
-              series={[
-                {
-                  cornerRadius: 4,
-                  cx: "50%",
-                  cy: "50%",
-                  data: subcategoryData,
-                  highlightScope: { fade: "global", highlight: "item" },
-                  innerRadius: 58,
-                  outerRadius: 98,
-                  paddingAngle: 2,
-                },
-              ]}
-              slotProps={{ legend: { hidden: true } }}
-            />
+            {subcategoryData.length === 0 ? (
+              <Typography
+                color="text.secondary"
+                sx={{ py: 8, textAlign: "center", fontSize: 14 }}
+              >
+                {t.dashboard.breakdownEmpty}
+              </Typography>
+            ) : (
+              <PieChart
+                height={250}
+                margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                onItemClick={(_event, itemData) => {
+                  const item = subcategoryData[itemData.dataIndex];
+                  if (!item) {
+                    return;
+                  }
+                  setActiveFilter((current) =>
+                    current?.type === breakdownMode &&
+                    current.value === item.label
+                      ? null
+                      : { type: breakdownMode, value: item.label },
+                  );
+                }}
+                series={[
+                  {
+                    cornerRadius: 4,
+                    cx: "50%",
+                    cy: "50%",
+                    data: subcategoryData,
+                    highlightScope: { fade: "global", highlight: "item" },
+                    innerRadius: 58,
+                    outerRadius: 98,
+                    paddingAngle: 2,
+                  },
+                ]}
+                slotProps={{ legend: { hidden: true } }}
+              />
+            )}
 
             <Stack spacing={1}>
               {subcategoryData.map((item) => (
@@ -655,7 +730,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
         >
           <Box>
             <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
-              {es.dashboard.consideredTitle}
+              {t.dashboard.consideredTitle}
             </Typography>
             <Typography color="text.secondary" sx={{ mt: 0.5, fontSize: 13 }}>
               {filterLabel}
@@ -667,7 +742,7 @@ export function DashboardView({ movements }: { movements: MovementRow[] }) {
               variant="outlined"
               onClick={() => setActiveFilter(null)}
             >
-              {es.dashboard.clearFilter}
+              {t.dashboard.clearFilter}
             </Button>
           ) : null}
         </Stack>

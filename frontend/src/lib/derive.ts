@@ -35,7 +35,6 @@ export type SettingsCategory = {
   id: string;
   name: string;
   kind: CategoryRead["kind"];
-  budget: number | null;
   movementCount: number;
   subcategories: SettingsSubcategory[];
 };
@@ -65,7 +64,6 @@ export function toSettingsCategories(
     id: category.id,
     name: category.name,
     kind: category.kind,
-    budget: category.budget,
     movementCount: category.movement_count,
     subcategories: category.subcategories.map((sub) => ({
       id: sub.id,
@@ -93,6 +91,14 @@ export function toMovementRows(movements: MovementRead[]): MovementRow[] {
 export type ClassificationMemoryEntry = {
   business: string;
   businessKey: string;
+  categoryId: string;
+  categoryName: string;
+  subcategoryId: string | null;
+  subcategoryName: string | null;
+  count: number;
+};
+
+export type PreviousClassificationEntry = {
   categoryId: string;
   categoryName: string;
   subcategoryId: string | null;
@@ -198,6 +204,36 @@ export function suggestSubcategoryFor(
     return null;
   }
   return entry;
+}
+
+export function previousClassificationsFor(
+  movement: MovementRead,
+  movements: MovementRead[],
+): PreviousClassificationEntry[] {
+  const targetKey = normalizeBusinessKey(movement.business || "");
+  if (!targetKey) return [];
+
+  const entries = new Map<string, PreviousClassificationEntry>();
+  for (const candidate of movements) {
+    if (candidate.id === movement.id || !candidate.reviewed) continue;
+    if (normalizeBusinessKey(candidate.business || "") !== targetKey) continue;
+
+    const key = classificationKey(candidate.category_id, candidate.subcategory_id);
+    const current = entries.get(key);
+    if (current) {
+      current.count += 1;
+      continue;
+    }
+    entries.set(key, {
+      categoryId: candidate.category_id,
+      categoryName: candidate.category_name,
+      subcategoryId: candidate.subcategory_id,
+      subcategoryName: candidate.subcategory_name,
+      count: 1,
+    });
+  }
+
+  return Array.from(entries.values()).sort((a, b) => b.count - a.count);
 }
 
 export function toDashboardSummary(

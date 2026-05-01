@@ -7,7 +7,8 @@ from sqlmodel import Session
 
 from app.database import get_session
 from app.schemas import ImportError as ImportErrorSchema
-from app.schemas import ImportResult
+from app.schemas import ImportResult, PreprocessedDocumentRead
+from app.services.document_preprocessor import preprocess_document
 from app.services.import_movements import (
     ImportOutcome,
     has_recognizable_schema,
@@ -37,7 +38,7 @@ def _csv_import_or_reject(
         status_code=422,
         detail=(
             "No reconozco las columnas del archivo. Usa un CSV/XLSX con fecha "
-            "y monto, o sube un PDF/imagen para procesarlo con Codex desde Forger."
+            "y monto, o sube un PDF/imagen para procesarlo con el asistente desde Forger."
         ),
     )
 
@@ -46,8 +47,41 @@ def _outcome_to_schema(outcome: ImportOutcome) -> ImportResult:
     return ImportResult(
         file=outcome.file,
         inserted=outcome.inserted,
+        duplicate=outcome.duplicate,
         failed=outcome.failed,
         errors=[ImportErrorSchema(row=err.row, error=err.error) for err in outcome.errors],
+    )
+
+
+@router.post("/imports/preprocess-document", response_model=PreprocessedDocumentRead)
+async def preprocess_import_document(
+    file: UploadFile = File(..., description="Statement file to preprocess locally"),
+) -> PreprocessedDocumentRead:
+    filename = file.filename or "upload"
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty file.")
+    try:
+        document = preprocess_document(
+            filename=filename,
+            content_type=file.content_type or "",
+            data=raw,
+        )
+    except UnicodeDecodeError as exc:
+        raise HTTPException(status_code=400, detail=f"File must be UTF-8: {exc}") from exc
+    except Exception as exc:  # noqa: BLE001 - extraction libraries expose varied errors
+        raise HTTPException(
+            status_code=422,
+            detail=f"No se pudo preprocesar el archivo: {exc}",
+        ) from exc
+    return PreprocessedDocumentRead(
+        filename=document.filename,
+        content_type=document.content_type,
+        kind=document.kind,
+        text=document.text,
+        row_count=document.row_count,
+        page_count=document.page_count,
+        warning=document.warning,
     )
 
 

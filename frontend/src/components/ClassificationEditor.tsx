@@ -1,16 +1,26 @@
 import { useState } from "react";
+import AddRounded from "@mui/icons-material/AddRounded";
 import {
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import { createCategory, createSubcategory } from "@/api/categories";
 import {
   updateMovementAccountingDate,
+  updateMovementAmount,
   updateMovementCategoryOnly,
   updateMovementSubcategory,
 } from "@/api/movements";
@@ -18,23 +28,50 @@ import { ApiError } from "@/api/utils";
 import type { MovementRead } from "@/api/types";
 import type { CategoryOption, MovementRow } from "@/lib/derive";
 import { isoDateOnly } from "@/api/utils";
+import { useI18n } from "@/i18n";
 
 export type { CategoryOption, MovementRow } from "@/lib/derive";
 
 const NO_SUBCATEGORY = "__none__";
+
+const dateInputSx = {
+  '& input[type="date"]::-webkit-calendar-picker-indicator': {
+    filter: "invert(1)",
+    opacity: 0.9,
+  },
+};
+
+const amountInputSx = {
+  "& input": {
+    fontVariantNumeric: "tabular-nums",
+  },
+};
 
 type Props = {
   movement: MovementRow;
   categories: CategoryOption[];
   dense?: boolean;
   reviewLayout?: boolean;
+  showAmount?: boolean;
   onChange: (movement: MovementRead) => void;
+  onCategoriesChanged?: () => Promise<void> | void;
 };
 
-function describeError(error: unknown): string {
+function describeError(error: unknown, fallback: string): string {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error) return error.message;
-  return "No se pudo guardar el cambio.";
+  return fallback;
+}
+
+function formatAmountInput(value: number | string): string {
+  const digits = String(value).replace(/\D/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("es-CL");
+}
+
+function parseAmountInput(value: string): number {
+  const digits = value.replace(/\D/g, "");
+  return digits ? Number(digits) : Number.NaN;
 }
 
 export function ClassificationEditor({
@@ -42,15 +79,24 @@ export function ClassificationEditor({
   categories,
   dense = false,
   reviewLayout = false,
+  showAmount = false,
   onChange,
+  onCategoriesChanged,
 }: Props) {
+  const es = useI18n();
   const [draftValues, setDraftValues] = useState({
     accountingDate: isoDateOnly(movement.accounting_date),
+    amount: formatAmountInput(movement.amount),
     categoryId: movement.category_id,
     movementId: movement.id,
     subcategoryId: movement.subcategory_id,
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [creationModal, setCreationModal] = useState<"category" | "subcategory" | null>(
+    null,
+  );
+  const [creationName, setCreationName] = useState("");
+  const [creating, setCreating] = useState(false);
 
   const isCurrentMovement = draftValues.movementId === movement.id;
   const selectedCategoryId = isCurrentMovement
@@ -62,6 +108,9 @@ export function ClassificationEditor({
   const selectedAccountingDate = isCurrentMovement
     ? draftValues.accountingDate
     : isoDateOnly(movement.accounting_date);
+  const selectedAmount = isCurrentMovement
+    ? draftValues.amount
+    : formatAmountInput(movement.amount);
 
   const activeCategory =
     categories.find((category) => category.id === selectedCategoryId) ??
@@ -73,7 +122,7 @@ export function ClassificationEditor({
   };
 
   const handleApiError = (error: unknown) => {
-    setErrorMessage(describeError(error));
+    setErrorMessage(describeError(error, es.editor.saveError));
   };
 
   const handleCategoryChange = (nextCategoryId: string) => {
@@ -88,6 +137,7 @@ export function ClassificationEditor({
 
     setDraftValues({
       accountingDate: selectedAccountingDate,
+      amount: selectedAmount,
       categoryId: nextCategory.id,
       movementId: movement.id,
       subcategoryId: firstSubId,
@@ -115,6 +165,7 @@ export function ClassificationEditor({
     if (rawValue === NO_SUBCATEGORY) {
       setDraftValues({
         accountingDate: selectedAccountingDate,
+        amount: selectedAmount,
         categoryId: selectedCategoryId,
         movementId: movement.id,
         subcategoryId: null,
@@ -131,6 +182,7 @@ export function ClassificationEditor({
 
     setDraftValues({
       accountingDate: selectedAccountingDate,
+      amount: selectedAmount,
       categoryId: selectedCategoryId,
       movementId: movement.id,
       subcategoryId: rawValue,
@@ -147,6 +199,7 @@ export function ClassificationEditor({
   const handleAccountingDateChange = (nextAccountingDate: string) => {
     setDraftValues({
       accountingDate: nextAccountingDate,
+      amount: selectedAmount,
       categoryId: selectedCategoryId,
       movementId: movement.id,
       subcategoryId: selectedSubcategoryId,
@@ -160,29 +213,186 @@ export function ClassificationEditor({
       .catch(handleApiError);
   };
 
+  const handleAmountChange = (nextAmount: string) => {
+    setDraftValues({
+      accountingDate: selectedAccountingDate,
+      amount: formatAmountInput(nextAmount),
+      categoryId: selectedCategoryId,
+      movementId: movement.id,
+      subcategoryId: selectedSubcategoryId,
+    });
+    setErrorMessage(null);
+  };
+
+  const handleAmountCommit = () => {
+    const parsed = parseAmountInput(selectedAmount);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      setErrorMessage(es.editor.invalidAmount);
+      return;
+    }
+    if (parsed === movement.amount) {
+      return;
+    }
+    void updateMovementAmount({
+      movementId: movement.id,
+      amount: parsed,
+    })
+      .then(handleApiResult)
+      .catch(handleApiError);
+  };
+
+  const openCreationModal = (kind: "category" | "subcategory") => {
+    setCreationModal(kind);
+    setCreationName("");
+    setErrorMessage(null);
+  };
+
+  const closeCreationModal = () => {
+    if (creating) return;
+    setCreationModal(null);
+    setCreationName("");
+  };
+
+  const handleCreateClassification = async () => {
+    const name = creationName.trim();
+    if (!name || !creationModal) return;
+    setCreating(true);
+    setErrorMessage(null);
+    try {
+      if (creationModal === "category") {
+        const created = await createCategory({
+          name,
+          kind: movement.category_kind,
+        });
+        const updated = await updateMovementCategoryOnly({
+          movementId: movement.id,
+          categoryId: created.id,
+        });
+        setDraftValues({
+          accountingDate: selectedAccountingDate,
+          amount: selectedAmount,
+          categoryId: created.id,
+          movementId: movement.id,
+          subcategoryId: null,
+        });
+        handleApiResult(updated);
+      } else {
+        const categoryId = activeCategory?.id ?? selectedCategoryId;
+        const created = await createSubcategory({
+          name,
+          categoryId,
+        });
+        const updated = await updateMovementSubcategory({
+          movementId: movement.id,
+          subcategoryId: created.id,
+        });
+        setDraftValues({
+          accountingDate: selectedAccountingDate,
+          amount: selectedAmount,
+          categoryId,
+          movementId: movement.id,
+          subcategoryId: created.id,
+        });
+        handleApiResult(updated);
+      }
+      await onCategoriesChanged?.();
+      setCreationModal(null);
+      setCreationName("");
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const subOptions = activeCategory?.subcategories ?? [];
-  const showSubSelect = subOptions.length > 0;
+  const showSubSelect = reviewLayout || subOptions.length > 0;
   // The Select wants a string value; ``null`` becomes the sentinel "no sub".
   const subSelectValue = selectedSubcategoryId ?? NO_SUBCATEGORY;
+
+  const creationDialog = (
+    <Dialog
+      fullWidth
+      maxWidth="xs"
+      open={creationModal !== null}
+      onClose={closeCreationModal}
+    >
+      <DialogTitle>
+        {creationModal === "category"
+          ? es.editor.newCategoryTitle
+          : es.editor.newSubcategoryTitle}
+      </DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          fullWidth
+          label={
+            creationModal === "category"
+              ? es.editor.newCategoryLabel
+              : es.editor.newSubcategoryLabel
+          }
+          sx={{ mt: 1 }}
+          value={creationName}
+          onChange={(event) => setCreationName(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") void handleCreateClassification();
+          }}
+        />
+        {creationModal === "subcategory" && activeCategory ? (
+          <Typography color="text.secondary" sx={{ fontSize: 12, mt: 1 }}>
+            {es.editor.newSubcategoryHint(activeCategory.name)}
+          </Typography>
+        ) : null}
+      </DialogContent>
+      <DialogActions>
+        <Button disabled={creating} onClick={closeCreationModal}>
+          {es.editor.cancelButton}
+        </Button>
+        <Button
+          disabled={creating || creationName.trim().length === 0}
+          variant="contained"
+          onClick={() => void handleCreateClassification()}
+        >
+          {es.editor.createButton}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   if (reviewLayout) {
     return (
       <Stack spacing={1.5}>
         <TextField
           fullWidth
-          label="Accounting date"
+          label={es.editor.dateLabel}
           size="small"
+          sx={dateInputSx}
           type="date"
           value={selectedAccountingDate}
           onChange={(event) => handleAccountingDateChange(event.target.value)}
           slotProps={{ inputLabel: { shrink: true } }}
         />
-
-        <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+        {showAmount ? (
+          <TextField
+            fullWidth
+            label={es.editor.amountLabel}
+            size="small"
+            type="text"
+            inputMode="numeric"
+            sx={amountInputSx}
+            value={selectedAmount}
+            onBlur={handleAmountCommit}
+            onChange={(event) => handleAmountChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleAmountCommit();
+            }}
+          />
+        ) : null}
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <FormControl fullWidth size="small">
-            <InputLabel>Clasificacion</InputLabel>
+            <InputLabel>{es.editor.categoryLabel}</InputLabel>
             <Select
-              label="Clasificacion"
+              label={es.editor.categoryLabel}
               value={selectedCategoryId}
               onChange={(event) => handleCategoryChange(event.target.value)}
             >
@@ -193,19 +403,28 @@ export function ClassificationEditor({
               ))}
             </Select>
           </FormControl>
+          <Tooltip title={es.editor.addCategoryTooltip}>
+            <IconButton
+              aria-label={es.editor.addCategoryTooltip}
+              color="primary"
+              onClick={() => openCreationModal("category")}
+            >
+              <AddRounded />
+            </IconButton>
+          </Tooltip>
+        </Stack>
 
-          {showSubSelect ? (
+        {showSubSelect ? (
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <FormControl fullWidth size="small">
-              <InputLabel>Sub clasificacion</InputLabel>
+              <InputLabel>{es.editor.subcategoryLabel}</InputLabel>
               <Select
-                label="Sub clasificacion"
+                label={es.editor.subcategoryLabel}
                 value={subSelectValue}
-                onChange={(event) =>
-                  handleSubcategoryChange(event.target.value)
-                }
+                onChange={(event) => handleSubcategoryChange(event.target.value)}
               >
                 <MenuItem value={NO_SUBCATEGORY}>
-                  <em>Sin subcategoría</em>
+                  <em>{es.editor.noSubcategory}</em>
                 </MenuItem>
                 {subOptions.map((subcategory) => (
                   <MenuItem key={subcategory.id} value={subcategory.id}>
@@ -214,13 +433,23 @@ export function ClassificationEditor({
                 ))}
               </Select>
             </FormControl>
-          ) : null}
-        </Stack>
+            <Tooltip title={es.editor.addSubcategoryTooltip}>
+              <IconButton
+                aria-label={es.editor.addSubcategoryTooltip}
+                color="primary"
+                onClick={() => openCreationModal("subcategory")}
+              >
+                <AddRounded />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        ) : null}
         {errorMessage ? (
           <Typography color="error" sx={{ fontSize: 12 }}>
             {errorMessage}
           </Typography>
         ) : null}
+        {creationDialog}
       </Stack>
     );
   }
@@ -277,19 +506,37 @@ export function ClassificationEditor({
     <Stack spacing={1}>
       <TextField
         fullWidth
-        label="Accounting date"
+        label={es.editor.dateLabel}
         size="small"
+        sx={dateInputSx}
         type="date"
         value={selectedAccountingDate}
         onChange={(event) => handleAccountingDateChange(event.target.value)}
         slotProps={{ inputLabel: { shrink: true } }}
       />
 
+      {showAmount ? (
+        <TextField
+          fullWidth
+          label={es.editor.amountLabel}
+          size="small"
+          type="text"
+          inputMode="numeric"
+          sx={amountInputSx}
+          value={selectedAmount}
+          onBlur={handleAmountCommit}
+          onChange={(event) => handleAmountChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") handleAmountCommit();
+          }}
+        />
+      ) : null}
+
       <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
         <FormControl fullWidth size="small">
-          <InputLabel>Categoria</InputLabel>
+          <InputLabel>{es.editor.categoryLabel}</InputLabel>
           <Select
-            label="Categoria"
+            label={es.editor.categoryLabel}
             value={selectedCategoryId}
             onChange={(event) => handleCategoryChange(event.target.value)}
           >
@@ -303,14 +550,14 @@ export function ClassificationEditor({
 
         {showSubSelect ? (
           <FormControl fullWidth size="small">
-            <InputLabel>Subcategoria</InputLabel>
+            <InputLabel>{es.editor.subcategoryLabel}</InputLabel>
             <Select
-              label="Subcategoria"
+              label={es.editor.subcategoryLabel}
               value={subSelectValue}
               onChange={(event) => handleSubcategoryChange(event.target.value)}
             >
               <MenuItem value={NO_SUBCATEGORY}>
-                <em>Sin subcategoría</em>
+                <em>{es.editor.noSubcategory}</em>
               </MenuItem>
               {subOptions.map((subcategory) => (
                 <MenuItem key={subcategory.id} value={subcategory.id}>
@@ -326,6 +573,7 @@ export function ClassificationEditor({
           {errorMessage}
         </Typography>
       ) : null}
+      {creationDialog}
     </Stack>
   );
 }

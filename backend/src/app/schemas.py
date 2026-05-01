@@ -26,7 +26,6 @@ class _Base(BaseModel):
 class SubcategoryRead(_Base):
     id: str
     name: str
-    budget: float | None
     category_id: str
     movement_count: int = 0
 
@@ -35,7 +34,6 @@ class CategoryRead(_Base):
     id: str
     name: str
     kind: CategoryKind
-    budget: float | None
     movement_count: int = 0
     subcategories: list[SubcategoryRead] = Field(default_factory=list)
 
@@ -43,33 +41,29 @@ class CategoryRead(_Base):
 class CategoryCreate(_Base):
     name: str
     kind: CategoryKind
-    budget: float | None = None
 
 
 class CategoryUpdate(_Base):
     name: str | None = None
-    budget: float | None = None
-    # Use a sentinel? Keep it simple: PATCH with explicit ``budget`` clears via ``null``
-    # only if the field is in the JSON body. We rely on ``model_fields_set``.
 
 
-class CategoryMoveSubcategories(_Base):
+class CategoryMigrateMovements(_Base):
     target_category_id: str
+    target_subcategory_id: str | None = None
 
 
 class SubcategoryCreate(_Base):
     name: str
     category_id: str
-    budget: float | None = None
 
 
 class SubcategoryUpdate(_Base):
     name: str | None = None
-    budget: float | None = None
 
 
 class SubcategoryMoveMovements(_Base):
-    target_subcategory_id: str
+    target_category_id: str | None = None
+    target_subcategory_id: str | None = None
 
 
 # --------------------------------------------------------------------------- movements
@@ -84,13 +78,77 @@ class MovementRead(_Base):
     reason: str
     source: MovementSource
     raw_description: str | None
+    source_file: str | None = None
+    external_id: str | None = None
+    source_row: str | None = None
+    import_hash: str | None = None
+    duplicate_warning: str | None = None
     reviewed: bool
     category_id: str
     category_name: str
     category_kind: CategoryKind
-    category_budget: float | None
     subcategory_id: str | None = None
     subcategory_name: str | None = None
+
+
+# --------------------------------------------------------------------------- budgets
+
+
+class CategoryBudgetRead(_Base):
+    id: str
+    budget_id: str
+    category_id: str
+    category_name: str
+    amount: float
+
+
+class SubcategoryBudgetRead(_Base):
+    id: str
+    budget_id: str
+    subcategory_id: str
+    subcategory_name: str
+    category_id: str
+    category_name: str
+    amount: float
+
+
+class BudgetRead(_Base):
+    id: str
+    month: int
+    year: int
+    label: str
+    category_budgets: list[CategoryBudgetRead] = Field(default_factory=list)
+    subcategory_budgets: list[SubcategoryBudgetRead] = Field(default_factory=list)
+
+
+class BudgetCreate(_Base):
+    month: int = Field(ge=1, le=12)
+    year: int = Field(ge=1900, le=9999)
+
+
+class BudgetUpdate(_Base):
+    month: int | None = Field(default=None, ge=1, le=12)
+    year: int | None = Field(default=None, ge=1900, le=9999)
+
+
+class CategoryBudgetCreate(_Base):
+    category_id: str
+    amount: float
+
+
+class CategoryBudgetUpdate(_Base):
+    category_id: str | None = None
+    amount: float | None = None
+
+
+class SubcategoryBudgetCreate(_Base):
+    subcategory_id: str
+    amount: float
+
+
+class SubcategoryBudgetUpdate(_Base):
+    subcategory_id: str | None = None
+    amount: float | None = None
 
 
 class MovementUpdate(_Base):
@@ -108,6 +166,9 @@ class MovementUpdate(_Base):
     reason: str | None = None
     source: MovementSource | None = None
     raw_description: str | None = None
+    source_file: str | None = None
+    external_id: str | None = None
+    source_row: str | None = None
 
 
 class MovementCreate(_Base):
@@ -120,6 +181,9 @@ class MovementCreate(_Base):
     reason: str
     source: MovementSource = MovementSource.MANUAL
     raw_description: str | None = None
+    source_file: str | None = None
+    external_id: str | None = None
+    source_row: str | None = None
     reviewed: bool = False
     category_id: str
     subcategory_id: str | None = None
@@ -151,8 +215,19 @@ class ImportError(_Base):
 class ImportResult(_Base):
     file: str
     inserted: int
+    duplicate: int = 0
     failed: int
     errors: list[ImportError] = Field(default_factory=list)
+
+
+class PreprocessedDocumentRead(_Base):
+    filename: str
+    content_type: str
+    kind: str
+    text: str
+    row_count: int | None = None
+    page_count: int | None = None
+    warning: str | None = None
 
 
 # --------------------------------------------------------------------------- generic

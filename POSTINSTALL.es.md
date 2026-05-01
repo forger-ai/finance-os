@@ -4,25 +4,22 @@ Finance OS sirve para llevar tus gastos e ingresos de manera inteligente, local 
 
 ## Como comenzar
 
-1. Crea tus categorias. Puedes hacerlo manualmente dentro de la app o pedirle a Forger que las cree por ti.
-2. Comparte tus datos con Forger: cartolas, estados de cuenta, CSVs, XLSX, PDFs, imagenes, capturas o textos copiados.
-3. Forger puede analizar esos archivos, extraer movimientos, cargarlos masivamente y proponer clasificaciones inteligentes.
-4. Revisa los movimientos pendientes, corrige lo que haga falta y marca como revisado lo que ya confirmaste.
-5. Usa el resumen para entender en que se va tu dinero y que categorias requieren mas atencion.
+1. Abre Finance OS desde Forger.
+2. Sigue el flujo de inicializacion que aparece la primera vez.
+3. Elige como quieres partir clasificando tus gastos:
+   - Simple: Ingresos, Gastos y No computables.
+   - Ordenada: Esenciales, No esenciales, Extraordinarios, Ingresos, Ahorros y No computables.
+4. Comparte una cartola, estado de cuenta, CSV, XLSX, PDF, imagen o captura con varios movimientos.
+5. El asistente analizara el archivo, usara la estructura elegida, agregara subcategorias utiles si hacen falta y dejara los movimientos pendientes de revision.
+6. Revisa los movimientos pendientes, corrige lo que haga falta y confirma lo que ya este listo.
+7. Cuando termines la revision, entra al dashboard para ver tu resumen.
 
-## Categorias recomendadas
+## Sobre las categorias iniciales
 
-Puedes partir con esta estructura y ajustarla despues a tu forma de vivir:
+La estructura inicial es solo un punto de partida. Puedes modificarla con total libertad desde la vista Categorias: agregar categorias, editar nombres, eliminar las que no uses o migrar movimientos a otra categoria o subcategoria.
 
-- Ingresos: Sueldo, Bono, Devolucion, Reembolso, Retiro ahorro.
-- Esencial fijo: Arriendo, Gastos comunes, Internet y telefono, Luz, Banco y mantenciones, Supermercado.
-- Ahorro: Fondo de emergencia, Ahorro corto plazo, Inversion, Meta grande.
-- Esencial variable: Minimarket, Transporte, Bencina, Farmacia, Mascota, Hogar basico.
-- No esencial: Delivery, Restaurantes, Cafe, Salidas, Entretencion, Mascota, Ropa, Compras.
-- Suscripciones: Streaming, Herramientas, Apps, Membresias.
-- Extraordinario: Salud mayor, Viajes, Tramites, Regalos, Emergencias, Reparaciones.
-- No cobrable: Transferencia interna, Ajuste, Movimiento entre cuentas, Dinero por rendir.
+Para transferencias internas, pagos de tarjeta, traspasos entre cuentas y ajustes, Finance OS usa categorias no computables para que esos movimientos no distorsionen tus gastos o ingresos reales.
 
-## Sugerencia para empezar
+## Si no tienes IA conectada
 
-Si no sabes como partir, dile a Forger: "crea categorias recomendadas para Finance OS y despues ayudame a cargar mis ultimos movimientos". Luego puedes compartir archivos y pedirle que los clasifique antes de dejarlos listos para revisar en la app.
+Puedes omitir el flujo inicial por ahora y usar la app manualmente. Tus datos se guardan localmente en tu computador. Cuando conectes tu cuenta de IA en Forger, podras volver a cargar archivos para que el asistente extraiga y clasifique movimientos.

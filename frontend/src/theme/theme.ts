@@ -96,6 +96,12 @@ export const appTheme = createTheme({
         contained: {
           color: "#08110f",
           background: "linear-gradient(135deg, #67e8c2 0%, #7dd3fc 100%)",
+          "&.Mui-disabled": {
+            background: "rgba(103, 232, 194, 0.26)",
+            border: "1px solid rgba(103, 232, 194, 0.24)",
+            color: "rgba(238, 244, 247, 0.72)",
+            boxShadow: "none",
+          },
         },
       },
     },

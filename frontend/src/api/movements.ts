@@ -57,6 +57,16 @@ export function updateMovementAccountingDate(input: {
   });
 }
 
+export function updateMovementAmount(input: {
+  movementId: string;
+  amount: number;
+}): Promise<MovementRead> {
+  return request<MovementRead>(`/api/movements/${input.movementId}`, {
+    method: "PATCH",
+    body: { amount: input.amount },
+  });
+}
+
 export function deleteMovement(movementId: string): Promise<ActionResult> {
   return request<ActionResult>(`/api/movements/${movementId}`, {
     method: "DELETE",

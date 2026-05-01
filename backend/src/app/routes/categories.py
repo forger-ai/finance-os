@@ -11,7 +11,7 @@ from app.models import Category, Movement, Subcategory, utcnow
 from app.schemas import (
     ActionResult,
     CategoryCreate,
-    CategoryMoveSubcategories,
+    CategoryMigrateMovements,
     CategoryRead,
     CategoryUpdate,
     SubcategoryCreate,
@@ -19,7 +19,6 @@ from app.schemas import (
     SubcategoryRead,
     SubcategoryUpdate,
 )
-from app.utils import to_cents, to_pesos
 
 router = APIRouter(prefix="/api", tags=["categories"])
 
@@ -35,7 +34,6 @@ def _serialize_category(category: Category, session: Session) -> CategoryRead:
             SubcategoryRead(
                 id=sub.id,
                 name=sub.name,
-                budget=to_pesos(sub.budget) if sub.budget is not None else None,
                 category_id=sub.category_id,
                 movement_count=len(count),
             )
@@ -51,7 +49,6 @@ def _serialize_category(category: Category, session: Session) -> CategoryRead:
         id=category.id,
         name=category.name,
         kind=category.kind,
-        budget=to_pesos(category.budget) if category.budget is not None else None,
         movement_count=total_movements,
         subcategories=sub_reads,
     )
@@ -76,7 +73,6 @@ def create_category(
     category = Category(
         name=name,
         kind=payload.kind,
-        budget=to_cents(payload.budget) if payload.budget is not None else None,
     )
     session.add(category)
     try:
@@ -107,9 +103,6 @@ def update_category(
         if not new_name:
             raise HTTPException(status_code=400, detail="El nombre no puede estar vacío.")
         category.name = new_name
-    if "budget" in fields:
-        category.budget = to_cents(payload.budget) if payload.budget is not None else None
-
     category.updated_at = utcnow()
     session.add(category)
     try:
@@ -132,6 +125,12 @@ def delete_category(
     category = session.get(Category, category_id)
     if category is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada.")
+    category_count = len(session.exec(select(Category)).all())
+    if category_count <= 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Debe existir al menos una categoría.",
+        )
 
     movement_count = session.exec(
         select(Movement).where(Movement.category_id == category_id)
@@ -148,12 +147,12 @@ def delete_category(
 
 
 @router.post(
-    "/categories/{category_id}/move-subcategories",
+    "/categories/{category_id}/migrate-movements",
     response_model=ActionResult,
 )
-def move_category_subcategories(
+def migrate_category_movements(
     category_id: str,
-    payload: CategoryMoveSubcategories,
+    payload: CategoryMigrateMovements,
     session: Session = Depends(get_session),
 ) -> ActionResult:
     if not payload.target_category_id:
@@ -166,51 +165,23 @@ def move_category_subcategories(
     if source is None or target is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada.")
 
-    source_subs = session.exec(
-        select(Subcategory)
-        .where(Subcategory.category_id == category_id)
-        .order_by(Subcategory.created_at)
-    ).all()
-
-    for sub in source_subs:
-        existing_target = session.exec(
-            select(Subcategory).where(
-                Subcategory.category_id == payload.target_category_id,
-                Subcategory.name == sub.name,
+    target_sub: Subcategory | None = None
+    if payload.target_subcategory_id:
+        target_sub = session.get(Subcategory, payload.target_subcategory_id)
+        if target_sub is None:
+            raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
+        if target_sub.category_id != target.id:
+            raise HTTPException(
+                status_code=400,
+                detail="La subcategoría de destino no pertenece a la categoría indicada.",
             )
-        ).first()
-        if existing_target is not None:
-            movements = session.exec(
-                select(Movement).where(Movement.subcategory_id == sub.id)
-            ).all()
-            for movement in movements:
-                movement.subcategory_id = existing_target.id
-                movement.category_id = payload.target_category_id
-                movement.updated_at = utcnow()
-                session.add(movement)
-            session.delete(sub)
-        else:
-            sub.category_id = payload.target_category_id
-            sub.updated_at = utcnow()
-            session.add(sub)
-            # Movements riding on this subcategory need their cached
-            # ``category_id`` synced too.
-            movements = session.exec(
-                select(Movement).where(Movement.subcategory_id == sub.id)
-            ).all()
-            for movement in movements:
-                movement.category_id = payload.target_category_id
-                movement.updated_at = utcnow()
-                session.add(movement)
-    # Movements that lived in this category WITHOUT a subcategory also need
-    # to follow.
-    orphan_movements = session.exec(
-        select(Movement)
-        .where(Movement.category_id == category_id)
-        .where(Movement.subcategory_id.is_(None))  # type: ignore[union-attr]
+
+    movements = session.exec(
+        select(Movement).where(Movement.category_id == category_id)
     ).all()
-    for movement in orphan_movements:
+    for movement in movements:
         movement.category_id = payload.target_category_id
+        movement.subcategory_id = target_sub.id if target_sub is not None else None
         movement.updated_at = utcnow()
         session.add(movement)
 
@@ -246,7 +217,6 @@ def create_subcategory(
     sub = Subcategory(
         name=name,
         category_id=payload.category_id,
-        budget=to_cents(payload.budget) if payload.budget is not None else None,
     )
     session.add(sub)
     try:
@@ -261,7 +231,6 @@ def create_subcategory(
     return SubcategoryRead(
         id=sub.id,
         name=sub.name,
-        budget=to_pesos(sub.budget) if sub.budget is not None else None,
         category_id=sub.category_id,
         movement_count=0,
     )
@@ -283,9 +252,6 @@ def update_subcategory(
         if not new_name:
             raise HTTPException(status_code=400, detail="El nombre no puede estar vacío.")
         sub.name = new_name
-    if "budget" in fields:
-        sub.budget = to_cents(payload.budget) if payload.budget is not None else None
-
     sub.updated_at = utcnow()
     session.add(sub)
     try:
@@ -304,7 +270,6 @@ def update_subcategory(
     return SubcategoryRead(
         id=sub.id,
         name=sub.name,
-        budget=to_pesos(sub.budget) if sub.budget is not None else None,
         category_id=sub.category_id,
         movement_count=movement_count,
     )
@@ -342,22 +307,32 @@ def move_subcategory_movements(
     payload: SubcategoryMoveMovements,
     session: Session = Depends(get_session),
 ) -> ActionResult:
-    if not payload.target_subcategory_id:
-        raise HTTPException(status_code=400, detail="Debes elegir una subcategoría de destino.")
+    source = session.get(Subcategory, subcategory_id)
+    if source is None:
+        raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
     if payload.target_subcategory_id == subcategory_id:
         raise HTTPException(status_code=400, detail="Debes elegir otra subcategoría de destino.")
 
-    source = session.get(Subcategory, subcategory_id)
-    target = session.get(Subcategory, payload.target_subcategory_id)
-    if source is None or target is None:
-        raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
+    target_category: Category | None = None
+    target_subcategory: Subcategory | None = None
+    if payload.target_subcategory_id:
+        target_subcategory = session.get(Subcategory, payload.target_subcategory_id)
+        if target_subcategory is None:
+            raise HTTPException(status_code=404, detail="Subcategoría no encontrada.")
+        target_category = session.get(Category, target_subcategory.category_id)
+    elif payload.target_category_id:
+        target_category = session.get(Category, payload.target_category_id)
+    if target_category is None:
+        raise HTTPException(status_code=400, detail="Debes elegir un destino.")
 
     movements = session.exec(
         select(Movement).where(Movement.subcategory_id == subcategory_id)
     ).all()
     for movement in movements:
-        movement.subcategory_id = target.id
-        movement.category_id = target.category_id
+        movement.subcategory_id = (
+            target_subcategory.id if target_subcategory is not None else None
+        )
+        movement.category_id = target_category.id
         movement.updated_at = utcnow()
         session.add(movement)
     session.commit()

@@ -1,56 +1,48 @@
 import { useCallback, useRef, useState } from "react";
+import AttachFileRounded from "@mui/icons-material/AttachFileRounded";
 import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
+import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import CloudUploadRounded from "@mui/icons-material/CloudUploadRounded";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import InsertDriveFileRounded from "@mui/icons-material/InsertDriveFileRounded";
+import CloseRounded from "@mui/icons-material/CloseRounded";
 import {
   Alert,
   Box,
   Button,
   CircularProgress,
-  Collapse,
+  IconButton,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { extractMovementsFromFile } from "@/api/imports";
-import { applyClassificationMemory } from "@/api/movements";
-import type { ImportResult } from "@/api/types";
-import { ApiError } from "@/api/utils";
-import { es } from "@/i18n/es";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useAiSubscription } from "@/ai/AiSubscriptionProvider";
+import { preprocessImportDocument } from "@/api/imports";
+import { listMovements } from "@/api/movements";
+import { useI18n, useLocale } from "@/i18n";
 
-type UploaderState =
+type UploadPhase =
   | { kind: "idle" }
-  | { kind: "uploading"; filename: string }
+  | { kind: "importing"; codexStatus?: ForgerCodexTaskStatus }
   | {
-      kind: "codex";
-      filename: string;
-      runId: string;
-      status: ForgerCodexTaskStatus;
-      progressLog: string[];
+      kind: "done";
+      inserted: number;
+      codexResultText: string | null;
     }
-  | { kind: "codexDone"; filename: string; resultText: string }
-  | { kind: "done"; result: ImportResult }
   | { kind: "error"; message: string };
 
+type ProgressMessage = {
+  id: string;
+  text: string;
+};
+
 const ACCEPTED =
-  ".csv,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*,text/csv," +
+  ".csv,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,.heic,application/pdf,image/*,text/csv," +
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 const CODEX_TEMPLATE_ID = "extract_movements_from_statement";
-
-function isCodexDocument(file: File): boolean {
-  const type = file.type.toLowerCase();
-  const name = file.name.toLowerCase();
-  return (
-    type === "application/pdf" ||
-    type.startsWith("image/") ||
-    [".pdf", ".png", ".jpg", ".jpeg", ".webp", ".heic"].some((ext) =>
-      name.endsWith(ext),
-    )
-  );
-}
 
 function readFileBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -64,45 +56,18 @@ function readFileBase64(file: File): Promise<string> {
   });
 }
 
-function lastDistinctProgress(entries: string[]): string | null {
-  for (let index = entries.length - 1; index >= 0; index -= 1) {
-    const entry = entries[index]?.trim();
-    if (entry && entry !== entries[index - 1]?.trim()) {
-      return entry;
-    }
-  }
-  return null;
+function fileKey(file: File): string {
+  return `${file.name}:${file.size}:${file.lastModified}`;
 }
 
-function CodexMarkdownResult({ text }: { text: string }) {
-  return (
-    <Box
-      sx={{
-        fontSize: 13,
-        lineHeight: 1.55,
-        "& p": { mt: 0, mb: 1 },
-        "& p:last-child": { mb: 0 },
-        "& ul, & ol": { mt: 0, mb: 1, pl: 2.5 },
-        "& li": { mb: 0.35 },
-        "& strong": { fontWeight: 700 },
-        "& code": {
-          px: 0.5,
-          py: 0.1,
-          borderRadius: 0.5,
-          bgcolor: (theme) => alpha(theme.palette.common.white, 0.08),
-          fontSize: "0.92em",
-        },
-      }}
-    >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
-    </Box>
-  );
+function localizeAssistantName(text: string, assistantName: string): string {
+  return text.replace(/\b(Codex|The assistant|El asistente)\b/gi, assistantName);
 }
 
 async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
   const api = window.forgerApp;
   if (!api) {
-    throw new Error(es.review.upload.codexUnavailable);
+    throw new Error("codex_unavailable");
   }
   const initial = await api.getCodexTask(runId);
   if (
@@ -127,118 +92,206 @@ async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> 
   });
 }
 
-export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
-  const [state, setState] = useState<UploaderState>({ kind: "idle" });
+function AssistantMarkdownResult({ text }: { text: string }) {
+  return (
+    <Box
+      sx={{
+        fontSize: 13,
+        lineHeight: 1.55,
+        "& p": { mt: 0, mb: 1 },
+        "& p:last-child": { mb: 0 },
+        "& ul, & ol": { mt: 0, mb: 1, pl: 2.5 },
+        "& li": { mb: 0.35 },
+        "& strong": { fontWeight: 700 },
+        "& code": {
+          px: 0.5,
+          py: 0.1,
+          borderRadius: 0.5,
+          bgcolor: (theme) => alpha(theme.palette.common.white, 0.08),
+          fontSize: "0.92em",
+        },
+      }}
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+    </Box>
+  );
+}
+
+export function MovementsUploader({
+  templateId = CODEX_TEMPLATE_ID,
+  onUploaded,
+  onGoToReview,
+  userNote = "",
+}: {
+  templateId?: string;
+  onUploaded: () => Promise<void> | void;
+  onGoToReview: () => void;
+  userNote?: string;
+}) {
+  const es = useI18n();
+  const locale = useLocale();
+  const aiSubscription = useAiSubscription();
+  const [files, setFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [memoryBusy, setMemoryBusy] = useState(false);
-  const [memoryNote, setMemoryNote] = useState<string | null>(null);
+  const [phase, setPhase] = useState<UploadPhase>({ kind: "idle" });
+  const [progress, setProgress] = useState<ProgressMessage[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const onApplyMemory = useCallback(async () => {
-    setMemoryBusy(true);
-    setMemoryNote(null);
-    try {
-      const result = await applyClassificationMemory();
-      setMemoryNote(
-        result.updated === 0
-          ? es.review.applyMemoryEmpty
-          : es.review.applyMemorySuccess(result.updated),
-      );
-      if (result.updated > 0) onUploaded();
-    } catch (err) {
-      setMemoryNote(
-        err instanceof ApiError ? err.message : es.review.upload.genericError,
-      );
-    } finally {
-      setMemoryBusy(false);
+  const appendFiles = useCallback((incoming: FileList | File[]) => {
+    const nextFiles = Array.from(incoming);
+    setFiles((current) => {
+      const keys = new Set(current.map(fileKey));
+      return [
+        ...current,
+        ...nextFiles.filter((file) => {
+          const key = fileKey(file);
+          if (keys.has(key)) return false;
+          keys.add(key);
+          return true;
+        }),
+      ];
+    });
+    setPhase({ kind: "idle" });
+  }, []);
+
+  const pushProgress = useCallback((text: string) => {
+    setProgress((current) => [
+      ...current,
+      { id: `${Date.now()}-${current.length}`, text },
+    ]);
+  }, []);
+
+  const removeFile = useCallback((target: File) => {
+    setFiles((current) => current.filter((file) => fileKey(file) !== fileKey(target)));
+    setPhase({ kind: "idle" });
+  }, []);
+
+  const handleImport = useCallback(async () => {
+    if (files.length === 0) {
+      setPhase({ kind: "error", message: es.load.noFilesError });
+      return;
     }
-  }, [onUploaded]);
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      setState({ kind: "uploading", filename: file.name });
-      try {
-        if (isCodexDocument(file)) {
-          if (!window.forgerApp) {
-            throw new Error(es.review.upload.codexUnavailable);
-          }
-          const dataBase64 = await readFileBase64(file);
-          const started = await window.forgerApp.startCodexTask({
-            templateId: CODEX_TEMPLATE_ID,
-            arguments: {
-              statement: {
-                type: "file",
-                name: file.name,
-                mimeType: file.type || undefined,
-                dataBase64,
-              },
-              userNote: {
-                type: "string",
-                value: "",
-              },
-            },
-          });
-          setState({
-            kind: "codex",
-            filename: file.name,
-            runId: started.runId,
-            status: started.status,
-            progressLog: started.progressLog ?? [],
-          });
-          const unsubscribe = window.forgerApp.onCodexTaskUpdated((event) => {
-            if (event.task.runId !== started.runId) return;
-            setState({
-              kind: "codex",
-              filename: file.name,
-              runId: event.task.runId,
-              status: event.task.status,
-              progressLog: event.task.progressLog ?? [],
-            });
-          });
-          const completed = await waitForCodexTask(started.runId);
-          unsubscribe();
-          if (completed.status !== "completed") {
-            throw new Error(completed.error || es.review.upload.genericError);
-          }
-          setState({
-            kind: "codexDone",
-            filename: file.name,
-            resultText: completed.resultText || es.review.upload.codexDone,
-          });
-          onUploaded();
-          return;
-        }
-        const result = await extractMovementsFromFile(file);
-        setState({ kind: "done", result });
-        if (result.inserted > 0) {
-          onUploaded();
-        }
-      } catch (err) {
-        const message =
-          err instanceof ApiError
-            ? err.message
-            : err instanceof Error
-              ? err.message
-              : es.review.upload.genericError;
-        setState({ kind: "error", message });
+    setPhase({ kind: "importing" });
+    setProgress([]);
+
+    let codexResultText: string | null = null;
+
+    try {
+      const hasAi = await aiSubscription.requireAi();
+      if (!hasAi) {
+        setPhase({ kind: "idle" });
+        return;
       }
-    },
-    [onUploaded],
-  );
+      if (!window.forgerApp) {
+        throw new Error(es.load.codexUnavailable);
+      }
 
-  const onPick = () => inputRef.current?.click();
+      const beforeCount = (await listMovements()).length;
+
+      pushProgress(es.load.codexProgressStarting(files.length));
+      const preprocessedDocuments = await Promise.all(
+        files.map(async (file) =>
+          preprocessImportDocument(file).catch((error: unknown) => ({
+            filename: file.name,
+            content_type: file.type,
+            kind: "preprocess_error",
+            text: "",
+            row_count: null,
+            page_count: null,
+            warning:
+              error instanceof Error
+                ? error.message
+                : "Local preprocessing failed.",
+          })),
+        ),
+      );
+      const statementFiles = await Promise.all(
+        files.map(async (file) => ({
+          type: "file" as const,
+          name: file.name,
+          mimeType: file.type || undefined,
+          dataBase64: await readFileBase64(file),
+        })),
+      );
+
+      const started = await window.forgerApp.startCodexTask({
+        templateId,
+        locale,
+        arguments: {
+          statement: statementFiles,
+          preprocessedDocuments: {
+            type: "string",
+            value: JSON.stringify(preprocessedDocuments),
+          },
+          locale: { type: "string", value: locale },
+          userNote: { type: "string", value: userNote },
+        },
+      });
+      setPhase({ kind: "importing", codexStatus: started.status });
+
+      const seenCodexProgress = new Set<string>();
+      const unsubscribe = window.forgerApp.onCodexTaskUpdated((event) => {
+        if (event.task.runId !== started.runId) return;
+        setPhase({ kind: "importing", codexStatus: event.task.status });
+        for (const entry of event.task.progressLog ?? []) {
+          const message = entry.trim();
+          if (!message || seenCodexProgress.has(message)) continue;
+          seenCodexProgress.add(message);
+          pushProgress(localizeAssistantName(message, es.app.assistantName));
+        }
+      });
+
+      const completed = await waitForCodexTask(started.runId);
+      unsubscribe();
+      if (completed.status !== "completed") {
+        throw new Error(completed.error || es.load.genericError);
+      }
+      codexResultText = completed.resultText
+        ? localizeAssistantName(completed.resultText, es.app.assistantName)
+        : es.load.codexDone;
+      pushProgress(es.load.codexDone);
+
+      const afterCount = (await listMovements()).length;
+      const insertedFromCount = Math.max(0, afterCount - beforeCount);
+      setPhase({
+        kind: "done",
+        inserted: insertedFromCount,
+        codexResultText,
+      });
+      await onUploaded();
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message !== "codex_unavailable"
+          ? err.message
+          : es.load.genericError;
+      setPhase({ kind: "error", message });
+    }
+  }, [aiSubscription, es, files, locale, onUploaded, pushProgress, templateId, userNote]);
+
+  const onPick = () => {
+    void aiSubscription.requireAi().then((hasAi) => {
+      if (hasAi) inputRef.current?.click();
+    });
+  };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const selected = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (file) void handleFile(file);
+    if (selected.length > 0) {
+      void aiSubscription.requireAi().then((hasAi) => {
+        if (hasAi) appendFiles(selected);
+      });
+    }
   };
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDragActive(false);
-    const file = event.dataTransfer.files?.[0];
-    if (file) void handleFile(file);
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    void aiSubscription.requireAi().then((hasAi) => {
+      if (hasAi) appendFiles(droppedFiles);
+    });
   };
 
   const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -247,214 +300,199 @@ export function MovementsUploader({ onUploaded }: { onUploaded: () => void }) {
   };
 
   const onDragLeave = () => setDragActive(false);
+  const importing = phase.kind === "importing";
 
   return (
-    <Paper
-      sx={{
-        maxWidth: 980,
-        p: { xs: 2, md: 2.5 },
-        borderRadius: 2,
-        border: "1px dashed",
-        borderColor: dragActive ? "primary.main" : "divider",
-        bgcolor: (theme) =>
-          dragActive
-            ? alpha(theme.palette.primary.main, 0.08)
-            : alpha(theme.palette.common.white, 0.02),
-        transition: "border-color 120ms, background-color 120ms",
-      }}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-    >
-      <Stack spacing={1.5}>
-        <Typography
-          color="text.secondary"
-          sx={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
-        >
-          {es.review.upload.eyebrow}
-        </Typography>
+    <Stack spacing={2.5} sx={{ alignItems: "center" }}>
+      <Paper
+        sx={{
+          width: "min(100%, 760px)",
+          p: { xs: 2, md: 3 },
+          borderRadius: 2,
+          border: "1px dashed",
+          borderColor: dragActive ? "primary.main" : "divider",
+          bgcolor: (theme) =>
+            dragActive
+              ? alpha(theme.palette.primary.main, 0.08)
+              : alpha(theme.palette.common.white, 0.02),
+          transition: "border-color 120ms, background-color 120ms",
+        }}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+      >
+        <Stack spacing={2.25}>
+          <Stack spacing={0.5}>
+            <Typography sx={{ fontSize: 24, fontWeight: 800 }}>
+              {es.load.promptTitle}
+            </Typography>
+            <Typography color="text.secondary" sx={{ fontSize: 14 }}>
+              {es.load.promptHint}
+            </Typography>
+          </Stack>
 
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          sx={{ alignItems: { xs: "flex-start", sm: "center" } }}
-        >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: { xs: 16, md: 18 }, fontWeight: 700 }}>
-              {es.review.upload.title}
-            </Typography>
-            <Typography color="text.secondary" sx={{ mt: 0.25, fontSize: 13 }}>
-              {es.review.upload.hint}
-            </Typography>
-          </Box>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
             <Button
-              startIcon={
-                memoryBusy ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : (
-                  <AutoAwesomeRounded />
-                )
-              }
+              startIcon={<AttachFileRounded />}
               variant="outlined"
-              disabled={memoryBusy || state.kind === "uploading" || state.kind === "codex"}
-              onClick={() => void onApplyMemory()}
+              disabled={importing}
+              onClick={onPick}
             >
-              {es.review.applyMemoryButton}
+              {files.length > 0 ? es.load.addMore : es.load.selectFiles}
             </Button>
             <Button
               startIcon={
-                state.kind === "uploading" ? (
-                  <CircularProgress size={16} color="inherit" />
+                importing ? (
+                  <CircularProgress color="inherit" size={16} />
                 ) : (
                   <CloudUploadRounded />
                 )
               }
               variant="contained"
-              disabled={state.kind === "uploading" || state.kind === "codex"}
-              onClick={onPick}
-              sx={{ minWidth: 180 }}
+              disabled={importing || files.length === 0}
+              onClick={() => void handleImport()}
             >
-              {state.kind === "uploading" || state.kind === "codex"
-                ? es.review.upload.processing
-                : dragActive
-                  ? es.review.upload.ctaDrop
-                  : es.review.upload.ctaIdle}
+              {importing ? es.load.importingTitle : es.load.importButton}
             </Button>
           </Stack>
-        </Stack>
 
-        {memoryNote ? (
-          <Alert
-            severity="info"
-            onClose={() => setMemoryNote(null)}
-            sx={{ mt: 0 }}
+          <input
+            ref={inputRef}
+            type="file"
+            accept={ACCEPTED}
+            hidden
+            multiple
+            onChange={onChange}
+          />
+
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 1.5,
+              bgcolor: (theme) => alpha(theme.palette.common.white, 0.03),
+              border: "1px solid",
+              borderColor: "divider",
+            }}
           >
-            {memoryNote}
-          </Alert>
-        ) : null}
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept={ACCEPTED}
-          hidden
-          onChange={onChange}
-        />
-
-        <Collapse
-          in={
-            state.kind === "done" ||
-            state.kind === "error" ||
-            state.kind === "codex" ||
-            state.kind === "codexDone"
-          }
-        >
-          {state.kind === "done" ? (
-            <Alert
-              severity={
-                state.result.failed > 0 && state.result.inserted === 0
-                  ? "warning"
-                  : "success"
-              }
-              onClose={() => setState({ kind: "idle" })}
-              sx={{ mt: 0.5 }}
-            >
+            <Typography sx={{ fontSize: 13, fontWeight: 700, mb: 1 }}>
+              {es.load.selectedTitle}
+            </Typography>
+            {files.length === 0 ? (
+              <Typography color="text.secondary" sx={{ fontSize: 13 }}>
+                {es.load.emptyFiles}
+              </Typography>
+            ) : (
               <Stack spacing={0.75}>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {state.result.inserted === 0 && state.result.failed === 0
-                    ? es.review.upload.summaryNothing
-                    : es.review.upload.summary(
-                        state.result.inserted,
-                        state.result.failed,
-                      )}
-                </Typography>
-                {state.result.errors.length > 0 ? (
-                  <Box>
-                    <Typography
-                      sx={{ fontSize: 12, fontWeight: 700, mb: 0.5 }}
-                    >
-                      {es.review.upload.errorsHeader}
-                    </Typography>
-                    <Box
-                      component="ul"
-                      sx={{ m: 0, pl: 2, fontSize: 12, lineHeight: 1.5 }}
-                    >
-                      {state.result.errors.slice(0, 5).map((e, i) => (
-                        <li key={`${e.row}-${i}`}>
-                          fila {e.row}: {e.error}
-                        </li>
-                      ))}
-                      {state.result.errors.length > 5 ? (
-                        <li>… +{state.result.errors.length - 5}</li>
-                      ) : null}
-                    </Box>
-                  </Box>
-                ) : null}
-              </Stack>
-            </Alert>
-          ) : state.kind === "codex" ? (
-            <Alert severity="info" sx={{ mt: 0.5 }}>
-              <Stack spacing={0.75}>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {es.review.upload.codexStatus(state.status)}
-                </Typography>
-                {lastDistinctProgress(state.progressLog) ? (
-                  <Box
-                    key={lastDistinctProgress(state.progressLog) ?? "progress"}
-                    sx={{
-                      fontSize: 13,
-                      color: "text.secondary",
-                      lineHeight: 1.5,
-                      "@keyframes codexProgressIn": {
-                        "0%": {
-                          opacity: 0,
-                          transform: "translateY(8px)",
-                        },
-                        "100%": {
-                          opacity: 1,
-                          transform: "translateY(0)",
-                        },
-                      },
-                      animation: "codexProgressIn 220ms ease-out",
-                    }}
+                {files.map((file) => (
+                  <Stack
+                    key={fileKey(file)}
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "center", minWidth: 0 }}
                   >
-                    {lastDistinctProgress(state.progressLog)}
-                  </Box>
-                ) : null}
+                    <InsertDriveFileRounded
+                      color="primary"
+                      sx={{ fontSize: 18, flex: "0 0 auto" }}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        minWidth: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {file.name}
+                    </Typography>
+                    <IconButton
+                      aria-label={es.load.removeFileLabel(file.name)}
+                      disabled={importing}
+                      size="small"
+                      onClick={() => removeFile(file)}
+                      sx={{ flex: "0 0 auto" }}
+                    >
+                      <CloseRounded fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                ))}
               </Stack>
-            </Alert>
-          ) : state.kind === "codexDone" ? (
-            <Alert
-              severity="success"
-              onClose={() => setState({ kind: "idle" })}
-              sx={{ mt: 0.5 }}
-            >
-              <Stack spacing={0.75}>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {es.review.upload.codexDone}
+            )}
+          </Box>
+        </Stack>
+      </Paper>
+
+      {phase.kind === "importing" ? (
+        <Paper sx={{ width: "min(100%, 760px)", p: 2.25 }}>
+          <Stack spacing={1.5}>
+            <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
+              <CircularProgress size={20} />
+              <Stack spacing={0.25}>
+                <Typography sx={{ fontWeight: 800 }}>
+                  {es.load.importingTitle}
                 </Typography>
-                <CodexMarkdownResult text={state.resultText} />
+                <Typography color="text.secondary" sx={{ fontSize: 13 }}>
+                  {es.load.importingHint}
+                </Typography>
               </Stack>
-            </Alert>
-          ) : state.kind === "error" ? (
-            <Alert
-              severity="error"
-              onClose={() => setState({ kind: "idle" })}
-              sx={{ mt: 0.5 }}
+            </Stack>
+            <Stack spacing={0.75}>
+              {progress.map((entry) => (
+                <Box
+                  key={entry.id}
+                  sx={{
+                    px: 1.25,
+                    py: 1,
+                    borderRadius: 1,
+                    bgcolor: (theme) => alpha(theme.palette.common.white, 0.04),
+                    fontSize: 13,
+                    color: "text.secondary",
+                    "@keyframes importProgressIn": {
+                      "0%": { opacity: 0, transform: "translateY(8px)" },
+                      "100%": { opacity: 1, transform: "translateY(0)" },
+                    },
+                    animation: "importProgressIn 220ms ease-out",
+                  }}
+                >
+                  {entry.text}
+                </Box>
+              ))}
+            </Stack>
+          </Stack>
+        </Paper>
+      ) : null}
+
+      {phase.kind === "done" ? (
+        <Alert
+          icon={<CheckCircleRounded />}
+          severity="success"
+          sx={{ width: "min(100%, 760px)" }}
+        >
+          <Stack spacing={1}>
+            <Typography sx={{ fontWeight: 800 }}>
+              {es.load.doneTitle(phase.inserted)}
+            </Typography>
+            <Typography sx={{ fontSize: 13 }}>{es.load.doneHint}</Typography>
+            {phase.codexResultText ? (
+              <Box sx={{ mt: 0.5 }}>
+                <AssistantMarkdownResult text={phase.codexResultText} />
+              </Box>
+            ) : null}
+            <Button
+              startIcon={<AutoAwesomeRounded />}
+              variant="contained"
+              sx={{ alignSelf: "flex-start", mt: 0.5 }}
+              onClick={onGoToReview}
             >
-              {state.message}
-            </Alert>
-          ) : (
-            <Box />
-          )}
-        </Collapse>
-      </Stack>
-    </Paper>
+              {es.load.goToReview}
+            </Button>
+          </Stack>
+        </Alert>
+      ) : phase.kind === "error" ? (
+        <Alert severity="error" sx={{ width: "min(100%, 760px)" }}>
+          {phase.message}
+        </Alert>
+      ) : null}
+    </Stack>
   );
 }

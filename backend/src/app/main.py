@@ -8,10 +8,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.database import engine
 from app.database_ext import init_app_db
-from app.routes import categories, health, imports, movements
-from app.services.bootstrap import ensure_unclassified_subcategory
+from app.routes import budgets, categories, health, imports, movements
 
 
 def _allowed_origins() -> list[str]:
@@ -37,10 +35,6 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     def _startup() -> None:
         init_app_db()
-        from sqlmodel import Session
-
-        with Session(engine) as session:
-            ensure_unclassified_subcategory(session)
 
     @app.exception_handler(ValueError)
     async def _value_error_handler(_request, exc: ValueError):  # type: ignore[no-untyped-def]
@@ -48,6 +42,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(categories.router)
+    app.include_router(budgets.router)
     app.include_router(movements.router)
     app.include_router(imports.router)
 

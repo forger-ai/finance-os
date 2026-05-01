@@ -139,9 +139,11 @@ jobs:
           PUBLISHED_AT: ${{ steps.artifact.outputs.published_at }}
         run: |
           python3 - <<'PY'
+          import base64
           import hashlib
           import hmac
           import json
+          import mimetypes
           import os
           import subprocess
           import sys
@@ -165,15 +167,28 @@ jobs:
               f"- {change}" for change in changelog_entry['changes']
             )
 
+          app_payload = {
+            'slug': source_manifest['name'],
+            'name': catalog.get('display_name', source_manifest['name']),
+            'short_description': catalog.get('short_description', source_manifest.get('description', '')),
+            'description': catalog.get('description', source_manifest.get('description', '')),
+            'category': catalog.get('category', 'utilities'),
+            'beta': bool(catalog.get('beta', False)),
+          }
+          icon_path = catalog.get('icon_path')
+          if icon_path:
+            icon_file = Path(icon_path)
+            if not icon_file.is_file():
+              raise SystemExit(f"catalog.icon_path does not exist: {icon_path}")
+            content_type = mimetypes.guess_type(icon_file.name)[0] or 'application/octet-stream'
+            app_payload['icon'] = {
+              'filename': icon_file.name,
+              'content_type': content_type,
+              'data_base64': base64.b64encode(icon_file.read_bytes()).decode('ascii'),
+            }
+
           payload = {
-            'app': {
-              'slug': source_manifest['name'],
-              'name': catalog.get('display_name', source_manifest['name']),
-              'short_description': catalog.get('short_description', source_manifest.get('description', '')),
-              'description': catalog.get('description', source_manifest.get('description', '')),
-              'category': catalog.get('category', 'utilities'),
-              'beta': bool(catalog.get('beta', False)),
-            },
+            'app': app_payload,
             'version': {
               'version': version,
               'repository': os.environ['RELEASE_REPOSITORY'],

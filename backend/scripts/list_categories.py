@@ -18,7 +18,7 @@ from sqlmodel import Session, select
 from app.database import engine
 from app.database_ext import init_app_db as init_db
 from app.models import Category
-from app.utils import isoformat_z, to_pesos
+from app.utils import isoformat_z
 
 
 def main() -> None:
@@ -35,14 +35,12 @@ def main() -> None:
                     "id": category.id,
                     "name": category.name,
                     "kind": category.kind.value,
-                    "budget": to_pesos(category.budget) if category.budget is not None else None,
                     "createdAt": isoformat_z(category.created_at),
                     "updatedAt": isoformat_z(category.updated_at),
                     "subcategories": [
                         {
                             "id": sub.id,
                             "name": sub.name,
-                            "budget": to_pesos(sub.budget) if sub.budget is not None else None,
                             "categoryId": sub.category_id,
                             "createdAt": isoformat_z(sub.created_at),
                             "updatedAt": isoformat_z(sub.updated_at),
