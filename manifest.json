@@ -1,8 +1,15 @@
 {
   "name": "finance-os",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.14",
+      "summary": "Publishes a test catalog update.",
+      "changes": [
+        "Bumps Finance OS version to exercise the Forger app update flow."
+      ]
+    },
     {
       "version": "0.1.13",
       "summary": "Adds localized onboarding, budgets, category management, and faster assisted imports.",
