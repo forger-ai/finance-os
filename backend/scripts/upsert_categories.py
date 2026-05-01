@@ -6,7 +6,6 @@ Input format (matches BOOTSTRAP.md from the original repo):
       {
         "name": "Esencial fijo",
         "kind": "EXPENSE",
-        "budget": "900000",
         "subcategories": ["Arriendo", "Luz", "Internet"]
       }
     ]
@@ -29,7 +28,6 @@ from sqlmodel import Session, select
 from app.database import engine
 from app.database_ext import init_app_db as init_db
 from app.models import Category, CategoryKind, Subcategory, utcnow
-from app.utils import to_cents
 
 ALLOWED_KINDS = {kind.value for kind in CategoryKind}
 
@@ -45,14 +43,6 @@ def _assert_kind(value: object) -> CategoryKind:
     if text not in ALLOWED_KINDS:
         raise ValueError(f"Invalid kind: {value}")
     return CategoryKind(text)
-
-
-def _assert_budget(value: object) -> int | None:
-    if value is None or value == "":
-        return None
-    if not isinstance(value, str | int | float):
-        raise ValueError("Invalid budget")
-    return to_cents(value)
 
 
 def _assert_subcategories(value: object) -> list[str]:
@@ -85,17 +75,15 @@ def main(argv: list[str]) -> int:
         for item in payload:
             name = _assert_string(item.get("name"), "name")
             kind = _assert_kind(item.get("kind"))
-            budget = _assert_budget(item.get("budget"))
             subcategories = _assert_subcategories(item.get("subcategories", []))
 
             existing = session.exec(
                 select(Category).where(Category.name == name, Category.kind == kind)
             ).first()
             if existing is None:
-                category = Category(name=name, kind=kind, budget=budget)
+                category = Category(name=name, kind=kind)
                 session.add(category)
             else:
-                existing.budget = budget
                 existing.updated_at = utcnow()
                 session.add(existing)
                 category = existing

@@ -16,7 +16,6 @@ from app.schemas import (
     SummaryRead,
     SummarySourceCounts,
 )
-from app.services.bootstrap import UNCLASSIFIED_NAME
 from app.services.classification import (
     ClassificationError,
     resolve_movement_classification,
@@ -48,11 +47,15 @@ def _serialize_movement(movement: Movement) -> MovementRead:
         reason=movement.reason,
         source=movement.source,
         raw_description=movement.raw_description,
+        source_file=movement.source_file,
+        external_id=movement.external_id,
+        source_row=movement.source_row,
+        import_hash=movement.import_hash,
+        duplicate_warning=movement.duplicate_warning,
         reviewed=movement.reviewed,
         category_id=category.id,
         category_name=category.name,
         category_kind=category.kind,
-        category_budget=to_pesos(category.budget) if category.budget is not None else None,
         subcategory_id=sub.id if sub is not None else None,
         subcategory_name=sub.name if sub is not None else None,
     )
@@ -96,6 +99,9 @@ def create_movement(
         reason=payload.reason,
         source=payload.source,
         raw_description=payload.raw_description,
+        source_file=payload.source_file,
+        external_id=payload.external_id,
+        source_row=payload.source_row,
         reviewed=payload.reviewed,
         category_id=classification.category.id,
         subcategory_id=classification.subcategory.id
@@ -173,6 +179,12 @@ def update_movement(
         movement.source = payload.source
     if "raw_description" in fields:
         movement.raw_description = payload.raw_description
+    if "source_file" in fields:
+        movement.source_file = payload.source_file
+    if "external_id" in fields:
+        movement.external_id = payload.external_id
+    if "source_row" in fields:
+        movement.source_row = payload.source_row
 
     movement.updated_at = utcnow()
     session.add(movement)
@@ -208,24 +220,18 @@ def apply_classification_memory(
 ) -> ClassificationMemoryApplyResult:
     """Pre-classify pending movements using the user's confirmed history.
 
-    For every pending (``reviewed=false``) movement currently in "Sin
-    clasificar", look up its business in the memory built from
-    ``reviewed=true`` movements. When the memory has a dominant subcategory,
-    move the movement there but keep ``reviewed=false`` — it's a suggestion,
-    not a confirmation, so the user still gets it in the review queue.
+    For every pending (``reviewed=false``) movement, look up its business in the
+    memory built from ``reviewed=true`` movements. When the memory has a dominant
+    subcategory, move the movement there but keep ``reviewed=false`` — it's a
+    suggestion, not a confirmation, so the user still gets it in the review queue.
     """
     memory = build_classification_memory(session)
     if not memory:
         return ClassificationMemoryApplyResult(updated=0)
     lookup = memory_index(memory)
 
-    # Pending movements that are still in the bootstrap "Sin clasificar"
-    # category — that's our pool to backfill.
     candidates = session.exec(
-        select(Movement)
-        .join(Category, Movement.category_id == Category.id)
-        .where(Movement.reviewed.is_(False))  # type: ignore[union-attr]
-        .where(Category.name == UNCLASSIFIED_NAME)
+        select(Movement).where(Movement.reviewed.is_(False))  # type: ignore[union-attr]
     ).all()
 
     updated = 0

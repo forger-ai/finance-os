@@ -218,6 +218,20 @@ Use to load movements from data normalized by the agent.
 
 This script is an operational bridge for the agent, not a user interface.
 
+### MCP `ensure_category_tree` and `import_movements`
+
+Audience: agent.
+
+Type: validated batch write.
+
+Use these MCP tools for assistant-assisted imports. First call
+`ensure_category_tree` once with every category and subcategory needed for the
+batch. Then call `import_movements` once with structured movement objects.
+
+Prefer this batch path over one-by-one category/subcategory creation and over
+CSV text imports. The structured import reports inserted, duplicate, and failed
+rows separately. Duplicates are not import failures.
+
 Rules:
 
 - Before importing, review available categories/subcategories.

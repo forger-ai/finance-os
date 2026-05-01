@@ -1,8 +1,19 @@
 {
   "name": "finance-os",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.13",
+      "summary": "Adds localized onboarding, budgets, category management, and faster assisted imports.",
+      "changes": [
+        "Adds a first-run onboarding flow with selectable category presets and review-first import guidance.",
+        "Adds localized Finance OS UI copy, assistant progress language handling, and AI subscription gating.",
+        "Adds budget period management and recommendation flows backed by MCP tools.",
+        "Improves assisted imports with local preprocessing, batch MCP writes, stronger duplicate tracking, and review warnings.",
+        "Publishes the Finance OS catalog icon through the release workflow."
+      ]
+    },
     {
       "version": "0.1.12",
       "summary": "Improves FORGER Cloud release publishing diagnostics.",
@@ -47,11 +58,11 @@
     },
     {
       "version": "0.1.7",
-      "summary": "Adds Codex-assisted statement imports through Forger Desktop.",
+      "summary": "Adds assistant-assisted statement imports through Forger Desktop.",
       "changes": [
-        "Routes PDF and image statement imports through Forger Desktop Codex tasks.",
-        "Declares typed prompt arguments for Codex document processing.",
-        "Shows clearer import progress and markdown-formatted Codex results.",
+        "Routes PDF and image statement imports through Forger Desktop assistant tasks.",
+        "Declares typed prompt arguments for assistant document processing.",
+        "Shows clearer import progress and markdown-formatted assistant results.",
         "Adds PDF text extraction support for agent-assisted imports.",
         "Removes in-app OpenAI API key settings from the import flow."
       ]
@@ -104,8 +115,9 @@
   },
   "catalog": {
     "display_name": "Finance OS",
+    "icon_path": "frontend/public/finance-os-logo.png",
     "short_description": "Personal finance tracker with AI assistant. Your data, your machine.",
-    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the assistant questions about your finances. Your database stays on your machine; PDFs and images you choose to process with Codex are handled through Forger Desktop.",
+    "description": "Finance OS is a local-first personal finance app. Track income and expenses, categorize movements, import bank statements, and ask the assistant questions about your finances. Your database stays on your machine; PDFs and images you choose to process with the assistant are handled through Forger Desktop.",
     "category": "finance",
     "capabilities": [
       {
@@ -120,8 +132,8 @@
       },
       {
         "id": "ai_assisted_imports",
-        "title": "Usar Codex para leer documentos",
-        "description": "Procesa PDFs e imagenes mediante Codex provisto por Forger, sin API key propia dentro de la app."
+        "title": "Usar el asistente para leer documentos",
+        "description": "Procesa PDFs e imagenes mediante el asistente provisto por Forger, sin API key propia dentro de la app."
       }
     ],
     "supported_platforms": [
@@ -137,20 +149,26 @@
   },
   "promptTemplates": [
     {
-      "id": "extract_movements_from_statement",
-      "title": "Extraer movimientos desde cartola PDF o imagen",
-      "description": "Lee un documento financiero compartido por el usuario, normaliza movimientos y los carga en Finance OS como pendientes de revision.",
+      "id": "first_run_finance_os_import",
+      "title": "First run: discover categories and load movements",
+      "description": "Reads initial financial files, creates starter categories, imports movements, and prepares review.",
       "arguments": [
         {
           "name": "statement",
           "type": "file",
           "required": true,
+          "multiple": true,
           "acceptedFileTypes": [
             "application/pdf",
+            "text/csv",
+            "application/csv",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "image/png",
             "image/jpeg",
             "image/webp",
             "image/heic",
+            ".csv",
+            ".xlsx",
             ".pdf",
             ".png",
             ".jpg",
@@ -165,9 +183,104 @@
           "type": "string",
           "required": false,
           "maxLength": 2000
+        },
+        {
+          "name": "preprocessedDocuments",
+          "type": "string",
+          "required": false,
+          "maxLength": 200000
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "required": false,
+          "maxLength": 16
         }
       ],
-      "prompt": "Eres el agente interno de Finance OS.\n\nObjetivo:\nLee el documento financiero compartido por el usuario e importa sus movimientos en la base local de Finance OS.\n\nArchivo a procesar:\n{{statement}}\n\nNota del usuario:\n{{userNote}}\n\nInstrucciones:\n1. Extrae solo movimientos visibles en el documento. No inventes filas, fechas, montos, comercios, descripciones ni categorias.\n2. Normaliza los movimientos al formato esperado por el script interno import_movements.\n3. Conserva trazabilidad con la descripcion original, fecha contable y fuente del documento.\n4. Antes de clasificar, revisa las categorias y subcategorias disponibles con las herramientas internas de la app.\n5. Si una clasificacion no es clara, usa Sin clasificar o deja el movimiento pendiente de revision segun el flujo existente.\n6. Manten la regla de consistencia: si un movimiento tiene subcategoria, esa subcategoria debe pertenecer a la misma categoria.\n7. Importa los movimientos en la base local usando los scripts internos de Finance OS.\n8. Ejecuta las validaciones disponibles despues de importar.\n9. No modifiques archivos fuera del workspace de Finance OS.\n10. No expongas rutas, comandos ni detalles tecnicos en la respuesta final.\n\nRespuesta final:\nResponde solo con un resumen funcional para mostrar dentro de Finance OS: cuantos movimientos se importaron, cuantos se omitieron o fallaron, que quedo pendiente de revision, y cualquier problema concreto que el usuario deba corregir."
+      "prompt": "You are the internal Finance OS agent.\n\nGoal:\nThis is the user's first import. The user already chose a starter category style in Finance OS, and the app created that category/subcategory schema before this task started. Read the documents, adapt movement classifications to the existing schema, create only clearly useful missing subcategories or categories with Finance OS MCP, import the movements in one structured batch, and leave them pending review.\n\nFiles to process:\n{{statement}}\n\nLocal preprocessing extracted from those files, when available:\n{{preprocessedDocuments}}\n\nUser note with selected category preset and existing schema:\n{{userNote}}\n\nResponse language:\n{{locale}}\n\nInstructions:\n1. Write every progress message and the final answer in the requested language. If the language is es, use Spanish. If it is en, use English.\n2. Use the local preprocessing text/tables first because it is faster and more reliable. Inspect the original files only when the preprocessed content is missing, incomplete, or ambiguous.\n3. Extract only visible movements. Files may be CSV, XLSX, PDF, or images. Do not invent rows, dates, amounts, merchants, or descriptions.\n4. Read the existing category schema from the user note and preserve it. Prefer classifying into those categories/subcategories instead of replacing the structure.\n5. Create missing subcategories only when the document shows a clear repeated pattern that does not fit an existing subcategory. Create a missing top-level category only when the current schema cannot represent the movement type.\n6. Use English canonical category and subcategory names when creating new categories or subcategories, regardless of the document language.\n7. Classify deposits, salary, refunds, or other real income into the existing income category/subcategory when available.\n8. Detect internal transfers, payments between the user's own accounts, credit card payments, account transfers, adjustments, and movements that do not represent real expense or income. The category must be Non accountable and the specific type must be the subcategory: Internal transfers, Credit card payment, Transfers between accounts, Adjustments, or another English subcategory if the document shows a clear pattern. If that subcategory is missing, include it in the category batch before classifying movements.\n9. Avoid redundant categories. Prefer the existing schema and clear subcategories.\n10. Use MCP for all writes. Do not write directly to the database and do not use ad hoc scripts.\n11. First call ensure_category_tree once with every missing category/subcategory needed. Use the returned IDs or names for classification. Do not create categories or subcategories one by one unless the batch tool is unavailable.\n12. Then call import_movements once with structured JSON. Do not use import_csv_text unless import_movements is unavailable. Include source_label, source_file, source_row when visible, date, accounting_date when visible, amount, business, reason, raw_description, source, reviewed=false, and category/subcategory IDs or names.\n13. Preserve the original description, accounting date, source file, and source type.\n14. If a classification is unclear, choose the closest existing category, leave subcategory empty when needed, and keep reviewed=false so the user can correct it in review.\n15. Keep this rule: if a movement has a subcategory, it belongs to the same category as that subcategory.\n16. Run verify_data_integrity after importing.\n17. Report inserted, duplicate, and failed counts separately from the import result. A duplicate is not a failed import.\n18. Do not expose paths, commands, or technical details.\n\nFinal answer:\nExplain in functional language which categories/subcategories were used or added, how many movements were inserted, how many were duplicates, how many failed, which movements were marked as Non accountable or internal transfers, what remains pending review, and that the user can review everything in the next view."
+    },
+    {
+      "id": "extract_movements_from_statement",
+      "title": "Load more movements",
+      "description": "Reads additional financial files, preserves the current structure, and proposes missing categories when useful.",
+      "arguments": [
+        {
+          "name": "statement",
+          "type": "file",
+          "required": true,
+          "multiple": true,
+          "acceptedFileTypes": [
+            "application/pdf",
+            "text/csv",
+            "application/csv",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/heic",
+            ".csv",
+            ".xlsx",
+            ".pdf",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".heic"
+          ],
+          "maxBytes": 20971520
+        },
+        {
+          "name": "userNote",
+          "type": "string",
+          "required": false,
+          "maxLength": 2000
+        },
+        {
+          "name": "preprocessedDocuments",
+          "type": "string",
+          "required": false,
+          "maxLength": 200000
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "required": false,
+          "maxLength": 16
+        }
+      ],
+      "prompt": "You are the internal Finance OS agent.\n\nGoal:\nRead the financial documents shared by the user, preserve their current category/subcategory structure, propose new categories only when needed, and import the movements into Finance OS.\n\nFiles to process:\n{{statement}}\n\nLocal preprocessing extracted from those files, when available:\n{{preprocessedDocuments}}\n\nUser note:\n{{userNote}}\n\nResponse language:\n{{locale}}\n\nInstructions:\n1. Write every progress message and the final answer in the requested language. If the language is es, use Spanish. If it is en, use English.\n2. Use the local preprocessing text/tables first because it is faster and more reliable. Inspect the original files only when the preprocessed content is missing, incomplete, or ambiguous.\n3. Review existing categories, subcategories, and movements with MCP before classifying.\n4. Extract only visible movements. Do not invent data.\n5. Preserve the user's current structure whenever it is reasonable. If no structure exists yet, organize expenses into Essentials, Non-essential, and Extraordinary, with subcategories detected from the movements.\n6. Use Income for deposits, salary, refunds, or other real income.\n7. Detect internal transfers, payments between the user's own accounts, credit card payments, account transfers, adjustments, and movements that do not represent real expense or income. The category must be exactly Non accountable and the specific type must be the subcategory: Internal transfers, Credit card payment, Transfers between accounts, Adjustments, or another detected subcategory if the document shows a clear pattern. If that subcategory is missing, include it in the category batch before classifying movements.\n8. Use MCP for all writes. Do not write directly to the database and do not use ad hoc scripts.\n9. First call ensure_category_tree once for any missing categories/subcategories. If nothing is missing, skip that write. Do not create categories or subcategories one by one unless the batch tool is unavailable.\n10. Then call import_movements once with structured JSON. Do not use import_csv_text unless import_movements is unavailable. Include source_label, source_file, source_row when visible, date, accounting_date when visible, amount, business, reason, raw_description, source, reviewed=false, and category/subcategory IDs or names.\n11. Avoid duplicates within the batch when you are certain they are the same source row. If two rows share date, amount, and description but appear as separate visible rows, import both; Finance OS will flag the later one for review as a possible duplicate. If the import reports duplicates, summarize them as duplicates, not failures.\n12. Leave uncertain classifications pending review.\n13. Run verify_data_integrity after importing.\n14. Report inserted, duplicate, and failed counts separately from the import result.\n15. Do not expose paths, commands, or technical details.\n\nFinal answer:\nSummarize how many movements were inserted, how many were duplicates, how many failed, which new categories were recommended or created, how many movements were marked as Non accountable or internal transfers, what remains pending review, and any concrete issue."
+    },
+    {
+      "id": "recommend_budget",
+      "title": "Recommend budget",
+      "description": "Recommends category/subcategory budgets for a period using expected income and local history.",
+      "arguments": [
+        {
+          "name": "expectedIncome",
+          "type": "string",
+          "required": true,
+          "maxLength": 100
+        },
+        {
+          "name": "month",
+          "type": "string",
+          "required": true,
+          "maxLength": 2
+        },
+        {
+          "name": "year",
+          "type": "string",
+          "required": true,
+          "maxLength": 4
+        },
+        {
+          "name": "locale",
+          "type": "string",
+          "required": false,
+          "maxLength": 16
+        }
+      ],
+      "prompt": "You are the internal Finance OS agent.\n\nGoal:\nRecommend and load budgets for period {{month}}/{{year}} using expected income {{expectedIncome}}, existing categories, and historical movements.\n\nResponse language:\n{{locale}}\n\nInstructions:\n1. Write every progress message and the final answer in the requested language. If the language is es, use Spanish. If it is en, use English.\n2. Review existing categories, subcategories, movements, and budgets with MCP.\n3. Create or update the period budget with MCP.\n4. Create CategoryBudget and SubcategoryBudget rows with MCP according to the recommendation.\n5. Do not validate that totals match the income; use income only as context for the recommendation.\n6. Do not expose paths, commands, or technical details.\n\nFinal answer:\nSummarize the recommended budget and the main allocations created or updated."
     }
   ],
   "services": [

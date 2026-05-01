@@ -25,9 +25,9 @@ export function formatDate(value: string | Date): string {
   }).format(date);
 }
 
-export function formatMonthLabel(value: string): string {
+export function formatMonthLabel(value: string, locale = "es-CL"): string {
   const [year, month] = value.split("-").map(Number);
-  return new Intl.DateTimeFormat("es-CL", {
+  return new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
   }).format(new Date(year, month - 1, 1));

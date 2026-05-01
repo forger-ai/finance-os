@@ -4,25 +4,22 @@ Finance OS helps you manage expenses and income intelligently, locally, and with
 
 ## How to start
 
-1. Create your categories. You can do it manually in the app or ask Forger to create them for you.
-2. Share your data with Forger: bank statements, account statements, CSVs, XLSX files, PDFs, images, screenshots, or copied text.
-3. Forger can analyze those files, extract movements, load them in bulk, and propose smart classifications.
-4. Review pending movements, correct what needs adjustment, and mark as reviewed what you have confirmed.
-5. Use the summary to understand where your money goes and which categories need more attention.
+1. Open Finance OS from Forger.
+2. Follow the initialization flow shown the first time.
+3. Choose how you want to start classifying your expenses:
+   - Simple: Income, Expenses, and Non accountable.
+   - Organized: Essentials, Non-essential, Extraordinary, Income, Savings, and Non accountable.
+4. Share a bank statement, account statement, CSV, XLSX, PDF, image, or screenshot with several movements.
+5. The assistant will analyze the file, use the structure you selected, add useful subcategories if needed, and leave the movements pending review.
+6. Review pending movements, correct what needs adjustment, and confirm what is ready.
+7. When review is complete, open the dashboard to see your summary.
 
-## Recommended categories
+## About initial categories
 
-You can start with this structure and adjust it later to match your life:
+The initial structure is only a starting point. You can freely modify it from the Categories view: add categories, edit names, delete categories you do not use, or migrate movements to another category or subcategory.
 
-- Income: Salary, Bonus, Refund, Reimbursement, Savings withdrawal.
-- Fixed essentials: Rent, Building fees, Internet and phone, Electricity, Bank and maintenance fees, Groceries.
-- Savings: Emergency fund, Short-term savings, Investment, Big goal.
-- Variable essentials: Convenience store, Transport, Fuel, Pharmacy, Pet, Basic home.
-- Non-essential: Delivery, Restaurants, Coffee, Outings, Entertainment, Pet, Clothes, Shopping.
-- Subscriptions: Streaming, Tools, Apps, Memberships.
-- Extraordinary: Major health, Travel, Paperwork, Gifts, Emergencies, Repairs.
-- Non-billable: Internal transfer, Adjustment, Movement between accounts, Money to report.
+For internal transfers, credit card payments, transfers between accounts, and adjustments, Finance OS uses non-accountable categories so those movements do not distort your real expenses or income.
 
-## Suggested first request
+## If AI is not connected
 
-If you are not sure where to start, tell Forger: "create recommended categories for Finance OS and then help me load my latest movements". Then you can share files and ask Forger to classify them before leaving them ready for review in the app.
+You can skip the initial flow for now and use the app manually. Your data is stored locally on your computer. Once you connect your AI account in Forger, you can load files again so the assistant extracts and classifies movements.

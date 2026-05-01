@@ -4,7 +4,7 @@ import SavingsRounded from "@mui/icons-material/SavingsRounded";
 import PaidRounded from "@mui/icons-material/PaidRounded";
 import TrendingUpRounded from "@mui/icons-material/TrendingUpRounded";
 import { alpha, Box, Card, CardContent, Stack, Typography } from "@mui/material";
-import { es } from "@/i18n/es";
+import { useI18n } from "@/i18n";
 
 function MetricCard({
   color,
@@ -64,11 +64,20 @@ export function DashboardMetrics({
 }: {
   summary: {
     balance: string;
+    balanceValue: number;
     totalIncome: string;
     totalSaved: string;
     totalSpent: string;
   };
 }) {
+  const t = useI18n();
+  const balanceColor =
+    summary.balanceValue < 0
+      ? "#ef4444"
+      : summary.balanceValue > 0
+        ? "#22c55e"
+        : "#94a3b8";
+
   return (
     <Box
       sx={{
@@ -83,23 +92,23 @@ export function DashboardMetrics({
     >
       <MetricCard
         icon={<AssessmentRounded />}
-        label={es.dashboard.metrics.totalSpent}
+        label={t.dashboard.metrics.totalSpent}
         value={summary.totalSpent}
       />
       <MetricCard
         icon={<SavingsRounded />}
-        label={es.dashboard.metrics.totalSaved}
+        label={t.dashboard.metrics.totalSaved}
         value={summary.totalSaved}
       />
       <MetricCard
         icon={<PaidRounded />}
-        label={es.dashboard.metrics.totalIncome}
+        label={t.dashboard.metrics.totalIncome}
         value={summary.totalIncome}
       />
       <MetricCard
         icon={<TrendingUpRounded />}
-        label={es.dashboard.metrics.balance}
-        color={summary.balance.startsWith("-") ? "#ef4444" : "#22c55e"}
+        label={t.dashboard.metrics.balance}
+        color={balanceColor}
         value={summary.balance}
       />
     </Box>

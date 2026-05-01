@@ -55,8 +55,6 @@ class Category(SQLModel, table=True):
     id: str = Field(default_factory=generate_id, primary_key=True)
     name: str
     kind: CategoryKind
-    # Stored as integer pesos. ``None`` means "no budget defined".
-    budget: int | None = Field(default=None)
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
 
@@ -75,13 +73,74 @@ class Subcategory(SQLModel, table=True):
 
     id: str = Field(default_factory=generate_id, primary_key=True)
     name: str
-    budget: int | None = Field(default=None)
     category_id: str = Field(foreign_key="category.id", ondelete="CASCADE")
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
 
     category: "Category" = Relationship(back_populates="subcategories")
     movements: list["Movement"] = Relationship(back_populates="subcategory")
+
+
+class Budget(SQLModel, table=True):
+    __tablename__ = "budget"
+    __table_args__ = (UniqueConstraint("month", "year", name="uq_budget_period"),)
+
+    id: str = Field(default_factory=generate_id, primary_key=True)
+    month: int = Field(index=True)
+    year: int = Field(index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+    category_budgets: list["CategoryBudget"] = Relationship(
+        back_populates="budget",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+    subcategory_budgets: list["SubcategoryBudget"] = Relationship(
+        back_populates="budget",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+
+
+class CategoryBudget(SQLModel, table=True):
+    __tablename__ = "category_budget"
+    __table_args__ = (
+        UniqueConstraint("budget_id", "category_id", name="uq_category_budget_period_category"),
+        Index("ix_category_budget_budget_id", "budget_id"),
+        Index("ix_category_budget_category_id", "category_id"),
+    )
+
+    id: str = Field(default_factory=generate_id, primary_key=True)
+    budget_id: str = Field(foreign_key="budget.id", ondelete="CASCADE")
+    category_id: str = Field(foreign_key="category.id", ondelete="CASCADE")
+    amount_cents: int
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+    budget: Budget = Relationship(back_populates="category_budgets")
+    category: Category = Relationship()
+
+
+class SubcategoryBudget(SQLModel, table=True):
+    __tablename__ = "subcategory_budget"
+    __table_args__ = (
+        UniqueConstraint(
+            "budget_id",
+            "subcategory_id",
+            name="uq_subcategory_budget_period_subcategory",
+        ),
+        Index("ix_subcategory_budget_budget_id", "budget_id"),
+        Index("ix_subcategory_budget_subcategory_id", "subcategory_id"),
+    )
+
+    id: str = Field(default_factory=generate_id, primary_key=True)
+    budget_id: str = Field(foreign_key="budget.id", ondelete="CASCADE")
+    subcategory_id: str = Field(foreign_key="subcategory.id", ondelete="CASCADE")
+    amount_cents: int
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+    budget: Budget = Relationship(back_populates="subcategory_budgets")
+    subcategory: Subcategory = Relationship()
 
 
 class Setting(SQLModel, table=True):
@@ -105,6 +164,7 @@ class Movement(SQLModel, table=True):
         Index("ix_movement_accounting_date", "accounting_date"),
         Index("ix_movement_category_date", "category_id", "date"),
         Index("ix_movement_subcategory_date", "subcategory_id", "date"),
+        Index("ix_movement_import_hash", "import_hash", unique=True),
     )
 
     id: str = Field(default_factory=generate_id, primary_key=True)
@@ -116,6 +176,11 @@ class Movement(SQLModel, table=True):
     reason: str
     source: MovementSource
     raw_description: str | None = Field(default=None)
+    source_file: str | None = Field(default=None)
+    external_id: str | None = Field(default=None)
+    source_row: str | None = Field(default=None)
+    import_hash: str | None = Field(default=None)
+    duplicate_warning: str | None = Field(default=None)
     reviewed: bool = Field(default=False)
     # ``category_id`` is the source of truth for classification — every movement
     # belongs to a category. ``subcategory_id`` is optional: when present its

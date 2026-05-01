@@ -34,8 +34,11 @@ type ForgerCodexTaskEvent = {
 
 interface Window {
   forgerApp?: {
+    getContext?: () => Promise<{ locale?: string }>;
+    getAiSubscriptionStatus?: () => Promise<{ connected: boolean }>;
     startCodexTask: (input: {
       templateId: string;
+      locale?: string;
       arguments?: Record<
         string,
         | string

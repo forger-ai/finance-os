@@ -13,14 +13,12 @@ export function listCategories(): Promise<CategoryRead[]> {
 export function createCategory(input: {
   name: string;
   kind: CategoryKind;
-  budget?: number | null;
 }): Promise<CategoryRead> {
   return request<CategoryRead>("/api/categories", {
     method: "POST",
     body: {
       name: input.name,
       kind: input.kind,
-      budget: input.budget ?? null,
     },
   });
 }
@@ -28,14 +26,12 @@ export function createCategory(input: {
 export function createSubcategory(input: {
   name: string;
   categoryId: string;
-  budget?: number | null;
 }): Promise<SubcategoryRead> {
   return request<SubcategoryRead>("/api/subcategories", {
     method: "POST",
     body: {
       name: input.name,
       category_id: input.categoryId,
-      budget: input.budget ?? null,
     },
   });
 }
@@ -50,41 +46,25 @@ export function renameCategory(input: {
   });
 }
 
-export function updateCategoryBudget(input: {
-  categoryId: string;
-  budget: string;
-}): Promise<CategoryRead> {
-  const normalized = input.budget.trim().replace(",", ".");
-  const value =
-    normalized === ""
-      ? null
-      : Number.isNaN(Number(normalized))
-        ? Promise.reject(new Error("El budget debe ser un número válido."))
-        : Number(normalized);
-  if (value instanceof Promise) {
-    return value as Promise<CategoryRead>;
-  }
-  return request<CategoryRead>(`/api/categories/${input.categoryId}`, {
-    method: "PATCH",
-    body: { budget: value },
-  });
-}
-
 export function deleteCategory(categoryId: string): Promise<ActionResult> {
   return request<ActionResult>(`/api/categories/${categoryId}`, {
     method: "DELETE",
   });
 }
 
-export function moveCategorySubcategories(input: {
+export function migrateCategoryMovements(input: {
   categoryId: string;
   targetCategoryId: string;
+  targetSubcategoryId?: string | null;
 }): Promise<ActionResult> {
   return request<ActionResult>(
-    `/api/categories/${input.categoryId}/move-subcategories`,
+    `/api/categories/${input.categoryId}/migrate-movements`,
     {
       method: "POST",
-      body: { target_category_id: input.targetCategoryId },
+      body: {
+        target_category_id: input.targetCategoryId,
+        target_subcategory_id: input.targetSubcategoryId ?? null,
+      },
     },
   );
 }
@@ -109,13 +89,17 @@ export function deleteSubcategory(
 
 export function moveSubcategoryMovements(input: {
   subcategoryId: string;
-  targetSubcategoryId: string;
+  targetCategoryId?: string | null;
+  targetSubcategoryId?: string | null;
 }): Promise<ActionResult> {
   return request<ActionResult>(
     `/api/subcategories/${input.subcategoryId}/move-movements`,
     {
       method: "POST",
-      body: { target_subcategory_id: input.targetSubcategoryId },
+      body: {
+        target_category_id: input.targetCategoryId ?? null,
+        target_subcategory_id: input.targetSubcategoryId ?? null,
+      },
     },
   );
 }
