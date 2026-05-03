@@ -1,8 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.15",
+      "summary": "Improves movement loading, manual entry, and first-run onboarding.",
+      "changes": [
+        "Adds compact top-bar actions for loading movements, adding a manual movement, and seeing pending review status.",
+        "Adds a manual movement form that creates reviewed manual movements from the app UI.",
+        "Shows review progress as remaining movements and surfaces pending review counts in the top bar.",
+        "Skips the category setup screen when categories already exist and keeps the first-run skip action visible during loading."
+      ]
+    },
     {
       "version": "0.1.14",
       "summary": "Publishes a test catalog update.",

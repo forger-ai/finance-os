@@ -24,7 +24,6 @@ export function ReviewCard({
   movement,
   previousClassifications,
   remaining,
-  total,
   onGoToDashboard,
   onCategoriesChanged,
   onMovementChange,
@@ -33,7 +32,6 @@ export function ReviewCard({
   movement: MovementRow | null;
   previousClassifications: PreviousClassificationEntry[];
   remaining: number;
-  total: number;
   onGoToDashboard: () => void;
   onCategoriesChanged?: () => Promise<void> | void;
   onMovementChange: (movement: MovementRead) => void;
@@ -91,7 +89,7 @@ export function ReviewCard({
               color="text.secondary"
               sx={{ fontSize: 13, fontWeight: 700 }}
             >
-              {total - remaining + 1}/{total}
+              {es.review.remainingLabel(remaining)}
             </Typography>
           </Stack>
 

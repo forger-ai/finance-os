@@ -1,5 +1,5 @@
 import { request } from "./utils";
-import type { ActionResult, MovementRead, SummaryRead } from "./types";
+import type { ActionResult, MovementCreate, MovementRead, SummaryRead } from "./types";
 
 export function listMovements(): Promise<MovementRead[]> {
   return request<MovementRead[]>("/api/movements");
@@ -7,6 +7,13 @@ export function listMovements(): Promise<MovementRead[]> {
 
 export function getSummary(): Promise<SummaryRead> {
   return request<SummaryRead>("/api/summary");
+}
+
+export function createMovement(input: MovementCreate): Promise<MovementRead> {
+  return request<MovementRead>("/api/movements", {
+    method: "POST",
+    body: input,
+  });
 }
 
 export function updateMovementSubcategory(input: {

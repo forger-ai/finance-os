@@ -4,12 +4,20 @@ import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
-import { useAiSubscription } from "@/ai/AiSubscriptionProvider";
 import { AppShell, type ViewMode } from "@/components/AppShell";
 import { DashboardView } from "@/components/DashboardView";
 import { MovementsTable } from "@/components/MovementsTable";
@@ -19,7 +27,7 @@ import { SettingsView } from "@/components/SettingsView";
 import { BudgetView } from "@/components/BudgetView";
 import { createCategory, createSubcategory, listCategories } from "@/api/categories";
 import { listBudgets } from "@/api/budgets";
-import { listMovements } from "@/api/movements";
+import { createMovement, listMovements } from "@/api/movements";
 import {
   previousClassificationsFor,
   type CategoryOption,
@@ -42,6 +50,7 @@ type AppData = {
 const ONBOARDING_SKIP_STORAGE_KEY = "finance-os:onboarding-skipped";
 const ONBOARDING_PRESET_STORAGE_KEY = "finance-os:onboarding-preset";
 const FIRST_RUN_IMPORT_TEMPLATE_ID = "first_run_finance_os_import";
+const NO_SUBCATEGORY = "__none__";
 
 type CategoryPresetId = "simple" | "organized";
 
@@ -141,13 +150,220 @@ function categoryPresetUserNote(preset: CategoryPreset): string {
   ].join("\n");
 }
 
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatAmountInput(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("es-CL");
+}
+
+function parseAmountInput(value: string): number {
+  const digits = value.replace(/\D/g, "");
+  return digits ? Number(digits) : Number.NaN;
+}
+
+function ManualMovementDialog({
+  categories,
+  open,
+  onClose,
+  onCreated,
+}: {
+  categories: CategoryOption[];
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => Promise<void>;
+}) {
+  const es = useI18n();
+  const [date, setDate] = useState(todayIsoDate);
+  const [amount, setAmount] = useState("");
+  const [business, setBusiness] = useState("");
+  const [reason, setReason] = useState("");
+  const [source, setSource] = useState<"BANK" | "CREDIT_CARD" | "MANUAL">("MANUAL");
+  const [categoryId, setCategoryId] = useState("");
+  const [subcategoryId, setSubcategoryId] = useState(NO_SUBCATEGORY);
+  const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const firstCategoryId = categories[0]?.id ?? "";
+    setDate(todayIsoDate());
+    setAmount("");
+    setBusiness("");
+    setReason("");
+    setSource("MANUAL");
+    setCategoryId(firstCategoryId);
+    setSubcategoryId(NO_SUBCATEGORY);
+    setErrorMessage(null);
+  }, [categories, open]);
+
+  const activeCategory = categories.find((category) => category.id === categoryId);
+  const subcategories = activeCategory?.subcategories ?? [];
+  const hasCategories = categories.length > 0;
+
+  const handleCategoryChange = (nextCategoryId: string) => {
+    setCategoryId(nextCategoryId);
+    setSubcategoryId(NO_SUBCATEGORY);
+    setErrorMessage(null);
+  };
+
+  const handleSubmit = async () => {
+    const parsedAmount = parseAmountInput(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setErrorMessage(es.manualMovement.invalidAmount);
+      return;
+    }
+    if (!date || !business.trim() || !reason.trim() || !categoryId) {
+      setErrorMessage(es.manualMovement.requiredFields);
+      return;
+    }
+
+    setSaving(true);
+    setErrorMessage(null);
+    try {
+      await createMovement({
+        date,
+        accounting_date: date,
+        amount: parsedAmount,
+        business: business.trim(),
+        reason: reason.trim(),
+        source,
+        raw_description: business.trim(),
+        reviewed: true,
+        category_id: categoryId,
+        subcategory_id:
+          subcategoryId === NO_SUBCATEGORY ? null : subcategoryId,
+      });
+      await onCreated();
+      onClose();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(es.manualMovement.saveError);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog fullWidth maxWidth="sm" open={open} onClose={saving ? undefined : onClose}>
+      <DialogTitle>{es.manualMovement.title}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ pt: 1 }}>
+          {!hasCategories ? (
+            <Alert severity="info">{es.manualMovement.noCategories}</Alert>
+          ) : null}
+          <TextField
+            fullWidth
+            label={es.manualMovement.dateLabel}
+            type="date"
+            value={date}
+            onChange={(event) => setDate(event.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+          <TextField
+            fullWidth
+            inputMode="numeric"
+            label={es.manualMovement.amountLabel}
+            value={amount}
+            onChange={(event) => setAmount(formatAmountInput(event.target.value))}
+          />
+          <TextField
+            fullWidth
+            label={es.manualMovement.businessLabel}
+            value={business}
+            onChange={(event) => setBusiness(event.target.value)}
+          />
+          <TextField
+            fullWidth
+            label={es.manualMovement.reasonLabel}
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+          />
+          <FormControl fullWidth>
+            <InputLabel>{es.manualMovement.sourceLabel}</InputLabel>
+            <Select
+              label={es.manualMovement.sourceLabel}
+              value={source}
+              onChange={(event) =>
+                setSource(event.target.value as "BANK" | "CREDIT_CARD" | "MANUAL")
+              }
+            >
+              <MenuItem value="MANUAL">{es.settings.sourceLabels.MANUAL}</MenuItem>
+              <MenuItem value="BANK">{es.settings.sourceLabels.BANK}</MenuItem>
+              <MenuItem value="CREDIT_CARD">
+                {es.settings.sourceLabels.CREDIT_CARD}
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth disabled={!hasCategories}>
+            <InputLabel>{es.manualMovement.categoryLabel}</InputLabel>
+            <Select
+              label={es.manualMovement.categoryLabel}
+              value={categoryId}
+              onChange={(event) => handleCategoryChange(event.target.value)}
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth disabled={!hasCategories || subcategories.length === 0}>
+            <InputLabel>{es.manualMovement.subcategoryLabel}</InputLabel>
+            <Select
+              label={es.manualMovement.subcategoryLabel}
+              value={subcategoryId}
+              onChange={(event) => setSubcategoryId(event.target.value)}
+            >
+              <MenuItem value={NO_SUBCATEGORY}>
+                <em>{es.manualMovement.noSubcategory}</em>
+              </MenuItem>
+              {subcategories.map((subcategory) => (
+                <MenuItem key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {errorMessage ? (
+            <Typography color="error" sx={{ fontSize: 13 }}>
+              {errorMessage}
+            </Typography>
+          ) : null}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button disabled={saving} onClick={onClose}>
+          {es.manualMovement.cancelButton}
+        </Button>
+        <Button
+          disabled={saving || !hasCategories}
+          variant="contained"
+          onClick={() => void handleSubmit()}
+        >
+          {es.manualMovement.createButton}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function App() {
   const es = useI18n();
-  const aiSubscription = useAiSubscription();
   const [data, setData] = useState<AppData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<ViewMode>("dashboard");
+  const [manualMovementOpen, setManualMovementOpen] = useState(false);
   const [selectedPresetId, setSelectedPresetId] = useState<CategoryPresetId | null>(
     () => {
       const value = localStorage.getItem(ONBOARDING_PRESET_STORAGE_KEY);
@@ -285,11 +501,13 @@ export default function App() {
     if (!data) return false;
     return data.movements.length === 0;
   }, [data]);
+  const hasCategories = (data?.categories.length ?? 0) > 0;
   const onboarding = firstRunEmpty && !onboardingSkipped;
   const selectedPreset =
-    selectedPresetId && (data?.categories.length ?? 0) > 0
+    selectedPresetId && hasCategories
       ? CATEGORY_PRESETS[selectedPresetId]
       : null;
+  const showCategoryPresetPicker = !hasCategories;
   const onboardingUserNote = selectedPreset
     ? categoryPresetUserNote(selectedPreset)
     : "";
@@ -325,10 +543,12 @@ export default function App() {
               {es.onboarding.title}
             </Typography>
             <Typography color="text.secondary" sx={{ mt: 1.5, fontSize: 17 }}>
-              {selectedPreset ? es.onboarding.uploadBody : es.onboarding.introBody}
+              {showCategoryPresetPicker
+                ? es.onboarding.introBody
+                : es.onboarding.uploadBody}
             </Typography>
           </Box>
-          {!selectedPreset ? (
+          {showCategoryPresetPicker ? (
             <Stack spacing={2} sx={{ width: "min(100%, 900px)" }}>
               <Typography sx={{ fontSize: 22, fontWeight: 800, textAlign: "center" }}>
                 {es.onboarding.presetQuestion}
@@ -376,18 +596,18 @@ export default function App() {
               </Typography>
             </Stack>
           ) : (
-            <MovementsUploader
-              templateId={FIRST_RUN_IMPORT_TEMPLATE_ID}
-              userNote={onboardingUserNote}
-              onUploaded={() => handleOnboardingUploaded()}
-              onGoToReview={() => setViewMode("review")}
-            />
+            <Stack spacing={2} sx={{ alignItems: "center", width: "100%" }}>
+              <MovementsUploader
+                templateId={FIRST_RUN_IMPORT_TEMPLATE_ID}
+                userNote={onboardingUserNote}
+                onUploaded={() => handleOnboardingUploaded()}
+                onGoToReview={() => setViewMode("review")}
+              />
+              <Button variant="outlined" onClick={() => void handleSkipOnboarding()}>
+                {es.onboarding.skipButton}
+              </Button>
+            </Stack>
           )}
-          {!aiSubscription.loading && !aiSubscription.connected ? (
-            <Button variant="outlined" onClick={() => void handleSkipOnboarding()}>
-              {es.onboarding.skipButton}
-            </Button>
-          ) : null}
         </Stack>
       </Box>
     );
@@ -396,6 +616,8 @@ export default function App() {
   return (
     <>
       <AppShell
+        pendingReviewCount={reviewQueue.length}
+        onAddManualMovement={() => setManualMovementOpen(true)}
         onViewChange={setViewMode}
         viewMode={viewMode}
       >
@@ -490,7 +712,6 @@ export default function App() {
                 movement={activeReviewMovement}
                 previousClassifications={activePreviousClassifications}
                 remaining={reviewQueue.length}
-                total={movementRows.length}
                 onGoToDashboard={() => setViewMode("dashboard")}
                 onCategoriesChanged={() => reload()}
                 onMovementChange={handleMovementChange}
@@ -499,6 +720,12 @@ export default function App() {
           )}
         </Stack>
       </AppShell>
+      <ManualMovementDialog
+        categories={categoryOptions}
+        open={manualMovementOpen}
+        onClose={() => setManualMovementOpen(false)}
+        onCreated={() => reload()}
+      />
       <Snackbar
         open={Boolean(error)}
         autoHideDuration={6000}

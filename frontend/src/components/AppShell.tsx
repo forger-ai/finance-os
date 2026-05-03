@@ -1,21 +1,26 @@
 import type { ReactNode } from "react";
+import AddRounded from "@mui/icons-material/AddRounded";
+import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import DashboardRounded from "@mui/icons-material/DashboardRounded";
 import FileUploadRounded from "@mui/icons-material/FileUploadRounded";
 import PaidRounded from "@mui/icons-material/PaidRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
 import TableRowsRounded from "@mui/icons-material/TableRowsRounded";
 import ViewCarouselRounded from "@mui/icons-material/ViewCarouselRounded";
+import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import {
   AppBar,
+  Badge,
   Box,
-  Button,
   Drawer,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useI18n } from "@/i18n";
@@ -34,13 +39,21 @@ const appBarHeight = 64;
 export function AppShell({
   children,
   viewMode,
+  pendingReviewCount,
+  onAddManualMovement,
   onViewChange,
 }: {
   children: ReactNode;
   viewMode: ViewMode;
+  pendingReviewCount: number;
+  onAddManualMovement: () => void;
   onViewChange: (nextView: ViewMode) => void;
 }) {
   const es = useI18n();
+  const reviewTooltip =
+    pendingReviewCount > 0
+      ? es.topActions.reviewPendingTooltip(pendingReviewCount)
+      : es.topActions.reviewCompleteTooltip;
   return (
     <Box
       sx={{
@@ -74,14 +87,45 @@ export function AppShell({
           >
             {es.app.title}
           </Typography>
-          <Button
-            color="primary"
-            startIcon={<FileUploadRounded />}
-            variant="contained"
-            onClick={() => onViewChange("load")}
-          >
-            {es.load.headerAction}
-          </Button>
+          <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+            <Tooltip title={es.topActions.loadTooltip}>
+              <IconButton
+                aria-label={es.topActions.loadTooltip}
+                color="primary"
+                onClick={() => onViewChange("load")}
+              >
+                <FileUploadRounded />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={es.topActions.addManualTooltip}>
+              <IconButton
+                aria-label={es.topActions.addManualTooltip}
+                color="primary"
+                onClick={onAddManualMovement}
+              >
+                <AddRounded />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={reviewTooltip}>
+              <IconButton
+                aria-label={reviewTooltip}
+                color={pendingReviewCount > 0 ? "warning" : "success"}
+                onClick={() => onViewChange("review")}
+              >
+                {pendingReviewCount > 0 ? (
+                  <Badge
+                    badgeContent={pendingReviewCount}
+                    color="warning"
+                    max={99}
+                  >
+                    <WarningAmberRounded />
+                  </Badge>
+                ) : (
+                  <CheckCircleRounded />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Toolbar>
       </AppBar>
 

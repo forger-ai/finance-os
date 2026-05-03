@@ -15,6 +15,13 @@ export const en: Dictionary = {
     settings: "Categories",
     budgets: "Budgets",
   },
+  topActions: {
+    loadTooltip: "Load movements",
+    addManualTooltip: "Add manual movement",
+    reviewPendingTooltip: (count: number) =>
+      `${count} ${count === 1 ? "movement" : "movements"} pending review`,
+    reviewCompleteTooltip: "All movements are reviewed",
+  },
   views: {
     ...es.views,
     loadEyebrow: "Movement import",
@@ -147,6 +154,8 @@ export const en: Dictionary = {
     datesEyebrow: "Dates",
     originalDescription: "Original description",
     confirmAndContinue: "Confirm and continue",
+    remainingLabel: (count: number) =>
+      `${count} ${count === 1 ? "remaining" : "remaining"}`,
     amountLabel: "Amount",
     categoryLabel: "Category",
     subcategoryLabel: "Subcategory",
@@ -230,6 +239,23 @@ export const en: Dictionary = {
     deleteTooltip: "Delete movement",
     deleteConfirm:
       "Delete this movement? This action cannot be undone.",
+  },
+  manualMovement: {
+    title: "Add manual movement",
+    dateLabel: "Date",
+    amountLabel: "Amount",
+    businessLabel: "Merchant or description",
+    reasonLabel: "Detail",
+    sourceLabel: "Source",
+    categoryLabel: "Category",
+    subcategoryLabel: "Subcategory",
+    noSubcategory: "No subcategory",
+    noCategories: "Create a category before adding manual movements.",
+    cancelButton: "Cancel",
+    createButton: "Add",
+    invalidAmount: "Enter a valid amount.",
+    requiredFields: "Complete date, amount, description, detail, and category.",
+    saveError: "The movement could not be added.",
   },
   editor: {
     ...es.editor,
