@@ -15,6 +15,13 @@ export const es = {
     settings: "Categorías",
     budgets: "Budgets",
   },
+  topActions: {
+    loadTooltip: "Cargar movimientos",
+    addManualTooltip: "Agregar movimiento manual",
+    reviewPendingTooltip: (count: number) =>
+      `${count} ${count === 1 ? "movimiento pendiente" : "movimientos pendientes"} por revisar`,
+    reviewCompleteTooltip: "Todos los movimientos están revisados",
+  },
   views: {
     loadEyebrow: "Carga de movimientos",
     dashboardEyebrow: "Vista general",
@@ -105,6 +112,24 @@ export const es = {
     deleteConfirm:
       "¿Eliminar este movimiento? Esta acción no se puede deshacer.",
   },
+  manualMovement: {
+    title: "Agregar movimiento manual",
+    dateLabel: "Fecha",
+    amountLabel: "Monto",
+    businessLabel: "Comercio o descripción",
+    reasonLabel: "Detalle",
+    sourceLabel: "Fuente",
+    categoryLabel: "Categoría",
+    subcategoryLabel: "Subcategoría",
+    noSubcategory: "Sin subcategoría",
+    noCategories:
+      "Primero crea una categoría para poder agregar movimientos manuales.",
+    cancelButton: "Cancelar",
+    createButton: "Agregar",
+    invalidAmount: "Ingresa un monto válido.",
+    requiredFields: "Completa fecha, monto, descripción, detalle y categoría.",
+    saveError: "No se pudo agregar el movimiento.",
+  },
   review: {
     nothingTitle: "No hay movimientos para revisar.",
     nothingHint: "Prueba con otro filtro o vuelve al dashboard.",
@@ -119,6 +144,8 @@ export const es = {
     datesEyebrow: "Fechas",
     originalDescription: "Descripción original",
     confirmAndContinue: "Confirmar y seguir",
+    remainingLabel: (count: number) =>
+      `${count} ${count === 1 ? "restante" : "restantes"}`,
     amountLabel: "Monto",
     categoryLabel: "Categoría",
     subcategoryLabel: "Subcategoría",

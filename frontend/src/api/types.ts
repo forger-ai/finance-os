@@ -44,6 +44,22 @@ export type MovementRead = {
   subcategory_name: string | null;
 };
 
+export type MovementCreate = {
+  date: string;
+  accounting_date?: string | null;
+  amount: number;
+  business: string;
+  reason: string;
+  source: MovementSource;
+  raw_description?: string | null;
+  source_file?: string | null;
+  external_id?: string | null;
+  source_row?: string | null;
+  reviewed: boolean;
+  category_id: string;
+  subcategory_id?: string | null;
+};
+
 export type CategoryBudgetRead = {
   id: string;
   budget_id: string;
