@@ -1,0 +1,65 @@
+[
+  {
+    "code": "CLP",
+    "name": "Chilean peso",
+    "symbol": "$",
+    "locale": "es-CL",
+    "decimal_places": 0
+  },
+  {
+    "code": "USD",
+    "name": "US dollar",
+    "symbol": "$",
+    "locale": "en-US",
+    "decimal_places": 2
+  },
+  {
+    "code": "EUR",
+    "name": "Euro",
+    "symbol": "€",
+    "locale": "de-DE",
+    "decimal_places": 2
+  },
+  {
+    "code": "ARS",
+    "name": "Argentine peso",
+    "symbol": "$",
+    "locale": "es-AR",
+    "decimal_places": 2
+  },
+  {
+    "code": "BRL",
+    "name": "Brazilian real",
+    "symbol": "R$",
+    "locale": "pt-BR",
+    "decimal_places": 2
+  },
+  {
+    "code": "MXN",
+    "name": "Mexican peso",
+    "symbol": "$",
+    "locale": "es-MX",
+    "decimal_places": 2
+  },
+  {
+    "code": "COP",
+    "name": "Colombian peso",
+    "symbol": "$",
+    "locale": "es-CO",
+    "decimal_places": 0
+  },
+  {
+    "code": "PEN",
+    "name": "Peruvian sol",
+    "symbol": "S/",
+    "locale": "es-PE",
+    "decimal_places": 2
+  },
+  {
+    "code": "UYU",
+    "name": "Uruguayan peso",
+    "symbol": "$",
+    "locale": "es-UY",
+    "decimal_places": 2
+  }
+]

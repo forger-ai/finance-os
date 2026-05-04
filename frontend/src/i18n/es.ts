@@ -12,7 +12,8 @@ export const es = {
     dashboard: "Dashboard",
     movements: "Movimientos",
     review: "Revisión",
-    settings: "Categorías",
+    categories: "Categorías",
+    settings: "Configuración",
     budgets: "Budgets",
   },
   topActions: {
@@ -27,8 +28,10 @@ export const es = {
     dashboardEyebrow: "Vista general",
     movementsEyebrow: "Explorador",
     reviewEyebrow: "Cola de revisión",
-    settingsEyebrow: "Categorías",
-    settingsTitle: "Categorías",
+    categoriesEyebrow: "Categorías",
+    categoriesTitle: "Categorías",
+    settingsEyebrow: "Preferencias",
+    settingsTitle: "Configuración",
     budgetsEyebrow: "Presupuestos",
     budgetsTitle: "Budgets",
     settingsAdministration: "Administración",
@@ -249,6 +252,16 @@ export const es = {
     privacy:
       "Tus datos financieros se guardan localmente en tu computador. Solo los archivos o datos que elijas procesar con IA se envían al asistente para esa tarea.",
     confirmButton: "Entendido",
+  },
+  appSettings: {
+    moneyFormatTitle: "Formato de montos",
+    moneyFormatHint:
+      "Esta preferencia define cómo se muestran y editan los montos en Finance OS.",
+    visualOnlyHint:
+      "Es solo visual: no convierte montos ni cambia la moneda real de los datos.",
+    formatMovementsAsLabel: "Formatear movimientos como",
+    decimalCount: (count: number) =>
+      `${count} ${count === 1 ? "decimal" : "decimales"}`,
   },
   editor: {
     dateLabel: "Fecha",

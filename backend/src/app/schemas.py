@@ -189,6 +189,28 @@ class MovementCreate(_Base):
     subcategory_id: str | None = None
 
 
+# --------------------------------------------------------------------------- settings
+
+
+class CurrencyFormatRead(_Base):
+    code: str
+    name: str
+    symbol: str
+    locale: str
+    decimal_places: int
+
+
+class SettingsRead(_Base):
+    primary_currency_code: str
+    configured_currency_codes: list[str] = Field(default_factory=list)
+    primary_currency_format: CurrencyFormatRead
+    currency_formats: list[CurrencyFormatRead] = Field(default_factory=list)
+
+
+class SettingsUpdate(_Base):
+    primary_currency_code: str | None = None
+
+
 # --------------------------------------------------------------------------- summary
 
 

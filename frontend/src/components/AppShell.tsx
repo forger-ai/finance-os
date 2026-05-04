@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
+import CategoryRounded from "@mui/icons-material/CategoryRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import DashboardRounded from "@mui/icons-material/DashboardRounded";
 import FileUploadRounded from "@mui/icons-material/FileUploadRounded";
@@ -30,6 +31,7 @@ export type ViewMode =
   | "dashboard"
   | "movements"
   | "review"
+  | "categories"
   | "settings"
   | "budgets";
 
@@ -207,6 +209,18 @@ export function AppShell({
                 />
               </ListItemIcon>
               <ListItemText primary={es.nav.budgets} />
+            </ListItemButton>
+            <ListItemButton
+              selected={viewMode === "categories"}
+              sx={{ borderRadius: 1.5, mt: 0.5 }}
+              onClick={() => onViewChange("categories")}
+            >
+              <ListItemIcon sx={{ minWidth: 38 }}>
+                <CategoryRounded
+                  color={viewMode === "categories" ? "primary" : "inherit"}
+                />
+              </ListItemIcon>
+              <ListItemText primary={es.nav.categories} />
             </ListItemButton>
           </List>
 

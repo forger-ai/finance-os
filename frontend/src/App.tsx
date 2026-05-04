@@ -19,6 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { AppShell, type ViewMode } from "@/components/AppShell";
+import { AppSettingsView } from "@/components/AppSettingsView";
 import { DashboardView } from "@/components/DashboardView";
 import { MovementsTable } from "@/components/MovementsTable";
 import { MovementsUploader } from "@/components/MovementsUploader";
@@ -28,6 +29,7 @@ import { BudgetView } from "@/components/BudgetView";
 import { createCategory, createSubcategory, listCategories } from "@/api/categories";
 import { listBudgets } from "@/api/budgets";
 import { createMovement, listMovements } from "@/api/movements";
+import { listSettings, updateSettings } from "@/api/settings";
 import {
   previousClassificationsFor,
   type CategoryOption,
@@ -37,14 +39,26 @@ import {
   toMovementRows,
   toSettingsCategories,
 } from "@/lib/derive";
-import type { BudgetRead, CategoryRead, MovementRead } from "@/api/types";
+import type {
+  BudgetRead,
+  CategoryRead,
+  CurrencyFormatRead,
+  MovementRead,
+  SettingsRead,
+} from "@/api/types";
 import { ApiError } from "@/api/utils";
 import { useI18n } from "@/i18n";
+import {
+  DEFAULT_CURRENCY_FORMAT,
+  formatMoneyDraft,
+  parseMoneyInput,
+} from "@/lib/format";
 
 type AppData = {
   categories: CategoryRead[];
   budgets: BudgetRead[];
   movements: MovementRead[];
+  settings: SettingsRead;
 };
 
 const ONBOARDING_SKIP_STORAGE_KEY = "finance-os:onboarding-skipped";
@@ -154,24 +168,15 @@ function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function formatAmountInput(value: string): string {
-  const digits = value.replace(/\D/g, "");
-  if (!digits) return "";
-  return Number(digits).toLocaleString("es-CL");
-}
-
-function parseAmountInput(value: string): number {
-  const digits = value.replace(/\D/g, "");
-  return digits ? Number(digits) : Number.NaN;
-}
-
 function ManualMovementDialog({
   categories,
+  currencyFormat,
   open,
   onClose,
   onCreated,
 }: {
   categories: CategoryOption[];
+  currencyFormat: CurrencyFormatRead;
   open: boolean;
   onClose: () => void;
   onCreated: () => Promise<void>;
@@ -211,7 +216,7 @@ function ManualMovementDialog({
   };
 
   const handleSubmit = async () => {
-    const parsedAmount = parseAmountInput(amount);
+    const parsedAmount = parseMoneyInput(amount, currencyFormat);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       setErrorMessage(es.manualMovement.invalidAmount);
       return;
@@ -273,7 +278,9 @@ function ManualMovementDialog({
             inputMode="numeric"
             label={es.manualMovement.amountLabel}
             value={amount}
-            onChange={(event) => setAmount(formatAmountInput(event.target.value))}
+            onChange={(event) =>
+              setAmount(formatMoneyDraft(event.target.value, currencyFormat))
+            }
           />
           <TextField
             fullWidth
@@ -364,6 +371,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<ViewMode>("dashboard");
   const [manualMovementOpen, setManualMovementOpen] = useState(false);
+  const [onboardingCurrencyCode, setOnboardingCurrencyCode] = useState("CLP");
   const [selectedPresetId, setSelectedPresetId] = useState<CategoryPresetId | null>(
     () => {
       const value = localStorage.getItem(ONBOARDING_PRESET_STORAGE_KEY);
@@ -377,12 +385,13 @@ export default function App() {
   const reload = useCallback(async () => {
     setError(null);
     try {
-      const [categories, budgets, movements] = await Promise.all([
+      const [categories, budgets, movements, settings] = await Promise.all([
         listCategories(),
         listBudgets(),
         listMovements(),
+        listSettings(),
       ]);
-      setData({ budgets, categories, movements });
+      setData({ budgets, categories, movements, settings });
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -399,6 +408,12 @@ export default function App() {
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  useEffect(() => {
+    if (data?.settings.primary_currency_code) {
+      setOnboardingCurrencyCode(data.settings.primary_currency_code);
+    }
+  }, [data?.settings.primary_currency_code]);
 
   const handleMovementChange = useCallback((updated: MovementRead) => {
     setData((current) =>
@@ -454,6 +469,7 @@ export default function App() {
       setError(null);
       try {
         const preset = CATEGORY_PRESETS[presetId];
+        await updateSettings({ primaryCurrencyCode: onboardingCurrencyCode });
         await createPresetCategories(preset);
         localStorage.setItem(ONBOARDING_PRESET_STORAGE_KEY, presetId);
         setSelectedPresetId(presetId);
@@ -466,7 +482,7 @@ export default function App() {
         }
       }
     },
-    [es.errors.generic, reload],
+    [es.errors.generic, onboardingCurrencyCode, reload],
   );
 
   const categoryOptions = useMemo<CategoryOption[]>(
@@ -480,7 +496,13 @@ export default function App() {
   );
 
   const movementRows = useMemo<MovementRow[]>(
-    () => (data ? toMovementRows(data.movements) : []),
+    () =>
+      data
+        ? toMovementRows(
+            data.movements,
+            data.settings.primary_currency_format,
+          )
+        : [],
     [data],
   );
 
@@ -508,6 +530,7 @@ export default function App() {
       ? CATEGORY_PRESETS[selectedPresetId]
       : null;
   const showCategoryPresetPicker = !hasCategories;
+  const currencyFormat = data?.settings.primary_currency_format ?? DEFAULT_CURRENCY_FORMAT;
   const onboardingUserNote = selectedPreset
     ? categoryPresetUserNote(selectedPreset)
     : "";
@@ -550,6 +573,27 @@ export default function App() {
           </Box>
           {showCategoryPresetPicker ? (
             <Stack spacing={2} sx={{ width: "min(100%, 900px)" }}>
+              <FormControl fullWidth sx={{ maxWidth: 420, alignSelf: "center" }}>
+                <InputLabel>{es.appSettings.formatMovementsAsLabel}</InputLabel>
+                <Select
+                  label={es.appSettings.formatMovementsAsLabel}
+                  value={onboardingCurrencyCode}
+                  onChange={(event) => setOnboardingCurrencyCode(event.target.value)}
+                >
+                  {(data?.settings.currency_formats ?? []).map((format) => (
+                    <MenuItem key={format.code} value={format.code}>
+                      {format.code} - {format.name} ({format.symbol},{" "}
+                      {es.appSettings.decimalCount(format.decimal_places)})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Typography
+                color="text.secondary"
+                sx={{ textAlign: "center", fontSize: 13 }}
+              >
+                {es.appSettings.visualOnlyHint}
+              </Typography>
               <Typography sx={{ fontSize: 22, fontWeight: 800, textAlign: "center" }}>
                 {es.onboarding.presetQuestion}
               </Typography>
@@ -650,11 +694,13 @@ export default function App() {
                   ? es.views.loadEyebrow
                   : viewMode === "movements"
                   ? es.views.movementsEyebrow
-                  : viewMode === "review"
+                : viewMode === "review"
                     ? es.views.reviewEyebrow
                     : viewMode === "budgets"
                       ? es.views.budgetsEyebrow
-                      : es.views.settingsEyebrow}
+                      : viewMode === "categories"
+                        ? es.views.categoriesEyebrow
+                        : es.views.settingsEyebrow}
             </Typography>
             <Typography
               sx={{
@@ -670,16 +716,22 @@ export default function App() {
                   ? es.load.title
                   : viewMode === "movements"
                   ? es.nav.movements
-                  : viewMode === "review"
+                : viewMode === "review"
                     ? es.nav.review
                     : viewMode === "budgets"
                       ? es.views.budgetsTitle
-                      : es.views.settingsTitle}
+                      : viewMode === "categories"
+                        ? es.views.categoriesTitle
+                        : es.views.settingsTitle}
             </Typography>
           </Box>
 
           {viewMode === "dashboard" ? (
-            <DashboardView budgets={data?.budgets ?? []} movements={movementRows} />
+            <DashboardView
+              budgets={data?.budgets ?? []}
+              currencyFormat={currencyFormat}
+              movements={movementRows}
+            />
           ) : viewMode === "load" ? (
             <MovementsUploader
               templateId={firstRunEmpty ? FIRST_RUN_IMPORT_TEMPLATE_ID : undefined}
@@ -690,11 +742,12 @@ export default function App() {
           ) : viewMode === "movements" ? (
             <MovementsTable
               categories={categoryOptions}
+              currencyFormat={currencyFormat}
               movements={movementRows}
               onMovementChange={handleMovementChange}
               onMovementDelete={handleMovementDelete}
             />
-          ) : viewMode === "settings" ? (
+          ) : viewMode === "categories" ? (
             <SettingsView
               categories={settingsCategories}
               onChanged={() => reload()}
@@ -703,12 +756,26 @@ export default function App() {
             <BudgetView
               budgets={data?.budgets ?? []}
               categories={categoryOptions}
+              currencyFormat={currencyFormat}
               onChanged={() => reload()}
             />
+          ) : viewMode === "settings" ? (
+            data ? (
+              <AppSettingsView
+                settings={data.settings}
+                onChanged={async (settings) => {
+                  setData((current) =>
+                    current === null ? current : { ...current, settings },
+                  );
+                  await reload();
+                }}
+              />
+            ) : null
           ) : (
             <Box sx={{ width: "min(100%, 760px)" }}>
               <ReviewCard
                 categories={categoryOptions}
+                currencyFormat={currencyFormat}
                 movement={activeReviewMovement}
                 previousClassifications={activePreviousClassifications}
                 remaining={reviewQueue.length}
@@ -722,6 +789,7 @@ export default function App() {
       </AppShell>
       <ManualMovementDialog
         categories={categoryOptions}
+        currencyFormat={currencyFormat}
         open={manualMovementOpen}
         onClose={() => setManualMovementOpen(false)}
         onCreated={() => reload()}

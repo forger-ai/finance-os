@@ -1,8 +1,19 @@
 {
   "name": "finance-os",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.16",
+      "summary": "Adds visual amount-format preferences and settings for agents.",
+      "changes": [
+        "Adds a global visual setting for formatting movements as CLP, USD, EUR, and common Latin American currencies.",
+        "Adds HTTP and MCP settings access so the app UI and agents use the same amount-format preference.",
+        "Moves category management into its own navigation item and adds a real settings view.",
+        "Updates dashboard, movements, review, manual entry, and budgets to format amounts with the selected visual format.",
+        "Improves amount inputs so edits are kept as drafts and saved on blur, Enter, or the form action instead of changing while typing."
+      ]
+    },
     {
       "version": "0.1.15",
       "summary": "Improves movement loading, manual entry, and first-run onboarding.",

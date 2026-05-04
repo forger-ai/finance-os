@@ -22,6 +22,7 @@ from app.schemas import (
     CategoryUpdate,
     MovementCreate,
     MovementUpdate,
+    SettingsUpdate,
     SubcategoryBudgetCreate,
     SubcategoryBudgetUpdate,
     SubcategoryCreate,
@@ -33,6 +34,7 @@ from app.services.import_movements import (
     import_movements_structured,
 )
 from app.services.integrity import find_classification_mismatches
+from app.services.settings import settings_payload, update_primary_currency_code
 from app.utils import normalize_key
 
 registry = ToolRegistry()
@@ -49,6 +51,48 @@ def _require_string(args: dict[str, Any], name: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ToolError(f"{name} is required", code="invalid_input")
     return value.strip()
+
+
+@registry.tool(
+    "get_settings",
+    (
+        "Read Finance OS preferences. The primary_currency_code is a visual "
+        "formatting preference for displaying and parsing amounts; it does not "
+        "convert money or define a per-movement currency."
+    ),
+)
+def get_settings(_args: dict[str, Any]) -> dict[str, Any]:
+    init_app_db()
+    with Session(engine) as session:
+        return {"success": True, "settings": settings_payload(session)}
+
+
+@registry.tool(
+    "update_settings",
+    (
+        "Update Finance OS preferences. primary_currency_code controls visual "
+        "amount formatting only; it does not convert existing amounts."
+    ),
+    {
+        "type": "object",
+        "properties": {
+            "primary_currency_code": {"type": "string"},
+        },
+        "required": ["primary_currency_code"],
+        "additionalProperties": False,
+    },
+)
+def update_settings(args: dict[str, Any]) -> dict[str, Any]:
+    init_app_db()
+    payload = SettingsUpdate(**args)
+    if payload.primary_currency_code is None:
+        raise ToolError("primary_currency_code is required", code="invalid_input")
+    with Session(engine) as session:
+        try:
+            update_primary_currency_code(session, payload.primary_currency_code)
+        except ValueError as exc:
+            raise ToolError(str(exc), code="invalid_input") from exc
+        return {"success": True, "settings": settings_payload(session)}
 
 
 @registry.tool(
