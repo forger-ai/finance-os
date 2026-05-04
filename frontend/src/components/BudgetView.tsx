@@ -29,8 +29,13 @@ import {
   updateCategoryBudgetRow,
   updateSubcategoryBudgetRow,
 } from "@/api/budgets";
-import type { BudgetRead } from "@/api/types";
+import type { BudgetRead, CurrencyFormatRead } from "@/api/types";
 import type { CategoryOption } from "@/lib/derive";
+import {
+  formatMoneyDraft,
+  formatMoneyValueForInput,
+  parseMoneyInput,
+} from "@/lib/format";
 import { useI18n, useLocale } from "@/i18n";
 
 const RECOMMEND_BUDGET_TEMPLATE_ID = "recommend_budget";
@@ -45,19 +50,6 @@ type ProgressMessage = {
   id: string;
   text: string;
 };
-
-function parseAmount(value: string): number | null {
-  const normalized = value.trim().replace(/\./g, "").replace(/\s/g, "").replace(",", ".");
-  if (!normalized) return null;
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function formatAmountInput(value: string): string {
-  const digits = value.replace(/\D/g, "");
-  if (!digits) return "";
-  return Number(digits).toLocaleString("es-CL");
-}
 
 function localizeAssistantName(text: string, assistantName: string): string {
   return text.replace(/\b(Codex|The assistant|El asistente)\b/gi, assistantName);
@@ -94,10 +86,12 @@ async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> 
 export function BudgetView({
   budgets,
   categories,
+  currencyFormat,
   onChanged,
 }: {
   budgets: BudgetRead[];
   categories: CategoryOption[];
+  currencyFormat: CurrencyFormatRead;
   onChanged: () => Promise<void> | void;
 }) {
   const es = useI18n();
@@ -157,8 +151,8 @@ export function BudgetView({
 
   const runAddCategoryBudget = async () => {
     if (!selectedBudget || !targetCategoryId) return;
-    const parsed = parseAmount(categoryAmount);
-    if (parsed == null) return;
+    const parsed = parseMoneyInput(categoryAmount, currencyFormat);
+    if (!Number.isFinite(parsed) || parsed < 0) return;
     await createCategoryBudget({
       budgetId: selectedBudget.id,
       categoryId: targetCategoryId,
@@ -170,8 +164,8 @@ export function BudgetView({
 
   const runAddSubcategoryBudget = async () => {
     if (!selectedBudget || !targetSubcategoryId) return;
-    const parsed = parseAmount(subcategoryAmount);
-    if (parsed == null) return;
+    const parsed = parseMoneyInput(subcategoryAmount, currencyFormat);
+    if (!Number.isFinite(parsed) || parsed < 0) return;
     await createSubcategoryBudget({
       budgetId: selectedBudget.id,
       subcategoryId: targetSubcategoryId,
@@ -338,7 +332,9 @@ export function BudgetView({
               size="small"
               value={expectedIncome}
               onChange={(event) =>
-                setExpectedIncome(formatAmountInput(event.target.value))
+                setExpectedIncome(
+                  formatMoneyDraft(event.target.value, currencyFormat),
+                )
               }
             />
             <Button
@@ -418,7 +414,9 @@ export function BudgetView({
               size="small"
               value={categoryAmount}
               onChange={(event) =>
-                setCategoryAmount(formatAmountInput(event.target.value))
+                setCategoryAmount(
+                  formatMoneyDraft(event.target.value, currencyFormat),
+                )
               }
             />
             <Button
@@ -433,6 +431,7 @@ export function BudgetView({
               key={row.id}
               label={row.category_name}
               amount={row.amount}
+              currencyFormat={currencyFormat}
               onAmountChange={(nextAmount) =>
                 updateCategoryBudgetRow({
                   amount: nextAmount,
@@ -475,7 +474,9 @@ export function BudgetView({
               size="small"
               value={subcategoryAmount}
               onChange={(event) =>
-                setSubcategoryAmount(formatAmountInput(event.target.value))
+                setSubcategoryAmount(
+                  formatMoneyDraft(event.target.value, currencyFormat),
+                )
               }
             />
             <Button
@@ -490,6 +491,7 @@ export function BudgetView({
               key={row.id}
               label={`${row.category_name} / ${row.subcategory_name}`}
               amount={row.amount}
+              currencyFormat={currencyFormat}
               onAmountChange={(nextAmount) =>
                 updateSubcategoryBudgetRow({
                   amount: nextAmount,
@@ -561,44 +563,45 @@ function BudgetCreateForm({
 function BudgetRow({
   label,
   amount,
+  currencyFormat,
   onAmountChange,
   onDelete,
 }: {
   label: string;
   amount: number;
+  currencyFormat: CurrencyFormatRead;
   onAmountChange: (amount: number) => Promise<unknown>;
   onDelete: () => void;
 }) {
   const es = useI18n();
-  const [draft, setDraft] = useState(formatAmountInput(String(amount)));
+  const [draft, setDraft] = useState(
+    formatMoneyValueForInput(amount, currencyFormat),
+  );
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "saved" | "invalid" | "error"
   >("idle");
 
   useEffect(() => {
-    setDraft(formatAmountInput(String(amount)));
-  }, [amount]);
+    setDraft(formatMoneyValueForInput(amount, currencyFormat));
+  }, [amount, currencyFormat]);
 
-  useEffect(() => {
-    const parsed = parseAmount(draft);
-    if (draft.trim() === "" || parsed == null || parsed < 0) {
-      setSaveState(draft.trim() === "" ? "idle" : "invalid");
+  const commitDraft = () => {
+    const parsed = parseMoneyInput(draft, currencyFormat);
+    if (draft.trim() === "" || !Number.isFinite(parsed) || parsed < 0) {
+      setSaveState("invalid");
       return;
     }
     if (parsed === amount) {
+      setDraft(formatMoneyValueForInput(amount, currencyFormat));
       setSaveState("idle");
       return;
     }
 
     setSaveState("saving");
-    const timeout = window.setTimeout(() => {
-      void onAmountChange(parsed)
-        .then(() => setSaveState("saved"))
-        .catch(() => setSaveState("error"));
-    }, 600);
-
-    return () => window.clearTimeout(timeout);
-  }, [amount, draft, onAmountChange]);
+    void onAmountChange(parsed)
+      .then(() => setSaveState("saved"))
+      .catch(() => setSaveState("error"));
+  };
 
   const saveStateLabel =
     saveState === "saving"
@@ -632,7 +635,14 @@ function BudgetRow({
           size="small"
           sx={{ width: { xs: "100%", sm: 180 } }}
           value={draft}
-          onChange={(event) => setDraft(formatAmountInput(event.target.value))}
+          onBlur={commitDraft}
+          onChange={(event) => {
+            setDraft(formatMoneyDraft(event.target.value, currencyFormat));
+            setSaveState("idle");
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") commitDraft();
+          }}
         />
         {saveStateLabel ? (
           <Typography

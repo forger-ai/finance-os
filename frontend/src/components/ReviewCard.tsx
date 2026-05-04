@@ -16,11 +16,12 @@ import {
   type MovementRow,
 } from "./ClassificationEditor";
 import type { PreviousClassificationEntry } from "@/lib/derive";
-import type { MovementRead } from "@/api/types";
+import type { CurrencyFormatRead, MovementRead } from "@/api/types";
 import { useI18n } from "@/i18n";
 
 export function ReviewCard({
   categories,
+  currencyFormat,
   movement,
   previousClassifications,
   remaining,
@@ -29,6 +30,7 @@ export function ReviewCard({
   onMovementChange,
 }: {
   categories: CategoryOption[];
+  currencyFormat: CurrencyFormatRead;
   movement: MovementRow | null;
   previousClassifications: PreviousClassificationEntry[];
   remaining: number;
@@ -140,6 +142,7 @@ export function ReviewCard({
 
         <ClassificationEditor
           categories={categories}
+          currencyFormat={currencyFormat}
           movement={movement}
           reviewLayout
           showAmount

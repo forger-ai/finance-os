@@ -60,6 +60,21 @@ export type MovementCreate = {
   subcategory_id?: string | null;
 };
 
+export type CurrencyFormatRead = {
+  code: string;
+  name: string;
+  symbol: string;
+  locale: string;
+  decimal_places: number;
+};
+
+export type SettingsRead = {
+  primary_currency_code: string;
+  configured_currency_codes: string[];
+  primary_currency_format: CurrencyFormatRead;
+  currency_formats: CurrencyFormatRead[];
+};
+
 export type CategoryBudgetRead = {
   id: string;
   budget_id: string;

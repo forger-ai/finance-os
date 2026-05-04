@@ -19,12 +19,12 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import { DashboardMetrics } from "./DashboardMetrics";
-import type { BudgetRead } from "@/api/types";
+import type { BudgetRead, CurrencyFormatRead } from "@/api/types";
 import type { MovementRow } from "@/lib/derive";
 import {
-  formatCompactCurrency,
-  formatCurrency,
+  formatCompactMoney,
   formatMonthLabel,
+  formatMoney,
 } from "@/lib/format";
 import { useI18n, useLocale } from "@/i18n";
 
@@ -102,6 +102,7 @@ function BudgetProgressRow({
   active,
   budget,
   copy,
+  currencyFormat,
   maxValue,
   name,
   onSelect,
@@ -112,6 +113,7 @@ function BudgetProgressRow({
   copy: {
     spentLabel: (amount: string) => string;
   };
+  currencyFormat: CurrencyFormatRead;
   maxValue: number;
   name: string;
   onSelect: () => void;
@@ -160,7 +162,7 @@ function BudgetProgressRow({
             {name}
           </Typography>
           <Typography color="text.secondary" sx={{ mt: 0.25, fontSize: 12 }}>
-            {copy.spentLabel(formatCurrency(spent))}
+            {copy.spentLabel(formatMoney(spent, currencyFormat))}
           </Typography>
         </Box>
       </Stack>
@@ -180,7 +182,7 @@ function BudgetProgressRow({
             whiteSpace: "nowrap",
           }}
         >
-          {formatCompactCurrency(budget)}
+          {formatCompactMoney(budget, currencyFormat)}
         </Typography>
         <Box
           sx={{
@@ -224,9 +226,11 @@ function BudgetProgressRow({
 
 export function DashboardView({
   budgets,
+  currencyFormat,
   movements,
 }: {
   budgets: BudgetRead[];
+  currencyFormat: CurrencyFormatRead;
   movements: MovementRow[];
 }) {
   const theme = useTheme();
@@ -303,13 +307,13 @@ export function DashboardView({
 
     const balanceValue = totalIncome - totalSpent - totalSaved;
     return {
-      balance: `${balanceValue >= 0 ? "+" : ""}${formatCurrency(balanceValue)}`,
+      balance: `${balanceValue >= 0 ? "+" : ""}${formatMoney(balanceValue, currencyFormat)}`,
       balanceValue,
-      totalIncome: formatCurrency(totalIncome),
-      totalSaved: formatCurrency(totalSaved),
-      totalSpent: formatCurrency(totalSpent),
+      totalIncome: formatMoney(totalIncome, currencyFormat),
+      totalSaved: formatMoney(totalSaved, currencyFormat),
+      totalSpent: formatMoney(totalSpent, currencyFormat),
     };
-  }, [monthlyExpenses, monthlyMovements, monthlySavings]);
+  }, [currencyFormat, monthlyExpenses, monthlyMovements, monthlySavings]);
 
   const pieMovements = useMemo(() => {
     if (activeFilter?.type !== "category") {
@@ -558,6 +562,7 @@ export function DashboardView({
                 }
                 budget={item.budget}
                 copy={t.dashboard}
+                currencyFormat={currencyFormat}
                 maxValue={maxBudgetValue}
                 name={item.name}
                 onSelect={() =>
@@ -709,7 +714,7 @@ export function DashboardView({
                     color="text.secondary"
                     sx={{ fontSize: 13, fontWeight: 600 }}
                   >
-                    {formatCurrency(item.signedValue)}
+                    {formatMoney(item.signedValue, currencyFormat)}
                   </Typography>
                 </Stack>
               ))}

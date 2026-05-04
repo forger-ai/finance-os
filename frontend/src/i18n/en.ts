@@ -12,7 +12,8 @@ export const en: Dictionary = {
     dashboard: "Dashboard",
     movements: "Movements",
     review: "Review",
-    settings: "Categories",
+    categories: "Categories",
+    settings: "Settings",
     budgets: "Budgets",
   },
   topActions: {
@@ -28,8 +29,10 @@ export const en: Dictionary = {
     dashboardEyebrow: "Overview",
     movementsEyebrow: "Explorer",
     reviewEyebrow: "Review queue",
-    settingsEyebrow: "Categories",
-    settingsTitle: "Categories",
+    categoriesEyebrow: "Categories",
+    categoriesTitle: "Categories",
+    settingsEyebrow: "Preferences",
+    settingsTitle: "Settings",
     budgetsEyebrow: "Budgets",
     budgetsTitle: "Budgets",
   },
@@ -256,6 +259,16 @@ export const en: Dictionary = {
     invalidAmount: "Enter a valid amount.",
     requiredFields: "Complete date, amount, description, detail, and category.",
     saveError: "The movement could not be added.",
+  },
+  appSettings: {
+    moneyFormatTitle: "Amount format",
+    moneyFormatHint:
+      "This preference defines how Finance OS displays and edits amounts.",
+    visualOnlyHint:
+      "This is visual only: it does not convert amounts or change the real currency of the data.",
+    formatMovementsAsLabel: "Format movements as",
+    decimalCount: (count: number) =>
+      `${count} ${count === 1 ? "decimal" : "decimals"}`,
   },
   editor: {
     ...es.editor,

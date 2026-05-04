@@ -36,13 +36,14 @@ import {
   deleteMovement,
   updateMovementReviewed,
 } from "@/api/movements";
-import type { MovementRead } from "@/api/types";
+import type { CurrencyFormatRead, MovementRead } from "@/api/types";
 import { isoDateOnly } from "@/api/utils";
 import { es } from "@/i18n/es";
 import { toMovementRow } from "@/lib/derive";
 
 type Props = {
   categories: CategoryOption[];
+  currencyFormat: CurrencyFormatRead;
   movements: MovementRow[];
   onMovementChange: (movement: MovementRead) => void;
   onMovementDelete: (movementId: string) => void;
@@ -223,6 +224,7 @@ function MovementsFilters({
 
 export function MovementsTable({
   categories,
+  currencyFormat,
   movements,
   onMovementChange,
   onMovementDelete,
@@ -541,11 +543,12 @@ export function MovementsTable({
               </Box>
               <ClassificationEditor
                 categories={categories}
+                currencyFormat={currencyFormat}
                 movement={editingMovement}
                 showAmount
                 onChange={(updated) => {
                   onMovementChange(updated);
-                  setEditingMovement(toMovementRow(updated));
+                  setEditingMovement(toMovementRow(updated, currencyFormat));
                 }}
               />
             </Stack>

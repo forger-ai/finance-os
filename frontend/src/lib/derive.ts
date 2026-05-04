@@ -6,10 +6,11 @@
 
 import type {
   CategoryRead,
+  CurrencyFormatRead,
   MovementRead,
   SummaryRead,
 } from "@/api/types";
-import { formatCurrency, formatDate } from "./format";
+import { DEFAULT_CURRENCY_FORMAT, formatDate, formatMoney } from "./format";
 
 export type CategoryOption = {
   id: string;
@@ -75,17 +76,23 @@ export function toSettingsCategories(
   }));
 }
 
-export function toMovementRow(movement: MovementRead): MovementRow {
+export function toMovementRow(
+  movement: MovementRead,
+  currencyFormat: CurrencyFormatRead = DEFAULT_CURRENCY_FORMAT,
+): MovementRow {
   return {
     ...movement,
     dateLabel: formatDate(movement.date),
     accountingDateLabel: formatDate(movement.accounting_date),
-    amountLabel: formatCurrency(movement.amount),
+    amountLabel: formatMoney(movement.amount, currencyFormat),
   };
 }
 
-export function toMovementRows(movements: MovementRead[]): MovementRow[] {
-  return movements.map(toMovementRow);
+export function toMovementRows(
+  movements: MovementRead[],
+  currencyFormat: CurrencyFormatRead = DEFAULT_CURRENCY_FORMAT,
+): MovementRow[] {
+  return movements.map((movement) => toMovementRow(movement, currencyFormat));
 }
 
 export type ClassificationMemoryEntry = {

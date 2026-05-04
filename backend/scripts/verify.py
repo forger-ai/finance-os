@@ -63,6 +63,47 @@ def smoke_test() -> bool:
             print(f"  FAILED: unexpected body {body}")
             return False
 
+        response = client.get("/api/settings")
+        if response.status_code != 200:
+            print(f"  FAILED: settings expected 200, got {response.status_code}")
+            print(f"  body: {response.text}")
+            return False
+        body = response.json()
+        if not body.get("primary_currency_format") or not body.get("currency_formats"):
+            print(f"  FAILED: incomplete settings body {body}")
+            return False
+
+        response = client.patch("/api/settings", json={"primary_currency_code": "USD"})
+        if response.status_code != 200:
+            print(f"  FAILED: settings update expected 200, got {response.status_code}")
+            print(f"  body: {response.text}")
+            return False
+        body = response.json()
+        if body.get("primary_currency_code") != "USD":
+            print(f"  FAILED: unexpected updated settings body {body}")
+            return False
+
+        response = client.patch("/api/settings", json={"primary_currency_code": "XXX"})
+        if response.status_code != 400:
+            print(f"  FAILED: invalid settings expected 400, got {response.status_code}")
+            print(f"  body: {response.text}")
+            return False
+
+        try:
+            from app.mcp_server import get_settings, update_settings
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAILED to import MCP settings tools: {exc}")
+            return False
+
+        mcp_body = get_settings({})
+        if mcp_body.get("settings", {}).get("primary_currency_code") != "USD":
+            print(f"  FAILED: unexpected MCP settings body {mcp_body}")
+            return False
+        mcp_body = update_settings({"primary_currency_code": "CLP"})
+        if mcp_body.get("settings", {}).get("primary_currency_code") != "CLP":
+            print(f"  FAILED: unexpected MCP update body {mcp_body}")
+            return False
+
         suffix = uuid4().hex[:8]
         now = datetime.now(timezone.utc)
         with Session(engine) as session:

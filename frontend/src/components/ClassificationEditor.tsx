@@ -25,10 +25,16 @@ import {
   updateMovementSubcategory,
 } from "@/api/movements";
 import { ApiError } from "@/api/utils";
-import type { MovementRead } from "@/api/types";
+import type { CurrencyFormatRead, MovementRead } from "@/api/types";
 import type { CategoryOption, MovementRow } from "@/lib/derive";
 import { isoDateOnly } from "@/api/utils";
 import { useI18n } from "@/i18n";
+import {
+  DEFAULT_CURRENCY_FORMAT,
+  formatMoneyDraft,
+  formatMoneyValueForInput,
+  parseMoneyInput,
+} from "@/lib/format";
 
 export type { CategoryOption, MovementRow } from "@/lib/derive";
 
@@ -53,6 +59,7 @@ type Props = {
   dense?: boolean;
   reviewLayout?: boolean;
   showAmount?: boolean;
+  currencyFormat?: CurrencyFormatRead;
   onChange: (movement: MovementRead) => void;
   onCategoriesChanged?: () => Promise<void> | void;
 };
@@ -63,30 +70,20 @@ function describeError(error: unknown, fallback: string): string {
   return fallback;
 }
 
-function formatAmountInput(value: number | string): string {
-  const digits = String(value).replace(/\D/g, "");
-  if (!digits) return "";
-  return Number(digits).toLocaleString("es-CL");
-}
-
-function parseAmountInput(value: string): number {
-  const digits = value.replace(/\D/g, "");
-  return digits ? Number(digits) : Number.NaN;
-}
-
 export function ClassificationEditor({
   movement,
   categories,
   dense = false,
   reviewLayout = false,
   showAmount = false,
+  currencyFormat = DEFAULT_CURRENCY_FORMAT,
   onChange,
   onCategoriesChanged,
 }: Props) {
   const es = useI18n();
   const [draftValues, setDraftValues] = useState({
     accountingDate: isoDateOnly(movement.accounting_date),
-    amount: formatAmountInput(movement.amount),
+    amount: formatMoneyValueForInput(movement.amount, currencyFormat),
     categoryId: movement.category_id,
     movementId: movement.id,
     subcategoryId: movement.subcategory_id,
@@ -110,7 +107,7 @@ export function ClassificationEditor({
     : isoDateOnly(movement.accounting_date);
   const selectedAmount = isCurrentMovement
     ? draftValues.amount
-    : formatAmountInput(movement.amount);
+    : formatMoneyValueForInput(movement.amount, currencyFormat);
 
   const activeCategory =
     categories.find((category) => category.id === selectedCategoryId) ??
@@ -216,7 +213,7 @@ export function ClassificationEditor({
   const handleAmountChange = (nextAmount: string) => {
     setDraftValues({
       accountingDate: selectedAccountingDate,
-      amount: formatAmountInput(nextAmount),
+      amount: formatMoneyDraft(nextAmount, currencyFormat),
       categoryId: selectedCategoryId,
       movementId: movement.id,
       subcategoryId: selectedSubcategoryId,
@@ -225,12 +222,19 @@ export function ClassificationEditor({
   };
 
   const handleAmountCommit = () => {
-    const parsed = parseAmountInput(selectedAmount);
+    const parsed = parseMoneyInput(selectedAmount, currencyFormat);
     if (!Number.isFinite(parsed) || parsed < 0) {
       setErrorMessage(es.editor.invalidAmount);
       return;
     }
     if (parsed === movement.amount) {
+      setDraftValues({
+        accountingDate: selectedAccountingDate,
+        amount: formatMoneyValueForInput(movement.amount, currencyFormat),
+        categoryId: selectedCategoryId,
+        movementId: movement.id,
+        subcategoryId: selectedSubcategoryId,
+      });
       return;
     }
     void updateMovementAmount({

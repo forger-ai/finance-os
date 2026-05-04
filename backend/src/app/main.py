@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.database_ext import init_app_db
-from app.routes import budgets, categories, health, imports, movements
+from app.routes import budgets, categories, health, imports, movements, settings
 
 
 def _allowed_origins() -> list[str]:
@@ -45,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(budgets.router)
     app.include_router(movements.router)
     app.include_router(imports.router)
+    app.include_router(settings.router)
 
     return app
 
