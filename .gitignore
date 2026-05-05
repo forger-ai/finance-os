@@ -22,3 +22,4 @@ frontend/*.tsbuildinfo
 # Local env
 .env
 .env.local
+.version.dev
