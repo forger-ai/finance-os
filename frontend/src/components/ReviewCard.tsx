@@ -1,11 +1,13 @@
 import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
 import CalendarTodayRounded from "@mui/icons-material/CalendarTodayRounded";
 import DashboardRounded from "@mui/icons-material/DashboardRounded";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import DoneRounded from "@mui/icons-material/DoneRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import { alpha } from "@mui/material/styles";
 import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
 import {
+  deleteMovement,
   updateMovementCategoryOnly,
   updateMovementReviewed,
   updateMovementSubcategory,
@@ -28,6 +30,7 @@ export function ReviewCard({
   onGoToDashboard,
   onCategoriesChanged,
   onMovementChange,
+  onMovementDelete,
 }: {
   categories: CategoryOption[];
   currencyFormat: CurrencyFormatRead;
@@ -37,6 +40,7 @@ export function ReviewCard({
   onGoToDashboard: () => void;
   onCategoriesChanged?: () => Promise<void> | void;
   onMovementChange: (movement: MovementRead) => void;
+  onMovementDelete: (movementId: string) => void;
 }) {
   const es = useI18n();
 
@@ -151,7 +155,7 @@ export function ReviewCard({
         />
 
         <Stack
-          direction="row"
+          direction={{ xs: "column", sm: "row" }}
           spacing={2}
           sx={{ alignItems: "center", justifyContent: "stretch" }}
         >
@@ -170,6 +174,21 @@ export function ReviewCard({
             sx={{ minWidth: 220 }}
           >
             {es.review.confirmAndContinue}
+          </Button>
+          <Button
+            fullWidth
+            color="error"
+            startIcon={<DeleteOutlineRounded />}
+            variant="outlined"
+            onClick={() => {
+              if (!window.confirm(es.review.deleteConfirm)) return;
+              void deleteMovement(movement.id)
+                .then(() => onMovementDelete(movement.id))
+                .catch((error: unknown) => console.error(error));
+            }}
+            sx={{ minWidth: 180 }}
+          >
+            {es.review.deleteButton}
           </Button>
         </Stack>
 

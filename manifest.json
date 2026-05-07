@@ -1,8 +1,16 @@
 {
   "name": "finance-os",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.17",
+      "summary": "Adds movement deletion from review.",
+      "changes": [
+        "Adds a delete action to the movement review card with confirmation before removing the movement.",
+        "Keeps the review list in sync after a movement is deleted."
+      ]
+    },
     {
       "version": "0.1.16",
       "summary": "Adds visual amount-format preferences and settings for agents.",

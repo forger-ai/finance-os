@@ -782,6 +782,7 @@ export default function App() {
                 onGoToDashboard={() => setViewMode("dashboard")}
                 onCategoriesChanged={() => reload()}
                 onMovementChange={handleMovementChange}
+                onMovementDelete={handleMovementDelete}
               />
             </Box>
           )}

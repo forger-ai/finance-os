@@ -147,6 +147,9 @@ export const es = {
     datesEyebrow: "Fechas",
     originalDescription: "Descripción original",
     confirmAndContinue: "Confirmar y seguir",
+    deleteButton: "Eliminar",
+    deleteConfirm:
+      "¿Eliminar este movimiento? Esta acción no se puede deshacer.",
     remainingLabel: (count: number) =>
       `${count} ${count === 1 ? "restante" : "restantes"}`,
     amountLabel: "Monto",

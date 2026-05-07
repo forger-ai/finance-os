@@ -157,6 +157,9 @@ export const en: Dictionary = {
     datesEyebrow: "Dates",
     originalDescription: "Original description",
     confirmAndContinue: "Confirm and continue",
+    deleteButton: "Delete",
+    deleteConfirm:
+      "Delete this movement? This action cannot be undone.",
     remainingLabel: (count: number) =>
       `${count} ${count === 1 ? "remaining" : "remaining"}`,
     amountLabel: "Amount",
