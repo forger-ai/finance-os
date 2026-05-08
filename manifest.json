@@ -1,8 +1,15 @@
 {
   "name": "finance-os",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.18",
+      "summary": "Enables Finance OS installs on Windows.",
+      "changes": [
+        "Adds Windows x64 to the catalog-supported platforms so Forger Desktop can request and download the app on Windows."
+      ]
+    },
     {
       "version": "0.1.17",
       "summary": "Adds movement deletion from review.",
@@ -174,7 +181,8 @@
     ],
     "supported_platforms": [
       "darwin_arm64",
-      "darwin_x64"
+      "darwin_x64",
+      "win32_x64"
     ],
     "release": {
       "repository": "forger-ai/finance-os",
