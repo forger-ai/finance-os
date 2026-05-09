@@ -1,8 +1,15 @@
 {
   "name": "finance-os",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.19",
+      "summary": "Declares assistant runtime metadata.",
+      "changes": [
+        "Adds explicit model and reasoning effort metadata to Finance OS assistant prompt templates."
+      ]
+    },
     {
       "version": "0.1.18",
       "summary": "Enables Finance OS installs on Windows.",
@@ -196,6 +203,8 @@
       "id": "first_run_finance_os_import",
       "title": "First run: discover categories and load movements",
       "description": "Reads initial financial files, creates starter categories, imports movements, and prepares review.",
+      "model": "gpt-5.4",
+      "reasoningEffort": "medium",
       "arguments": [
         {
           "name": "statement",
@@ -247,6 +256,8 @@
       "id": "extract_movements_from_statement",
       "title": "Load more movements",
       "description": "Reads additional financial files, preserves the current structure, and proposes missing categories when useful.",
+      "model": "gpt-5.4",
+      "reasoningEffort": "medium",
       "arguments": [
         {
           "name": "statement",
@@ -298,6 +309,8 @@
       "id": "recommend_budget",
       "title": "Recommend budget",
       "description": "Recommends category/subcategory budgets for a period using expected income and local history.",
+      "model": "gpt-5.4",
+      "reasoningEffort": "medium",
       "arguments": [
         {
           "name": "expectedIncome",
