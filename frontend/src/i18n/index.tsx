@@ -29,6 +29,20 @@ const dictionaries: Record<Locale, Dictionary> = { es, en };
 const I18nContext = createContext<Dictionary>(es);
 const LocaleContext = createContext<Locale>("es");
 
+function cloneDictionary<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => cloneDictionary(item)) as T;
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nestedValue]) => [key, cloneDictionary(nestedValue)]),
+    ) as T;
+  }
+  return value;
+}
+
+const baseSpanishDictionary = cloneDictionary(es) as Dictionary;
+
 function normalizeLocale(value: string | null | undefined): Locale {
   const normalized = (value ?? "").toLowerCase();
   return normalized === "en" || normalized.startsWith("en-") ? "en" : "es";
@@ -46,8 +60,16 @@ function browserLocale(): Locale {
   return normalizeLocale(navigator.language);
 }
 
+function initialLocale(): Locale {
+  if (typeof window === "undefined") {
+    return "es";
+  }
+  const urlLocale = new URLSearchParams(window.location.search).get("forgerLocale");
+  return urlLocale ? normalizeLocale(urlLocale) : browserLocale();
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(browserLocale);
+  const [locale, setLocale] = useState<Locale>(initialLocale);
 
   useEffect(() => {
     let active = true;
@@ -70,7 +92,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const value = useMemo(() => {
-    const dictionary = dictionaries[locale] ?? es;
+    const dictionary = locale === "es" ? baseSpanishDictionary : dictionaries[locale] ?? baseSpanishDictionary;
     Object.assign(es, dictionary);
     return dictionary;
   }, [locale]);
