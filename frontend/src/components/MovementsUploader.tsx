@@ -19,13 +19,17 @@ import { alpha } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useAiSubscription } from "@/ai/AiSubscriptionProvider";
-import { preprocessImportDocument } from "@/api/imports";
+import {
+  startMovementImportTask,
+  waitForAssistantTask,
+} from "@/api/assistant";
 import { listMovements } from "@/api/movements";
+import type { AssistantTaskRead, AssistantTaskStatus } from "@/api/types";
 import { useI18n, useLocale } from "@/i18n";
 
 type UploadPhase =
   | { kind: "idle" }
-  | { kind: "importing"; codexStatus?: ForgerCodexTaskStatus }
+  | { kind: "importing"; codexStatus?: AssistantTaskStatus }
   | {
       kind: "done";
       inserted: number;
@@ -44,52 +48,12 @@ const ACCEPTED =
 
 const CODEX_TEMPLATE_ID = "extract_movements_from_statement";
 
-function readFileBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const value = typeof reader.result === "string" ? reader.result : "";
-      resolve(value.includes(",") ? value.split(",").pop() ?? "" : value);
-    };
-    reader.onerror = () => reject(reader.error ?? new Error("read_failed"));
-    reader.readAsDataURL(file);
-  });
-}
-
 function fileKey(file: File): string {
   return `${file.name}:${file.size}:${file.lastModified}`;
 }
 
 function localizeAssistantName(text: string, assistantName: string): string {
   return text.replace(/\b(Codex|The assistant|El asistente)\b/gi, assistantName);
-}
-
-async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
-  const api = window.forgerApp;
-  if (!api) {
-    throw new Error("codex_unavailable");
-  }
-  const initial = await api.getCodexTask(runId);
-  if (
-    initial?.status === "completed" ||
-    initial?.status === "failed" ||
-    initial?.status === "canceled"
-  ) {
-    return initial;
-  }
-  return new Promise((resolve) => {
-    const unsubscribe = api.onCodexTaskUpdated((event) => {
-      if (event.task.runId !== runId) return;
-      if (
-        event.task.status === "completed" ||
-        event.task.status === "failed" ||
-        event.task.status === "canceled"
-      ) {
-        unsubscribe();
-        resolve(event.task);
-      }
-    });
-  });
 }
 
 function AssistantMarkdownResult({ text }: { text: string }) {
@@ -183,67 +147,29 @@ export function MovementsUploader({
         setPhase({ kind: "idle" });
         return;
       }
-      if (!window.forgerApp) {
-        throw new Error(es.load.codexUnavailable);
-      }
-
       const beforeCount = (await listMovements()).length;
 
       pushProgress(es.load.codexProgressStarting(files.length));
-      const preprocessedDocuments = await Promise.all(
-        files.map(async (file) =>
-          preprocessImportDocument(file).catch((error: unknown) => ({
-            filename: file.name,
-            content_type: file.type,
-            kind: "preprocess_error",
-            text: "",
-            row_count: null,
-            page_count: null,
-            warning:
-              error instanceof Error
-                ? error.message
-                : "Local preprocessing failed.",
-          })),
-        ),
-      );
-      const statementFiles = await Promise.all(
-        files.map(async (file) => ({
-          type: "file" as const,
-          name: file.name,
-          mimeType: file.type || undefined,
-          dataBase64: await readFileBase64(file),
-        })),
-      );
-
-      const started = await window.forgerApp.startCodexTask({
+      const started = await startMovementImportTask({
+        files,
         templateId,
         locale,
-        arguments: {
-          statement: statementFiles,
-          preprocessedDocuments: {
-            type: "string",
-            value: JSON.stringify(preprocessedDocuments),
-          },
-          locale: { type: "string", value: locale },
-          userNote: { type: "string", value: userNote },
-        },
+        userNote,
       });
       setPhase({ kind: "importing", codexStatus: started.status });
 
       const seenCodexProgress = new Set<string>();
-      const unsubscribe = window.forgerApp.onCodexTaskUpdated((event) => {
-        if (event.task.runId !== started.runId) return;
-        setPhase({ kind: "importing", codexStatus: event.task.status });
-        for (const entry of event.task.progressLog ?? []) {
+      const onTaskUpdate = (task: AssistantTaskRead) => {
+        setPhase({ kind: "importing", codexStatus: task.status });
+        for (const entry of task.progressLog ?? []) {
           const message = entry.trim();
           if (!message || seenCodexProgress.has(message)) continue;
           seenCodexProgress.add(message);
           pushProgress(localizeAssistantName(message, es.app.assistantName));
         }
-      });
+      };
 
-      const completed = await waitForCodexTask(started.runId);
-      unsubscribe();
+      const completed = await waitForAssistantTask(started.runId, onTaskUpdate);
       if (completed.status !== "completed") {
         throw new Error(completed.error || es.load.genericError);
       }
@@ -262,7 +188,7 @@ export function MovementsUploader({
       await onUploaded();
     } catch (err) {
       const message =
-        err instanceof Error && err.message !== "codex_unavailable"
+        err instanceof Error && err.message !== "assistant_task_timeout"
           ? err.message
           : es.load.genericError;
       setPhase({ kind: "error", message });

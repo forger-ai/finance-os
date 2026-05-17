@@ -1,8 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.22",
+      "summary": "Adds full Finance OS verification coverage.",
+      "changes": [
+        "Adds backend BDD specs with 100% line and branch coverage for Finance OS business behavior.",
+        "Keeps reusable stack runtime and test infrastructure in commons while Finance OS owns its domain specs.",
+        "Adds frontend verification for browser-only behavior, API clients, formatting, and core UI flows.",
+        "Packages shared stack runtime files from commons instead of keeping duplicate app-local copies."
+      ]
+    },
     {
       "version": "0.1.21",
       "summary": "Improves embedded locale selection.",

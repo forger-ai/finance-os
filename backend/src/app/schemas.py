@@ -252,6 +252,49 @@ class PreprocessedDocumentRead(_Base):
     warning: str | None = None
 
 
+# --------------------------------------------------------------------------- assistant
+
+
+AssistantTaskStatus = Literal[
+    "queued",
+    "running",
+    "needs_permission",
+    "completed",
+    "failed",
+    "canceled",
+]
+
+
+class AssistantStatusRead(_Base):
+    available: bool = False
+    connected: bool = False
+    codex: bool = False
+    claude: bool = False
+
+
+class AssistantTaskRead(_Base):
+    runId: str
+    appId: str
+    templateId: str
+    status: AssistantTaskStatus
+    createdAt: str
+    updatedAt: str
+    resultText: str | None = None
+    error: str | None = None
+    progressLog: list[str] = Field(default_factory=list)
+
+
+class BudgetRecommendationRequest(_Base):
+    expectedIncome: str = Field(max_length=100)
+    month: str = Field(max_length=2)
+    year: str = Field(max_length=4)
+    locale: str | None = Field(default=None, max_length=16)
+
+
+class CancelResult(_Base):
+    success: bool
+
+
 # --------------------------------------------------------------------------- generic
 
 

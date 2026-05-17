@@ -17,6 +17,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { getAssistantStatus } from "@/api/assistant";
 import { useI18n } from "@/i18n";
 
 type AiSubscriptionContextValue = {
@@ -40,8 +41,8 @@ export function AiSubscriptionProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const status = await window.forgerApp?.getAiSubscriptionStatus?.();
-      const nextConnected = Boolean(status?.connected);
+      const status = await getAssistantStatus();
+      const nextConnected = Boolean(status.available && status.connected);
       setConnected(nextConnected);
       return nextConnected;
     } catch {

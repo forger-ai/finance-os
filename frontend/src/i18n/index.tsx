@@ -69,23 +69,7 @@ function initialLocale(): Locale {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(initialLocale);
-
-  useEffect(() => {
-    let active = true;
-    void window.forgerApp
-      ?.getContext?.()
-      .then((context) => {
-        if (!active) return;
-        setLocale(normalizeLocale(context?.locale));
-      })
-      .catch(() => {
-        if (active) setLocale(browserLocale());
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const [locale] = useState<Locale>(initialLocale);
 
   useEffect(() => {
     document.documentElement.lang = locale;

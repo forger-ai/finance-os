@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,6 +31,11 @@ jobs:
       - name: Backend verify
         working-directory: backend
         run: |
+          cp ../commons/backend/database.py src/app/database.py
+          cp ../commons/backend/health.py src/app/health.py
+          cp ../commons/backend/cors.py src/app/cors.py
+          cp ../commons/backend/forger_desktop.py src/app/forger_desktop.py
+          cp ../commons/backend/mcp_runtime.py src/app/mcp_runtime.py
           uv sync
           uv run python scripts/verify.py
 
@@ -36,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -45,6 +54,7 @@ jobs:
       - name: Frontend verify + build
         working-directory: frontend
         run: |
+          cp ../commons/frontend/client.ts src/api/client.ts
           npm install
           npm run verify
           npm run build

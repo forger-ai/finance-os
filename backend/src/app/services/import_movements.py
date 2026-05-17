@@ -338,9 +338,7 @@ def _resolve_structured_classification(
         subcategory = subcategory_by_id.get(subcategory_id)
         if subcategory is None:
             raise ValueError(f"Unknown subcategory_id: {subcategory_id}")
-        category = category_by_id.get(subcategory.category_id)
-        if category is None:
-            raise ValueError("Subcategory parent category was not found.")
+        category = category_by_id[subcategory.category_id]
         return category, subcategory
 
     category_id = _string_value(item, "category_id")
@@ -374,9 +372,7 @@ def _resolve_structured_classification(
         ]
         if len(matches) == 1:
             subcategory = matches[0]
-            category = category_by_id.get(subcategory.category_id)
-            if category is None:
-                raise ValueError("Subcategory parent category was not found.")
+            category = category_by_id[subcategory.category_id]
             return category, subcategory
         if len(matches) > 1:
             raise ValueError(f"Ambiguous subcategory: {subcategory_name}")
@@ -475,6 +471,7 @@ def import_movements_structured(
                 reason=reason,
                 raw_description=raw_description,
             )
+            assert import_hash is not None
             similarity_key = _similarity_key(
                 date=raw_date,
                 amount_cents=amount_cents,
@@ -520,8 +517,7 @@ def import_movements_structured(
             session.add(movement)
             session.commit()
             session.refresh(movement)
-            if import_hash is not None:
-                known_hashes[import_hash] = movement.id
+            known_hashes[import_hash] = movement.id
             known_similar[similarity_key] = movement.id
             inserted += 1
             rows.append(

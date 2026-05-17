@@ -130,4 +130,31 @@ export type PreprocessedDocument = {
   warning: string | null;
 };
 
+export type AssistantTaskStatus =
+  | "queued"
+  | "running"
+  | "needs_permission"
+  | "completed"
+  | "failed"
+  | "canceled";
+
+export type AssistantStatusRead = {
+  available: boolean;
+  connected: boolean;
+  codex: boolean;
+  claude: boolean;
+};
+
+export type AssistantTaskRead = {
+  runId: string;
+  appId: string;
+  templateId: string;
+  status: AssistantTaskStatus;
+  createdAt: string;
+  updatedAt: string;
+  resultText?: string | null;
+  error?: string | null;
+  progressLog?: string[];
+};
+
 export type ActionResult = { ok: true };
