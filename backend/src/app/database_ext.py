@@ -8,11 +8,10 @@ without forking the shared database helper.
 from datetime import datetime
 
 from sqlalchemy import text
-from sqlalchemy.exc import OperationalError
 from sqlmodel import SQLModel
 
 from app import models as _models  # noqa: F401 - register SQLModel metadata
-from app.database import DATABASE_URL, engine, init_db
+from app.database import engine, init_db
 from app.models import generate_id, utcnow
 
 
@@ -33,9 +32,6 @@ def _movement_needs_category_migration(connection) -> bool:
 
 def _migrate_movement_schema() -> None:
     """Add movement.category_id and allow category-only classification."""
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
     with engine.begin() as conn:
         if not _movement_needs_category_migration(conn):
             return
@@ -103,9 +99,6 @@ def _normalize_movement_amounts() -> None:
     briefly stored expenses as negative values, so existing local databases are
     normalized during app DB initialization.
     """
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
     with engine.begin() as conn:
         rows = conn.execute(
             text("SELECT name FROM sqlite_master WHERE type='table' AND name='movement'")
@@ -180,9 +173,6 @@ def _ensure_budget_period(connection, *, month: int, year: int, timestamp: str) 
 
 def _migrate_legacy_budgets() -> None:
     """Copy legacy category/subcategory budget columns into period budget rows."""
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
     with engine.begin() as conn:
         category_has_budget = "budget" in _columns(conn, "category")
         subcategory_has_budget = "budget" in _columns(conn, "subcategory")
@@ -254,15 +244,10 @@ def _migrate_legacy_budgets() -> None:
                     },
                 )
 
-        try:
-            if category_has_budget:
-                conn.execute(text("ALTER TABLE category DROP COLUMN budget"))
-            if subcategory_has_budget:
-                conn.execute(text("ALTER TABLE subcategory DROP COLUMN budget"))
-        except OperationalError:
-            # Older SQLite builds may not support DROP COLUMN. The app models
-            # and API ignore legacy columns after their data is copied.
-            return
+        if category_has_budget:
+            conn.execute(text("ALTER TABLE category DROP COLUMN budget"))
+        if subcategory_has_budget:
+            conn.execute(text("ALTER TABLE subcategory DROP COLUMN budget"))
 
 
 def _repair_movement_classifications() -> None:
@@ -272,9 +257,6 @@ def _repair_movement_classifications() -> None:
     databases that were already left with ``movement.category_id`` pointing to a
     different category than ``movement.subcategory_id``.
     """
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
     with engine.begin() as conn:
         rows = conn.execute(
             text("SELECT name FROM sqlite_master WHERE type='table' AND name='movement'")
@@ -304,9 +286,6 @@ def _repair_movement_classifications() -> None:
 
 def _ensure_movement_import_metadata() -> None:
     """Add import metadata used by structured batch imports and deduplication."""
-    if not DATABASE_URL.startswith("sqlite"):
-        return
-
     with engine.begin() as conn:
         if not _table_exists(conn, "movement"):
             return

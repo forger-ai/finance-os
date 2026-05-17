@@ -17,6 +17,8 @@ services:
       - ./commons/backend/database.py:/app/src/app/database.py
       - ./commons/backend/health.py:/app/src/app/health.py
       - ./commons/backend/cors.py:/app/src/app/cors.py
+      - ./commons/backend/forger_desktop.py:/app/src/app/forger_desktop.py
+      - ./commons/backend/mcp_runtime.py:/app/src/app/mcp_runtime.py
 
   frontend:
     extends:

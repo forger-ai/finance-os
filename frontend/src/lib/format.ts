@@ -97,6 +97,9 @@ export function parseMoneyInput(
   if (!normalized) return Number.NaN;
 
   normalized = normalized
+    .split(format.symbol)
+    .join("")
+    .replace(/[^\d.,]/g, "")
     .replace(new RegExp(`\\${group}`, "g"), "")
     .replace(/\s/g, "");
 

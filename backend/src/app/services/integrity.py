@@ -24,8 +24,6 @@ def find_classification_mismatches(session: Session) -> list[ClassificationMisma
     ).all()
     mismatches: list[ClassificationMismatch] = []
     for movement in movements:
-        if movement.subcategory_id is None:
-            continue
         subcategory = session.get(Subcategory, movement.subcategory_id)
         expected_category_id = subcategory.category_id if subcategory is not None else None
         if expected_category_id != movement.category_id:

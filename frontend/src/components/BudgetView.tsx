@@ -20,6 +20,10 @@ import {
 import { alpha } from "@mui/material/styles";
 import { useAiSubscription } from "@/ai/AiSubscriptionProvider";
 import {
+  startBudgetRecommendationTask,
+  waitForAssistantTask,
+} from "@/api/assistant";
+import {
   createBudget,
   createCategoryBudget,
   createSubcategoryBudget,
@@ -29,7 +33,12 @@ import {
   updateCategoryBudgetRow,
   updateSubcategoryBudgetRow,
 } from "@/api/budgets";
-import type { BudgetRead, CurrencyFormatRead } from "@/api/types";
+import type {
+  AssistantTaskRead,
+  AssistantTaskStatus,
+  BudgetRead,
+  CurrencyFormatRead,
+} from "@/api/types";
 import type { CategoryOption } from "@/lib/derive";
 import {
   formatMoneyDraft,
@@ -38,11 +47,9 @@ import {
 } from "@/lib/format";
 import { useI18n, useLocale } from "@/i18n";
 
-const RECOMMEND_BUDGET_TEMPLATE_ID = "recommend_budget";
-
 type RecommendationPhase =
   | { kind: "idle" }
-  | { kind: "running"; codexStatus?: ForgerCodexTaskStatus }
+  | { kind: "running"; codexStatus?: AssistantTaskStatus }
   | { kind: "done"; resultText: string }
   | { kind: "error"; message: string };
 
@@ -53,34 +60,6 @@ type ProgressMessage = {
 
 function localizeAssistantName(text: string, assistantName: string): string {
   return text.replace(/\b(Codex|The assistant|El asistente)\b/gi, assistantName);
-}
-
-async function waitForCodexTask(runId: string): Promise<ForgerCodexTaskSummary> {
-  const api = window.forgerApp;
-  if (!api) {
-    throw new Error("codex_unavailable");
-  }
-  const initial = await api.getCodexTask(runId);
-  if (
-    initial?.status === "completed" ||
-    initial?.status === "failed" ||
-    initial?.status === "canceled"
-  ) {
-    return initial;
-  }
-  return new Promise((resolve) => {
-    const unsubscribe = api.onCodexTaskUpdated((event) => {
-      if (event.task.runId !== runId) return;
-      if (
-        event.task.status === "completed" ||
-        event.task.status === "failed" ||
-        event.task.status === "canceled"
-      ) {
-        unsubscribe();
-        resolve(event.task);
-      }
-    });
-  });
 }
 
 export function BudgetView({
@@ -179,39 +158,27 @@ export function BudgetView({
     if (!selectedBudget) return;
     const hasAi = await aiSubscription.requireAi();
     if (!hasAi) return;
-    if (!window.forgerApp) {
-      setRecommendationPhase({
-        kind: "error",
-        message: es.budgets.codexUnavailable,
-      });
-      return;
-    }
 
     setRecommendationPhase({ kind: "running" });
     setRecommendationProgress([]);
     pushRecommendationProgress(es.budgets.recommendationProgressStarting);
 
     try {
-      const started = await window.forgerApp.startCodexTask({
-        templateId: RECOMMEND_BUDGET_TEMPLATE_ID,
+      const started = await startBudgetRecommendationTask({
+        expectedIncome,
         locale,
-        arguments: {
-          expectedIncome: { type: "string", value: expectedIncome },
-          locale: { type: "string", value: locale },
-          month: { type: "string", value: String(selectedBudget.month) },
-          year: { type: "string", value: String(selectedBudget.year) },
-        },
+        month: String(selectedBudget.month),
+        year: String(selectedBudget.year),
       });
       setRecommendationPhase({ kind: "running", codexStatus: started.status });
 
       const seenCodexProgress = new Set<string>();
-      const unsubscribe = window.forgerApp.onCodexTaskUpdated((event) => {
-        if (event.task.runId !== started.runId) return;
+      const onTaskUpdate = (task: AssistantTaskRead) => {
         setRecommendationPhase({
           kind: "running",
-          codexStatus: event.task.status,
+          codexStatus: task.status,
         });
-        for (const entry of event.task.progressLog ?? []) {
+        for (const entry of task.progressLog ?? []) {
           const progressMessage = entry.trim();
           if (!progressMessage || seenCodexProgress.has(progressMessage)) continue;
           seenCodexProgress.add(progressMessage);
@@ -219,10 +186,9 @@ export function BudgetView({
             localizeAssistantName(progressMessage, es.app.assistantName),
           );
         }
-      });
+      };
 
-      const task = await waitForCodexTask(started.runId);
-      unsubscribe();
+      const task = await waitForAssistantTask(started.runId, onTaskUpdate);
       if (task.status !== "completed") {
         throw new Error(task.error || es.budgets.recommendationError);
       }
@@ -238,7 +204,7 @@ export function BudgetView({
       setRecommendationPhase({
         kind: "error",
         message:
-          error instanceof Error && error.message !== "codex_unavailable"
+          error instanceof Error && error.message !== "assistant_task_timeout"
             ? error.message
             : es.budgets.recommendationError,
       });

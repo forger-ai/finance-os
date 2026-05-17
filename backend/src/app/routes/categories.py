@@ -185,14 +185,7 @@ def migrate_category_movements(
         movement.updated_at = utcnow()
         session.add(movement)
 
-    try:
-        session.commit()
-    except IntegrityError as exc:
-        session.rollback()
-        raise HTTPException(
-            status_code=409,
-            detail="No se pudieron mover las subcategorías por un conflicto de nombres.",
-        ) from exc
+    session.commit()
     return ActionResult()
 
 
