@@ -43,7 +43,8 @@ type ProgressMessage = {
 };
 
 const ACCEPTED =
-  ".csv,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,.heic,application/pdf,image/*,text/csv," +
+  ".csv,.xls,.xlsx,.pdf,.png,.jpg,.jpeg,.webp,.heic,application/pdf,image/*,text/csv," +
+  "application/vnd.ms-excel," +
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 const CODEX_TEMPLATE_ID = "extract_movements_from_statement";

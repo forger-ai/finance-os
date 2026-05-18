@@ -45,11 +45,13 @@ ACCEPTED_EXTENSIONS = {
     ".pdf",
     ".png",
     ".webp",
+    ".xls",
     ".xlsx",
 }
 ACCEPTED_CONTENT_TYPES = {
     "application/csv",
     "application/pdf",
+    "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "image/heic",
     "image/jpeg",

@@ -1,6 +1,6 @@
 """Movement import services.
 
-The CSV importer remains for local CSV/XLSX uploads. Assistant-operated imports
+The CSV importer remains for local CSV/XLS/XLSX uploads. Assistant-operated imports
 should prefer the structured JSON batch path because it avoids header, quoting,
 and locale parsing ambiguity.
 

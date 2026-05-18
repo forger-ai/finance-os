@@ -170,7 +170,7 @@ export const es = {
     upload: {
       eyebrow: "Importar movimientos",
       title: "Sube un estado de cuenta o transferencia",
-      hint: "CSV, XLSX, PDF o captura (PNG/JPG). Las extracciones de PDF e imagen usan IA y aparecen como pendientes.",
+      hint: "CSV, XLS, XLSX, PDF o captura (PNG/JPG). Las extracciones de PDF e imagen usan IA y aparecen como pendientes.",
       ctaIdle: "Elegir archivo",
       ctaDrop: "Suelta el archivo",
       processing: "Procesando…",
@@ -200,7 +200,7 @@ export const es = {
     headerAction: "Cargar movimientos",
     promptTitle: "Selecciona tus archivos",
     promptHint:
-      "Puedes cargar CSV, XLSX, PDF o imágenes de cartolas. Los PDF e imágenes se analizan con el asistente en un solo lote.",
+      "Puedes cargar CSV, XLS, XLSX, PDF o imágenes de cartolas. Los PDF e imágenes se analizan con el asistente en un solo lote.",
     selectFiles: "Seleccionar archivos",
     addMore: "Agregar más",
     selectedTitle: "Archivos cargados",

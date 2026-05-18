@@ -286,11 +286,24 @@ def test_import_preprocess_document_and_local_extract_error_branches(
     )
     assert empty_xlsx.status_code == 400
 
-    unsupported = client.post(
+    monkeypatch.setattr(imports, "xls_to_csv", lambda _raw: "")
+    empty_xls = client.post(
         "/api/imports/movements-extract",
-        files={"file": ("statement.xls", b"not-xlsx", "application/vnd.ms-excel")},
+        files={"file": ("empty.xls", b"legacy workbook", "application/vnd.ms-excel")},
     )
-    assert unsupported.status_code == 415
+    assert empty_xls.status_code == 400
+
+    monkeypatch.setattr(
+        imports,
+        "xls_to_csv",
+        lambda _raw: (_ for _ in ()).throw(RuntimeError("not a workbook")),
+    )
+    invalid_xls = client.post(
+        "/api/imports/movements-extract",
+        files={"file": ("statement.xls", b"not-xls", "application/vnd.ms-excel")},
+    )
+    assert invalid_xls.status_code == 400
+    assert ".xls" in invalid_xls.json()["detail"]
 
     invalid_csv = client.post(
         "/api/imports/movements-csv",

@@ -14,6 +14,7 @@ from app.models import CategoryKind, Movement, MovementSource, Setting
 from app.services import document_preprocessor
 from app.services import import_movements as import_service
 from app.services import settings as settings_service
+from app.services import xls_to_csv as xls_service
 from app.services import xlsx_to_csv as xlsx_service
 from app.services.classification import ClassificationError, resolve_movement_classification
 from app.services.classification_memory import build_classification_memory, memory_index
@@ -34,6 +35,7 @@ from app.services.settings import (
     update_primary_currency_code,
     validate_currency_code,
 )
+from app.services.xls_to_csv import xls_to_csv
 from app.services.xlsx_to_csv import xlsx_to_csv
 from app.utils import (
     UTC,
@@ -498,7 +500,66 @@ def test_xlsx_conversion_uses_active_sheet_and_stringifies_supported_cell_types(
     ]
 
 
-def test_document_preprocessor_handles_supported_files_truncation_and_errors() -> None:
+def test_xls_conversion_uses_first_sheet_and_stringifies_supported_cell_types(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeCell:
+        def __init__(self, ctype: int, value: object) -> None:
+            self.ctype = ctype
+            self.value = value
+
+    date_serial = 46143.0
+    expected_date = xls_service.xlrd.xldate_as_datetime(date_serial, 0).isoformat()
+
+    class FakeSheet:
+        rows = [
+            [FakeCell(xls_service.xlrd.XL_CELL_TEXT, "Estado de cuenta mayo 2026")],
+            [FakeCell(xls_service.xlrd.XL_CELL_EMPTY, "")],
+            [
+                FakeCell(xls_service.xlrd.XL_CELL_TEXT, "Fecha"),
+                FakeCell(xls_service.xlrd.XL_CELL_TEXT, "Monto"),
+                FakeCell(xls_service.xlrd.XL_CELL_TEXT, "Descripcion"),
+            ],
+            [
+                FakeCell(
+                    xls_service.xlrd.XL_CELL_DATE,
+                    date_serial,
+                ),
+                FakeCell(xls_service.xlrd.XL_CELL_NUMBER, 1500.0),
+                FakeCell(xls_service.xlrd.XL_CELL_TEXT, "Panaderia"),
+            ],
+        ]
+        nrows = len(rows)
+
+        def row(self, row_index: int) -> list[FakeCell]:
+            return self.rows[row_index]
+
+    class FakeWorkbook:
+        datemode = 0
+        nsheets = 1
+
+        def sheet_by_index(self, index: int) -> FakeSheet:
+            assert index == 0
+            return FakeSheet()
+
+    monkeypatch.setattr(
+        xls_service.xlrd,
+        "open_workbook",
+        lambda **_kwargs: FakeWorkbook(),
+    )
+
+    converted = xls_to_csv(b"legacy workbook")
+    rows = list(csv.reader(io.StringIO(converted)))
+
+    assert rows == [
+        ["Fecha", "Monto", "Descripcion"],
+        [expected_date, "1500", "Panaderia"],
+    ]
+
+
+def test_document_preprocessor_handles_supported_files_truncation_and_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # CSV content is decoded as UTF-8, counted before truncation, and may be truncated.
     csv_doc = preprocess_document(
         filename="statement.csv",
@@ -529,6 +590,20 @@ def test_document_preprocessor_handles_supported_files_truncation_and_errors() -
     assert xlsx_doc.kind == "xlsx_as_csv"
     assert xlsx_doc.row_count == 1
     assert "2026-05-01,100" in xlsx_doc.text
+
+    monkeypatch.setattr(
+        document_preprocessor,
+        "xls_to_csv",
+        lambda _data: "Fecha,Monto\n2026-05-01,100\n",
+    )
+    xls_doc = preprocess_document(
+        filename="statement.xls",
+        content_type="application/vnd.ms-excel",
+        data=b"legacy workbook",
+    )
+    assert xls_doc.kind == "xls_as_csv"
+    assert xls_doc.row_count == 1
+    assert "2026-05-01,100" in xls_doc.text
 
     # PDFs with no selectable text still report page count and a warning.
     pdf_doc = preprocess_document(
@@ -735,6 +810,17 @@ def test_remaining_import_document_settings_and_parser_edges(
         lambda *_args, **_kwargs: EmptyWorkbook(),
     )
     assert xlsx_to_csv(b"anything") == ""
+
+    class EmptyXlsWorkbook:
+        datemode = 0
+        nsheets = 0
+
+    monkeypatch.setattr(
+        xls_service.xlrd,
+        "open_workbook",
+        lambda **_kwargs: EmptyXlsWorkbook(),
+    )
+    assert xls_to_csv(b"anything") == ""
 
     class TextPage:
         def extract_text(self) -> str:

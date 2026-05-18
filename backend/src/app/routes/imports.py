@@ -1,4 +1,4 @@
-"""Import endpoints for local CSV/XLSX movement loading."""
+"""Import endpoints for local CSV/XLS/XLSX movement loading."""
 
 from __future__ import annotations
 
@@ -14,16 +14,13 @@ from app.services.import_movements import (
     has_recognizable_schema,
     import_movements_from_csv,
 )
+from app.services.xls_to_csv import xls_to_csv
 from app.services.xlsx_to_csv import xlsx_to_csv
 
 router = APIRouter(prefix="/api", tags=["imports"])
 
 
 _CSV_TYPES = {"text/csv", "application/csv"}
-_XLSX_TYPES = {
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-excel",  # legacy mime some browsers send for xlsx
-}
 
 
 def _csv_import_or_reject(
@@ -37,7 +34,7 @@ def _csv_import_or_reject(
     raise HTTPException(
         status_code=422,
         detail=(
-            "No reconozco las columnas del archivo. Usa un CSV/XLSX con fecha "
+            "No reconozco las columnas del archivo. Usa un CSV/XLS/XLSX con fecha "
             "y monto, o sube un PDF/imagen para procesarlo con el asistente desde Forger."
         ),
     )
@@ -103,6 +100,12 @@ def _looks_like_xlsx(filename: str | None, content_type: str | None) -> bool:
     )
 
 
+def _looks_like_xls(filename: str | None, content_type: str | None) -> bool:
+    if filename and filename.lower().endswith(".xls"):
+        return True
+    return bool(content_type and content_type.lower() == "application/vnd.ms-excel")
+
+
 @router.post("/imports/movements-csv", response_model=ImportResult)
 async def import_movements_csv(
     file: UploadFile = File(..., description="CSV file with movement rows"),
@@ -157,7 +160,23 @@ async def import_movements_extract(
             )
         outcome = _csv_import_or_reject(session, csv_text, filename)
         return _outcome_to_schema(outcome)
+
+    if _looks_like_xls(filename, content_type):
+        try:
+            csv_text = xls_to_csv(raw)
+        except Exception as exc:  # noqa: BLE001 - xlrd error surface varies
+            raise HTTPException(
+                status_code=400,
+                detail=f"No se pudo leer el archivo .xls: {exc}",
+            ) from exc
+        if not csv_text.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="El archivo .xls está vacío o no tiene una hoja con datos.",
+            )
+        outcome = _csv_import_or_reject(session, csv_text, filename)
+        return _outcome_to_schema(outcome)
     raise HTTPException(
         status_code=415,
-        detail="Tipo de archivo no soportado por el importador local. Usa CSV/XLSX.",
+        detail="Tipo de archivo no soportado por el importador local. Usa CSV/XLS/XLSX.",
     )

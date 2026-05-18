@@ -1,6 +1,6 @@
 """Build a 'business → category[/subcategory]' memory from reviewed history.
 
-Used by Codex-assisted imports, the deterministic CSV/XLSX
+Used by Codex-assisted imports, the deterministic CSV/XLS/XLSX
 importer (default classification when the file has no classification columns),
 and the bulk-apply endpoint that backfills already-pending movements.
 
