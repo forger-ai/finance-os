@@ -231,8 +231,11 @@ def test_settings_validation_is_shared_by_api_and_mcp(client: TestClient) -> Non
 
 def test_imports_accept_recognized_csv_and_xlsx_and_reject_ambiguous_files(
     client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
     category_tree: dict[str, dict[str, Any]],
 ) -> None:
+    from app.routes import imports
+
     assert category_tree["expenses"]["id"]
     csv_text = (
         "date,amount,business,reason,source,reviewed\n"
@@ -283,6 +286,24 @@ def test_imports_accept_recognized_csv_and_xlsx_and_reject_ambiguous_files(
     )
     assert xlsx_import.status_code == 200, xlsx_import.text
     assert xlsx_import.json()["inserted"] == 1
+
+    monkeypatch.setattr(
+        imports,
+        "xls_to_csv",
+        lambda _raw: "Fecha,Monto,Descripcion\n2026-05-03,900,Farmacia\n",
+    )
+    xls_import = client.post(
+        "/api/imports/movements-extract",
+        files={
+            "file": (
+                "legacy-statement.xls",
+                b"legacy workbook",
+                "application/vnd.ms-excel",
+            )
+        },
+    )
+    assert xls_import.status_code == 200, xls_import.text
+    assert xls_import.json()["inserted"] == 1
 
     invalid_xlsx = client.post(
         "/api/imports/movements-extract",

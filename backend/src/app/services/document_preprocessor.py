@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from pypdf import PdfReader
 
+from app.services.xls_to_csv import xls_to_csv
 from app.services.xlsx_to_csv import xlsx_to_csv
 
 
@@ -62,6 +63,16 @@ def preprocess_document(
             filename=filename,
             content_type=content_type,
             kind="xlsx_as_csv",
+            text=_truncate(text, max_chars),
+            row_count=_count_csv_rows(text),
+        )
+
+    if lower_name.endswith(".xls") or lower_type == "application/vnd.ms-excel":
+        text = xls_to_csv(data)
+        return PreprocessedDocument(
+            filename=filename,
+            content_type=content_type,
+            kind="xls_as_csv",
             text=_truncate(text, max_chars),
             row_count=_count_csv_rows(text),
         )

@@ -86,7 +86,7 @@ export const en: Dictionary = {
     headerAction: "Load movements",
     promptTitle: "Select your files",
     promptHint:
-      "You can load CSV, XLSX, PDF, or statement images. PDFs and images are analyzed with the assistant in one batch.",
+      "You can load CSV, XLS, XLSX, PDF, or statement images. PDFs and images are analyzed with the assistant in one batch.",
     selectFiles: "Select files",
     addMore: "Add more",
     selectedTitle: "Loaded files",
@@ -181,7 +181,7 @@ export const en: Dictionary = {
       ...es.review.upload,
       eyebrow: "Import movements",
       title: "Upload a statement or transfer",
-      hint: "CSV, XLSX, PDF, or screenshot (PNG/JPG). PDF and image extraction uses AI and stays pending for review.",
+      hint: "CSV, XLS, XLSX, PDF, or screenshot (PNG/JPG). PDF and image extraction uses AI and stays pending for review.",
       ctaIdle: "Choose file",
       ctaDrop: "Drop the file",
       processing: "Processing...",
