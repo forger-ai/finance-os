@@ -1,8 +1,17 @@
 {
   "name": "finance-os",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.24",
+      "summary": "Adds provider-specific assistant runtime recommendations.",
+      "changes": [
+        "Declares recommended assistant models separately for Codex and Claude.",
+        "Lets Forger Desktop choose the user's default provider while keeping Finance OS task recommendations provider-aware.",
+        "Keeps per-task provider, model, and effort overrides available from the Forger Desktop prompt settings."
+      ]
+    },
     {
       "version": "0.1.23",
       "summary": "Adds legacy Excel import support.",
@@ -237,8 +246,16 @@
       "id": "first_run_finance_os_import",
       "title": "First run: discover categories and load movements",
       "description": "Reads initial financial files, creates starter categories, imports movements, and prepares review.",
-      "model": "gpt-5.4",
-      "reasoningEffort": "medium",
+      "runtimeRecommendations": {
+        "codex": {
+          "model": "gpt-5.4",
+          "reasoningEffort": "medium"
+        },
+        "claude": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      },
       "arguments": [
         {
           "name": "statement",
@@ -292,8 +309,16 @@
       "id": "extract_movements_from_statement",
       "title": "Load more movements",
       "description": "Reads additional financial files, preserves the current structure, and proposes missing categories when useful.",
-      "model": "gpt-5.4",
-      "reasoningEffort": "medium",
+      "runtimeRecommendations": {
+        "codex": {
+          "model": "gpt-5.4",
+          "reasoningEffort": "medium"
+        },
+        "claude": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      },
       "arguments": [
         {
           "name": "statement",
@@ -347,8 +372,16 @@
       "id": "recommend_budget",
       "title": "Recommend budget",
       "description": "Recommends category/subcategory budgets for a period using expected income and local history.",
-      "model": "gpt-5.4",
-      "reasoningEffort": "medium",
+      "runtimeRecommendations": {
+        "codex": {
+          "model": "gpt-5.4",
+          "reasoningEffort": "medium"
+        },
+        "claude": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      },
       "arguments": [
         {
           "name": "expectedIncome",
