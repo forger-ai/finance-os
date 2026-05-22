@@ -1,8 +1,17 @@
 {
   "name": "finance-os",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "changelog": [
+    {
+      "version": "0.1.25",
+      "summary": "Adds local network sharing support and mobile navigation.",
+      "changes": [
+        "Declares Finance OS support for Forger Desktop local network sharing.",
+        "Adds a mobile hamburger menu so navigation remains usable from a phone.",
+        "Keeps local network access behind Forger Desktop's secure sharing flow instead of exposing app services directly."
+      ]
+    },
     {
       "version": "0.1.24",
       "summary": "Adds provider-specific assistant runtime recommendations.",
@@ -227,6 +236,11 @@
         "id": "ai_assisted_imports",
         "title": "Usar el asistente para leer documentos",
         "description": "Procesa PDFs e imagenes mediante el asistente provisto por Forger, sin API key propia dentro de la app."
+      },
+      {
+        "id": "local_network_share",
+        "title": "Abrir Finance OS desde tu red local",
+        "description": "Permite activar desde Forger un link temporal para abrir la app desde otro dispositivo en la misma red."
       }
     ],
     "supported_platforms": [
