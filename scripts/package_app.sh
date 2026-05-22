@@ -49,6 +49,7 @@ install -m 0644 "$ROOT_DIR/commons/backend/forger_desktop.py" "$STAGE_DIR/$APP_N
 install -m 0644 "$ROOT_DIR/commons/backend/mcp_runtime.py" "$STAGE_DIR/$APP_NAME/backend/src/app/mcp_runtime.py"
 install -m 0644 "$ROOT_DIR/commons/backend/remote_tunnel.py" "$STAGE_DIR/$APP_NAME/backend/src/app/remote_tunnel.py"
 install -m 0644 "$ROOT_DIR/commons/frontend/client.ts" "$STAGE_DIR/$APP_NAME/frontend/src/api/client.ts"
+install -m 0644 "$ROOT_DIR/commons/frontend/forgerBrand.ts" "$STAGE_DIR/$APP_NAME/frontend/src/api/forgerBrand.ts"
 install -m 0644 "$ROOT_DIR/commons/frontend/remoteTunnel.ts" "$STAGE_DIR/$APP_NAME/frontend/src/api/remoteTunnel.ts"
 
 # Asegura que data exista pero sin bases locales ni backups.
