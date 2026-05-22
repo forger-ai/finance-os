@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
 import CategoryRounded from "@mui/icons-material/CategoryRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import DashboardRounded from "@mui/icons-material/DashboardRounded";
 import FileUploadRounded from "@mui/icons-material/FileUploadRounded";
+import MenuRounded from "@mui/icons-material/MenuRounded";
 import PaidRounded from "@mui/icons-material/PaidRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
 import TableRowsRounded from "@mui/icons-material/TableRowsRounded";
@@ -38,6 +39,15 @@ export type ViewMode =
 const drawerWidth = 232;
 const appBarHeight = 64;
 
+const mainNavItems = [
+  { view: "load", icon: FileUploadRounded, label: "load" },
+  { view: "dashboard", icon: DashboardRounded, label: "dashboard" },
+  { view: "movements", icon: TableRowsRounded, label: "movements" },
+  { view: "review", icon: ViewCarouselRounded, label: "review" },
+  { view: "budgets", icon: PaidRounded, label: "budgets" },
+  { view: "categories", icon: CategoryRounded, label: "categories" },
+] as const;
+
 export function AppShell({
   children,
   viewMode,
@@ -52,10 +62,52 @@ export function AppShell({
   onViewChange: (nextView: ViewMode) => void;
 }) {
   const es = useI18n();
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const reviewTooltip =
     pendingReviewCount > 0
       ? es.topActions.reviewPendingTooltip(pendingReviewCount)
       : es.topActions.reviewCompleteTooltip;
+  const handleViewChange = (nextView: ViewMode) => {
+    setMobileDrawerOpen(false);
+    onViewChange(nextView);
+  };
+  const drawerContent = (
+    <Stack sx={{ height: "100%" }}>
+      <List sx={{ px: 1.5, py: 1.5 }}>
+        {mainNavItems.map(({ view, icon: Icon, label }, index) => (
+          <ListItemButton
+            key={view}
+            selected={viewMode === view}
+            sx={{ borderRadius: 1.5, mt: index === 0 ? 0 : 0.5 }}
+            onClick={() => handleViewChange(view)}
+          >
+            <ListItemIcon sx={{ minWidth: 38 }}>
+              <Icon color={viewMode === view ? "primary" : "inherit"} />
+            </ListItemIcon>
+            <ListItemText primary={es.nav[label]} />
+          </ListItemButton>
+        ))}
+      </List>
+
+      <Box sx={{ flexGrow: 1 }} />
+
+      <List sx={{ px: 1.5, pb: 1.5 }}>
+        <ListItemButton
+          selected={viewMode === "settings"}
+          sx={{ borderRadius: 1.5 }}
+          onClick={() => handleViewChange("settings")}
+        >
+          <ListItemIcon sx={{ minWidth: 38 }}>
+            <SettingsRounded
+              color={viewMode === "settings" ? "primary" : "inherit"}
+            />
+          </ListItemIcon>
+          <ListItemText primary={es.nav.settings} />
+        </ListItemButton>
+      </List>
+    </Stack>
+  );
+
   return (
     <Box
       sx={{
@@ -84,17 +136,29 @@ export function AppShell({
             justifyContent: "space-between",
           }}
         >
-          <Typography
-            sx={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.04em" }}
-          >
-            {es.app.title}
-          </Typography>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center", minWidth: 0 }}>
+            <IconButton
+              aria-label="Abrir menú"
+              color="primary"
+              edge="start"
+              onClick={() => setMobileDrawerOpen(true)}
+              sx={{ display: { xs: "inline-flex", md: "none" } }}
+            >
+              <MenuRounded />
+            </IconButton>
+            <Typography
+              noWrap
+              sx={{ fontSize: 22, fontWeight: 800, letterSpacing: 0 }}
+            >
+              {es.app.title}
+            </Typography>
+          </Stack>
           <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
             <Tooltip title={es.topActions.loadTooltip}>
               <IconButton
                 aria-label={es.topActions.loadTooltip}
                 color="primary"
-                onClick={() => onViewChange("load")}
+                onClick={() => handleViewChange("load")}
               >
                 <FileUploadRounded />
               </IconButton>
@@ -112,7 +176,7 @@ export function AppShell({
               <IconButton
                 aria-label={reviewTooltip}
                 color={pendingReviewCount > 0 ? "warning" : "success"}
-                onClick={() => onViewChange("review")}
+                onClick={() => handleViewChange("review")}
               >
                 {pendingReviewCount > 0 ? (
                   <Badge
@@ -132,6 +196,23 @@ export function AppShell({
       </AppBar>
 
       <Drawer
+        open={mobileDrawerOpen}
+        onClose={() => setMobileDrawerOpen(false)}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+            pt: `${appBarHeight}px`,
+          },
+        }}
+        ModalProps={{ keepMounted: true }}
+        variant="temporary"
+      >
+        {drawerContent}
+      </Drawer>
+
+      <Drawer
         open
         sx={{
           width: drawerWidth,
@@ -148,99 +229,7 @@ export function AppShell({
         }}
         variant="permanent"
       >
-        <Stack sx={{ height: "100%" }}>
-          <List sx={{ px: 1.5, py: 1.5 }}>
-            <ListItemButton
-              selected={viewMode === "load"}
-              sx={{ borderRadius: 1.5 }}
-              onClick={() => onViewChange("load")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <FileUploadRounded
-                  color={viewMode === "load" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.load} />
-            </ListItemButton>
-            <ListItemButton
-              selected={viewMode === "dashboard"}
-              sx={{ borderRadius: 1.5, mt: 0.5 }}
-              onClick={() => onViewChange("dashboard")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <DashboardRounded
-                  color={viewMode === "dashboard" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.dashboard} />
-            </ListItemButton>
-            <ListItemButton
-              selected={viewMode === "movements"}
-              sx={{ borderRadius: 1.5, mt: 0.5 }}
-              onClick={() => onViewChange("movements")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <TableRowsRounded
-                  color={viewMode === "movements" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.movements} />
-            </ListItemButton>
-            <ListItemButton
-              selected={viewMode === "review"}
-              sx={{ borderRadius: 1.5, mt: 0.5 }}
-              onClick={() => onViewChange("review")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <ViewCarouselRounded
-                  color={viewMode === "review" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.review} />
-            </ListItemButton>
-            <ListItemButton
-              selected={viewMode === "budgets"}
-              sx={{ borderRadius: 1.5, mt: 0.5 }}
-              onClick={() => onViewChange("budgets")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <PaidRounded
-                  color={viewMode === "budgets" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.budgets} />
-            </ListItemButton>
-            <ListItemButton
-              selected={viewMode === "categories"}
-              sx={{ borderRadius: 1.5, mt: 0.5 }}
-              onClick={() => onViewChange("categories")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <CategoryRounded
-                  color={viewMode === "categories" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.categories} />
-            </ListItemButton>
-          </List>
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          <List sx={{ px: 1.5, pb: 1.5 }}>
-            <ListItemButton
-              selected={viewMode === "settings"}
-              sx={{ borderRadius: 1.5 }}
-              onClick={() => onViewChange("settings")}
-            >
-              <ListItemIcon sx={{ minWidth: 38 }}>
-                <SettingsRounded
-                  color={viewMode === "settings" ? "primary" : "inherit"}
-                />
-              </ListItemIcon>
-              <ListItemText primary={es.nav.settings} />
-            </ListItemButton>
-          </List>
-        </Stack>
+        {drawerContent}
       </Drawer>
 
       <Box
