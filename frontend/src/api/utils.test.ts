@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { isForgerRemoteTunnel, remoteFetch } from "./remoteTunnel";
 import { ApiError, isoDateOnly, request } from "./utils";
+
+vi.mock("./remoteTunnel", () => ({
+  isForgerRemoteTunnel: vi.fn(() => false),
+  remoteFetch: vi.fn(),
+}));
 
 const jsonResponse = (body: unknown, init: ResponseInit = {}) =>
   new Response(JSON.stringify(body), {
@@ -13,6 +19,8 @@ const jsonResponse = (body: unknown, init: ResponseInit = {}) =>
 describe("request", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn());
+    vi.mocked(isForgerRemoteTunnel).mockReturnValue(false);
+    vi.mocked(remoteFetch).mockReset();
   });
 
   afterEach(() => {
@@ -65,6 +73,19 @@ describe("request", () => {
     });
   });
 
+  it("formats object API details instead of showing object placeholders", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ detail: { error: "Invalid upload", field: "file" } }, { status: 422 }),
+    );
+
+    await expect(request("/api/imports/movements-extract")).rejects.toMatchObject({
+      name: "ApiError",
+      status: 422,
+      message: JSON.stringify({ error: "Invalid upload", field: "file" }),
+      body: { detail: { error: "Invalid upload", field: "file" } },
+    });
+  });
+
   it("falls back to HTTP status for non-JSON errors", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response("offline", { status: 503, headers: { "Content-Type": "text/plain" } }),
@@ -94,6 +115,59 @@ describe("request", () => {
     await expect(request("/api/settings")).rejects.toEqual(
       expect.objectContaining(new ApiError(0, "Network error", cause)),
     );
+  });
+
+  it("sends empty and multipart bodies through remote RPC mode", async () => {
+    vi.mocked(isForgerRemoteTunnel).mockReturnValue(true);
+    vi.mocked(remoteFetch)
+      .mockResolvedValueOnce(jsonResponse({ ok: true }))
+      .mockResolvedValueOnce(jsonResponse({ uploaded: true }));
+    const signal = new AbortController().signal;
+
+    await expect(request("/api/settings", { signal })).resolves.toEqual({ ok: true });
+    expect(remoteFetch).toHaveBeenNthCalledWith(1, {
+      method: "GET",
+      path: "/api/settings",
+      headers: { accept: "application/json" },
+      bodyBase64: null,
+    }, signal);
+
+    const formData = new FormData();
+    formData.append("file", new Blob(["a,b\n1,2\n"]), "movements.csv");
+    await expect(
+      request("/api/imports/movements-extract", { method: "POST", body: formData }),
+    ).resolves.toEqual({ uploaded: true });
+
+    const remoteRequest = vi.mocked(remoteFetch).mock.calls[1][0];
+    expect(remoteRequest.method).toBe("POST");
+    expect(remoteRequest.path).toBe("/api/imports/movements-extract");
+    expect(remoteRequest.headers["content-type"]).toEqual(expect.any(String));
+    expect(remoteRequest.bodyBase64).toEqual(expect.any(String));
+  });
+
+  it("serializes JSON bodies and readable detail arrays through remote RPC mode", async () => {
+    vi.mocked(isForgerRemoteTunnel).mockReturnValue(true);
+    vi.mocked(remoteFetch)
+      .mockResolvedValueOnce(jsonResponse({ ok: true }))
+      .mockResolvedValueOnce(jsonResponse({ detail: [1, true, null] }, { status: 422 }));
+
+    await expect(
+      request("/api/movements", { method: "PATCH", body: { amount: 10 } }),
+    ).resolves.toEqual({ ok: true });
+
+    expect(remoteFetch).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      method: "PATCH",
+      path: "/api/movements",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      bodyBase64: "eyJhbW91bnQiOjEwfQ==",
+    }), undefined);
+    await expect(request("/api/movements")).rejects.toMatchObject({
+      status: 422,
+      message: "1; true",
+    });
   });
 });
 

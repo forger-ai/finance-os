@@ -524,7 +524,7 @@ export default function App() {
     return data.movements.length === 0;
   }, [data]);
   const hasCategories = (data?.categories.length ?? 0) > 0;
-  const onboarding = firstRunEmpty && !onboardingSkipped;
+  const onboarding = firstRunEmpty && (!onboardingSkipped || !hasCategories);
   const selectedPreset =
     selectedPresetId && hasCategories
       ? CATEGORY_PRESETS[selectedPresetId]

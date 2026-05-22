@@ -20,7 +20,7 @@ export default defineConfig({
         statements: 100,
       },
       include: ["src/api/**/*.ts", "src/lib/**/*.ts"],
-      exclude: ["src/api/types.ts"],
+      exclude: ["src/api/types.ts", "src/api/client.ts", "src/api/remoteTunnel.ts"],
     },
   },
 });

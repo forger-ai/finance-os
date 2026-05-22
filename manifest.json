@@ -1,8 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
+  "remoteTunnel": true,
   "changelog": [
+    {
+      "version": "0.1.26",
+      "summary": "Adds secure remote tunnel support.",
+      "changes": [
+        "Declares Finance OS support for Forger remote tunnels.",
+        "Uses the shared remote tunnel client so local requests stay normal and remote requests travel through encrypted RPC.",
+        "Protects internal stack routes while allowing normal Finance OS workflows through the remote tunnel."
+      ]
+    },
     {
       "version": "0.1.25",
       "summary": "Adds local network sharing support and mobile navigation.",
@@ -241,6 +251,11 @@
         "id": "local_network_share",
         "title": "Abrir Finance OS desde tu red local",
         "description": "Permite activar desde Forger un link temporal para abrir la app desde otro dispositivo en la misma red."
+      },
+      {
+        "id": "remote_tunnel_share",
+        "title": "Abrir Finance OS por internet",
+        "description": "Permite activar desde Forger Cloud una sesión temporal para abrir la app desde otro dispositivo por internet."
       }
     ],
     "supported_platforms": [

@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from app.cors import allowed_origins
 from app.database_ext import init_app_db
 from app.health import router as health_router
+from app.remote_tunnel import RemoteTunnelGuardMiddleware
 from app.routes import assistant, budgets, categories, imports, movements, settings
 
 
@@ -26,6 +27,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(RemoteTunnelGuardMiddleware)
 
     @app.on_event("startup")
     def _startup() -> None:

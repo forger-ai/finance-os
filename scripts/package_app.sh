@@ -47,7 +47,9 @@ install -m 0644 "$ROOT_DIR/commons/backend/health.py" "$STAGE_DIR/$APP_NAME/back
 install -m 0644 "$ROOT_DIR/commons/backend/cors.py" "$STAGE_DIR/$APP_NAME/backend/src/app/cors.py"
 install -m 0644 "$ROOT_DIR/commons/backend/forger_desktop.py" "$STAGE_DIR/$APP_NAME/backend/src/app/forger_desktop.py"
 install -m 0644 "$ROOT_DIR/commons/backend/mcp_runtime.py" "$STAGE_DIR/$APP_NAME/backend/src/app/mcp_runtime.py"
+install -m 0644 "$ROOT_DIR/commons/backend/remote_tunnel.py" "$STAGE_DIR/$APP_NAME/backend/src/app/remote_tunnel.py"
 install -m 0644 "$ROOT_DIR/commons/frontend/client.ts" "$STAGE_DIR/$APP_NAME/frontend/src/api/client.ts"
+install -m 0644 "$ROOT_DIR/commons/frontend/remoteTunnel.ts" "$STAGE_DIR/$APP_NAME/frontend/src/api/remoteTunnel.ts"
 
 # Asegura que data exista pero sin bases locales ni backups.
 mkdir -p "$STAGE_DIR/$APP_NAME/backend/data"

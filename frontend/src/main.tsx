@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AiSubscriptionProvider } from "@/ai/AiSubscriptionProvider";
+import { mountForgerRemoteFab } from "@/api/remoteTunnel";
 import { I18nProvider } from "@/i18n";
 import { appTheme } from "@/theme/theme";
 import App from "./App";
@@ -11,6 +12,8 @@ const container = document.getElementById("root");
 if (!container) {
   throw new Error("Root container not found");
 }
+
+mountForgerRemoteFab();
 
 ReactDOM.createRoot(container).render(
   <React.StrictMode>

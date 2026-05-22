@@ -73,6 +73,7 @@ omit = [
   "src/app/forger_desktop.py",
   "src/app/health.py",
   "src/app/mcp_runtime.py",
+  "src/app/remote_tunnel.py",
 ]
 
 [tool.coverage.report]

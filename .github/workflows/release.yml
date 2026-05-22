@@ -87,6 +87,7 @@ jobs:
           cp ../commons/backend/cors.py src/app/cors.py
           cp ../commons/backend/forger_desktop.py src/app/forger_desktop.py
           cp ../commons/backend/mcp_runtime.py src/app/mcp_runtime.py
+          cp ../commons/backend/remote_tunnel.py src/app/remote_tunnel.py
           uv sync
           uv run python scripts/verify.py
 
@@ -99,6 +100,7 @@ jobs:
         working-directory: frontend
         run: |
           cp ../commons/frontend/client.ts src/api/client.ts
+          cp ../commons/frontend/remoteTunnel.ts src/api/remoteTunnel.ts
           npm install
           npm run verify
           npm run build
