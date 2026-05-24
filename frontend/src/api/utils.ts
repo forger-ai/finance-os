@@ -33,7 +33,7 @@ export async function request<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers);
 
-  let body: BodyInit | undefined;
+  let body: string | FormData | undefined;
   if (options.body !== undefined && options.body !== null) {
     if (
       typeof FormData !== "undefined" &&
@@ -101,18 +101,59 @@ type SerializedRemoteBody = {
   contentType?: string;
 };
 
-async function serializeBodyForRemote(body: BodyInit | undefined): Promise<SerializedRemoteBody> {
+async function serializeBodyForRemote(body: string | FormData | undefined): Promise<SerializedRemoteBody> {
   if (body === undefined) {
     return { bodyBase64: null };
   }
   if (typeof body === "string") {
     return { bodyBase64: btoa(unescape(encodeURIComponent(body))) };
   }
-  const response = new Response(body);
+  return serializeFormDataForRemote(body);
+}
+
+async function serializeFormDataForRemote(formData: FormData): Promise<SerializedRemoteBody> {
+  const boundary = `----forger-${Math.random().toString(36).slice(2)}`;
+  const encoder = new TextEncoder();
+  const chunks: Uint8Array[] = [];
+
+  for (const [name, value] of formData.entries()) {
+    chunks.push(encoder.encode(`--${boundary}\r\n`));
+    if (typeof Blob !== "undefined" && value instanceof Blob) {
+      const filename = "name" in value && typeof value.name === "string" ? value.name : "blob";
+      const contentType = value.type || "application/octet-stream";
+      chunks.push(encoder.encode(
+        `Content-Disposition: form-data; name="${escapeHeaderValue(name)}"; filename="${escapeHeaderValue(filename)}"\r\n` +
+        `Content-Type: ${contentType}\r\n\r\n`,
+      ));
+      chunks.push(new Uint8Array(await new Response(value).arrayBuffer()));
+      chunks.push(encoder.encode("\r\n"));
+    } else {
+      chunks.push(encoder.encode(
+        `Content-Disposition: form-data; name="${escapeHeaderValue(name)}"\r\n\r\n${String(value)}\r\n`,
+      ));
+    }
+  }
+
+  chunks.push(encoder.encode(`--${boundary}--\r\n`));
   return {
-    bodyBase64: bytesToBase64(new Uint8Array(await response.arrayBuffer())),
-    contentType: response.headers.get("Content-Type") ?? undefined,
+    bodyBase64: bytesToBase64(concatBytes(chunks)),
+    contentType: `multipart/form-data; boundary=${boundary}`,
   };
+}
+
+function escapeHeaderValue(value: string): string {
+  return value.replace(/["\r\n]/g, "_");
+}
+
+function concatBytes(chunks: Uint8Array[]): Uint8Array {
+  const totalLength = chunks.reduce((total, chunk) => total + chunk.byteLength, 0);
+  const bytes = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 function errorMessageFromPayload(payload: unknown, fallback: string): string {

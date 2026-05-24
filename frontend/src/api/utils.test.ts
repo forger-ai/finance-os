@@ -133,6 +133,9 @@ describe("request", () => {
     }, signal);
 
     const formData = new FormData();
+    formData.append("source", "manual import");
+    formData.append("unsafe\"\r\nname", "escaped");
+    formData.append("raw", new Blob(["raw-bytes"]));
     formData.append("file", new Blob(["a,b\n1,2\n"]), "movements.csv");
     await expect(
       request("/api/imports/movements-extract", { method: "POST", body: formData }),
@@ -143,13 +146,18 @@ describe("request", () => {
     expect(remoteRequest.path).toBe("/api/imports/movements-extract");
     expect(remoteRequest.headers["content-type"]).toEqual(expect.any(String));
     expect(remoteRequest.bodyBase64).toEqual(expect.any(String));
+    const multipart = atob(remoteRequest.bodyBase64 ?? "");
+    expect(multipart).toContain("manual import");
+    expect(multipart).toContain('name="unsafe___name"');
+    expect(multipart).toContain("Content-Type: application/octet-stream");
   });
 
   it("serializes JSON bodies and readable detail arrays through remote RPC mode", async () => {
     vi.mocked(isForgerRemoteTunnel).mockReturnValue(true);
     vi.mocked(remoteFetch)
       .mockResolvedValueOnce(jsonResponse({ ok: true }))
-      .mockResolvedValueOnce(jsonResponse({ detail: [1, true, null] }, { status: 422 }));
+      .mockResolvedValueOnce(jsonResponse({ detail: [1, true, null] }, { status: 422 }))
+      .mockResolvedValueOnce(jsonResponse({ detail: [] }, { status: 400 }));
 
     await expect(
       request("/api/movements", { method: "PATCH", body: { amount: 10 } }),
@@ -167,6 +175,10 @@ describe("request", () => {
     await expect(request("/api/movements")).rejects.toMatchObject({
       status: 422,
       message: "1; true",
+    });
+    await expect(request("/api/movements")).rejects.toMatchObject({
+      status: 400,
+      message: "HTTP 400",
     });
   });
 });

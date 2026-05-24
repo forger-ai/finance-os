@@ -16,7 +16,7 @@ import {
   ClassificationEditor,
   type CategoryOption,
   type MovementRow,
-} from "./ClassificationEditor";
+} from "@/features/movements/ClassificationEditor";
 import type { PreviousClassificationEntry } from "@/lib/derive";
 import type { CurrencyFormatRead, MovementRead } from "@/api/types";
 import { useI18n } from "@/i18n";
