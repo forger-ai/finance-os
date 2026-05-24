@@ -1,9 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "remoteTunnel": true,
   "changelog": [
+    {
+      "version": "0.1.29",
+      "summary": "Uses the shared Forger locale context bridge.",
+      "changes": [
+        "Loads the app locale from Forger Desktop through the signed HTTP context bridge.",
+        "Uses the shared stack locale helpers while preserving Finance OS Spanish copy compatibility.",
+        "Keeps browser and local development locale selection independent when Forger Desktop is not available."
+      ]
+    },
     {
       "version": "0.1.28",
       "summary": "Modularizes the app structure and shared runtime fallbacks.",
