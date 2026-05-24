@@ -77,6 +77,41 @@ def test_assistant_routes_cover_unavailable_not_found_and_error_branches(
     assert client.post("/api/assistant/tasks/run-1/cancel").status_code == 502
 
 
+def test_forger_context_route_returns_fallback_and_desktop_locale(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app import forger_context
+
+    fallback = client.get("/api/forger/context")
+    assert fallback.status_code == 200
+    assert fallback.json() == {
+        "locale": "es",
+        "rawLocale": None,
+        "source": "fallback",
+    }
+
+    monkeypatch.setattr(
+        forger_context,
+        "get_app_context",
+        lambda: {"locale": "en", "rawLocale": "en-US"},
+    )
+    desktop = client.get("/api/forger/context")
+    assert desktop.status_code == 200
+    assert desktop.json() == {
+        "locale": "en",
+        "rawLocale": "en-US",
+        "source": "desktop",
+    }
+
+    monkeypatch.setattr(forger_context, "get_app_context", lambda: "bad")
+    assert forger_context.runtime_context() == {
+        "locale": "es",
+        "rawLocale": None,
+        "source": "fallback",
+    }
+
+
 def test_assistant_movement_import_validates_inputs_and_preprocesses_documents(
     client: TestClient,
     monkeypatch: pytest.MonkeyPatch,

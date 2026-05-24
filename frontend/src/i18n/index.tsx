@@ -7,10 +7,10 @@ import {
   useMemo,
   useState,
 } from "react";
+import { initialLocale, loadForgerRuntimeContext, type Locale } from "@/api/locale";
 import { en } from "./en";
 import { es } from "./es";
 
-export type Locale = "es" | "en";
 type Widen<T> = T extends (...args: infer Args) => infer Return
   ? (...args: Args) => Return
   : T extends string
@@ -43,37 +43,24 @@ function cloneDictionary<T>(value: T): T {
 
 const baseSpanishDictionary = cloneDictionary(es) as Dictionary;
 
-function normalizeLocale(value: string | null | undefined): Locale {
-  const normalized = (value ?? "").toLowerCase();
-  return normalized === "en" || normalized.startsWith("en-") ? "en" : "es";
-}
-
-function browserLocale(): Locale {
-  if (typeof navigator === "undefined") {
-    return "es";
-  }
-  for (const language of navigator.languages ?? []) {
-    if (normalizeLocale(language) === "en") {
-      return "en";
-    }
-  }
-  return normalizeLocale(navigator.language);
-}
-
-function initialLocale(): Locale {
-  if (typeof window === "undefined") {
-    return "es";
-  }
-  const urlLocale = new URLSearchParams(window.location.search).get("forgerLocale");
-  return urlLocale ? normalizeLocale(urlLocale) : browserLocale();
-}
-
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale] = useState<Locale>(initialLocale);
+  const [locale, setLocale] = useState<Locale>(() => initialLocale());
 
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadForgerRuntimeContext(controller.signal)
+      .then((context) => {
+        if (context.source === "desktop") {
+          setLocale(context.locale);
+        }
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
 
   const value = useMemo(() => {
     const dictionary = locale === "es" ? baseSpanishDictionary : dictionaries[locale] ?? baseSpanishDictionary;

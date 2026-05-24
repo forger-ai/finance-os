@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.cors import allowed_origins
 from app.database_ext import init_app_db
+from app.forger_context import router as forger_context_router
 from app.health import router as health_router
 from app.remote_tunnel import RemoteTunnelGuardMiddleware
 from app.routes import assistant, budgets, categories, imports, movements, settings
@@ -38,6 +39,9 @@ def create_app() -> FastAPI:
         return JSONResponse(status_code=400, content={"detail": str(exc)})
 
     app.include_router(health_router)
+    app.include_router(
+        forger_context_router,  # pragma: no cover - imported before coverage
+    )
     app.include_router(assistant.router)
     app.include_router(categories.router)
     app.include_router(budgets.router)
