@@ -1,9 +1,18 @@
 {
   "name": "finance-os",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "remoteTunnel": true,
   "changelog": [
+    {
+      "version": "0.1.28",
+      "summary": "Modularizes the app structure and shared runtime fallbacks.",
+      "changes": [
+        "Moves frontend screens into feature-focused modules while preserving the visible Finance OS workflows.",
+        "Adds app-local shared stack fallbacks for packaged and non-Docker runtime paths.",
+        "Improves remote multipart upload serialization for secure remote sessions."
+      ]
+    },
     {
       "version": "0.1.27",
       "summary": "Uses the Forger logo in the remote session control.",
