@@ -209,6 +209,8 @@ jobs:
               'required_node_version': source_manifest.get('stack', {}).get('frontend', {}).get('node_version'),
               'supported_platforms': catalog.get('supported_platforms', []),
               'capabilities': catalog.get('capabilities', []),
+              'local_network_share': source_manifest.get('localNetworkShare') is True,
+              'remote_tunnel': source_manifest.get('remoteTunnel') is True,
               'tools': source_manifest.get('tools', {}),
               'agents': source_manifest.get('agents', []),
               'prompt_templates': source_manifest.get('promptTemplates', []),

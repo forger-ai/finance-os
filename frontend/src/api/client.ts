@@ -1,7 +1,8 @@
 export * from "./utils";
-export { request as get } from "./utils";
 import { request } from "./utils";
 
+export const get = <T>(path: string, signal?: AbortSignal) =>
+  request<T>(path, { signal });
 export const post = <T>(path: string, body: unknown, signal?: AbortSignal) =>
   request<T>(path, { method: "POST", body, signal });
 export const patch = <T>(path: string, body: unknown, signal?: AbortSignal) =>
