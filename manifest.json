@@ -1,10 +1,19 @@
 {
   "name": "finance-os",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "description": "Personal finance app: FastAPI backend, Vite + React frontend, SQLite storage. Designed to run locally via Docker Compose or Forger.",
   "localNetworkShare": true,
   "remoteTunnel": true,
   "changelog": [
+    {
+      "version": "0.1.30",
+      "summary": "Publishes local and remote access support flags.",
+      "changes": [
+        "Declares Finance OS support for local network sharing in the app manifest.",
+        "Publishes local network and remote tunnel support flags to the Forger catalog release payload.",
+        "Updates the shared stack commons reference used by Finance OS packaging."
+      ]
+    },
     {
       "version": "0.1.29",
       "summary": "Uses the shared Forger locale context bridge.",
